@@ -4,24 +4,56 @@ import { View,
          StyleSheet,
          TouchableOpacity,
          TouchableWithoutFeedback,
-         Modal,
+         Alert,
+         Animated,
+         LayoutAnimation,
+         Dimensions,
+         ActivityIndicator,
          SafeAreaView } from 'react-native'
-import ChangeModeSwitch from './ChangeModeSwitch'
 import { Constants, Location, Camera, Permissions } from 'expo'
 
-import LandmarkDetailsModal from './LandmarkDetailsModal'
 import vision from "react-cloud-vision-api"
 
+import ChangeModeSwitch from './ChangeModeSwitch'
+import LandmarkDetailsModal from './LandmarkDetailsModal'
 
-vision.init({ auth: 'AIzaSyA361CU6vtQeV7TySOxc0VO_pBhIxaRt6M'})
+import { purple, white } from '../utils/colors'
+import { fixDetectedLandmarks, fixLandmarkDetails } from '../utils/helpers'
 
+import { CLOUD_VISION_API_KEY } from '../utils/CloudVisionAPI'
+import { FS_CLIENT_ID, FS_CLIENT_PW } from '../utils/FoursquareAPI'
+
+// Initalize the FourSquare API
+var foursquare = require('react-foursquare')({
+  clientID: 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH',
+  clientSecret: '1LL20JSTUVM1BM4G30E0KMN1QBKU3ZDVLMO1OP5QIPWCQEOK'
+})
+
+// Initalize the CloudVision API
+vision.init({ auth: CLOUD_VISION_API_KEY })
+
+const ScreenWidth = Dimensions.get('window')
+
+
+// ===========================================================================
+//  BEGINNING OF THE CLASS
+// ===========================================================================
 class DetectionMode extends Component {
   state = {
     hasCameraPermission: null,
     errorMessage: null,
-    location: 'Nothing Now',
-    modalVisible: true,
-    // image: '',
+    loading: false,
+    locations: [],
+    locationDetails: null,
+    detected: true,
+    modalVisible: false,
+    modalButtonAnimations: {
+      diameter: new Animated.Value(200),
+      height: 200,
+      radius: new Animated.Value(100),
+      top: '30%',
+      opacity: 1,
+    }
   }
 
   // ========================================================================
@@ -32,11 +64,35 @@ class DetectionMode extends Component {
     this.setState({ hasCameraPermission: status === 'granted' });
   }
 
+  //
+
+
+
+
   // ========================================================================
   // Detect Landmark using Google's Cloud Vision api
   // ========================================================================
   detectLandmark = async () => {
     console.log("take photo");
+    // LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+    // this.setState({
+    //   modalButtonAnimations: {
+    //     diameter: 2,
+    //     radius: 1,
+    //     top: '6%',
+    //     opacity: 0,
+    //   },
+    // })
+
+    this.setState({
+      loading: true,
+      detected: false,
+      // modalButtonAnimations: {
+      //   diameter: 200,
+      //   radius: 100,
+      //   top: '30%',
+      // },
+    })
 
     let photo = null;
     if (this.camera) {
@@ -46,11 +102,6 @@ class DetectionMode extends Component {
       });
     }
 
-
-    // SETTING THE IMAGE URI TO CHECK QUUALITY
-    // this.setState({ image: photo.uri })
-
-
     const req = new vision.Request({
       image: new vision.Image({
         base64: photo.base64,
@@ -59,34 +110,245 @@ class DetectionMode extends Component {
         new vision.Feature('LANDMARK_DETECTION', 5),
       ]
     })
-    vision.annotate(req).then((res) => {
-      // handling response
 
-      if (res.responses[0].landmarkAnnotations !== undefined){
-        console.log(res.responses)
-        console.log(res.responses[0].landmarkAnnotations)
-        console.log(res.responses[0].landmarkAnnotations[0])
-        this.setState({ location : res.responses[0].landmarkAnnotations[0].description})
+    vision.annotate(req).then((res) => {
+
+      // handling response
+      let fixedRes = fixDetectedLandmarks(res)
+      // console.log(this.state);
+      // console.log(fixedRes);
+      if (fixedRes !== null ) {
+
+
+        // this.setState({ location : fixedRes[0].description })
+
+        // var locations = []
+        // this.setState((prevState) => ({
+        //   locations: prevState.locations.push(location)
+        // }))
+
+        this.setState({
+          locations: fixedRes,
+          loading: false,
+          detected: true,
+        })
+
+        // var CustomLayoutSpring = {
+        //   duration: 1000,
+        //   create: {
+        //     type: LayoutAnimation.Types.linear,
+        //     property: LayoutAnimation.Properties.opacity,
+        //   },
+        //   update: {
+        //     type: LayoutAnimation.Types.curveEaseInEaseOut,
+        //   },
+        // };
+        //
+        // LayoutAnimation.configureNext(CustomLayoutSpring);
+        // this.setState({
+        //   modalButtonAnimations: {
+        //     diameter: 74,
+        //     radius: 37,
+        //     top: '5%',
+        //   },
+        // })
+
+        // fixedRes.forEach( location => {
+        //   console.log(location);
+        //   foursquare.venues.getVenues({
+        //     ll: ''+location.latitude+','+location.longitude,
+        //     query: location.description,
+        //     radius: 100,
+        //     limit: 1
+        //   }).then(res => {
+        //     let fixedDetail = fixLandmarkDetails(res)
+        //
+        //     if (fixedDetail ) {
+        //       this.setState((prevState) => ({
+        //         locations: prevState.locations.push(fixedDetail),
+        //       }))
+        //       console.log("This is the name of the object added");
+        //       console.log(" ");
+        //       console.log(fixedDetail.name)
+        //       console.log(" ");
+        //     } else {
+        //       console.log("Location not Found")
+        //     }
+        //
+        //   })
+        // })
+
+        // for (const location of fixedRes){
+        //   await getLocationDetails(location)
+        // }
+        // this.getLocationDetails(fixedRes)
+
+
+        // this.setState({
+        //   loading: false,
+        //   detected: true,
+        //   modalVisible: true,
+        // })
+
+        // this.setState({ locations })
+        // console.log("NEW STATEE");
+        // console.log(this.state);
+
       } else {
-        this.setState({ location : "Sorry, this landmark's not famous enough :("})
+        Alert.alert("Sorry. This particular landmark couldn't be detected.")
+        this.setState({
+          location : [],
+          loading: false,
+        })
       }
-      // res.responses[0].
     }, (e) => {
       console.log('Error: ', e)
     })
 
-    console.log(req);
 
-    console.log(photo);
+
+
+  // foursquare.venues.getVenues({
+  //   ll: '51.500782,-0.12462600000000001',
+  //   query: 'house of parliament',
+  //   radius: 100,
+  //   limit: 1
+  // }).then(res => {
+  //   let fixedDetail = fixLandmarkDetails(res)
+  //
+  //   if (fixedDetail !== null ) {
+  //     // locations.push(location)
+  //     console.log(fixedDetail)
+  //   } else {
+  //     console.log("Location not Found")
+  //   }
+  // })
+    // console.log(photo);
   }
+
+  // ========================================================================
+  //  GET DETAILS FOR LANDMARKS
+  // ========================================================================
+
+  // getLocationDetails = async (data) => {
+  //   for (const location of data){
+  //     console.log(location);
+  //     await foursquare.venues.getVenues({
+  //       ll: ''+location.latitude+','+location.longitude,
+  //       query: 'Houses of parliament',
+  //       radius: 100,
+  //       limit: 1
+  //     }).then(async (res) => {
+  //       let fixedDetail = fixLandmarkDetails(res)
+  //
+  //       if (fixedDetail ) {
+  //         this.setState((prevState) => ({
+  //           locations: prevState.locations.push(fixedDetail),
+  //         }))
+  //         console.log("This is the name of the object added");
+  //         console.log(" ");
+  //         console.log(fixedDetail.name)
+  //         console.log(" ");
+  //       } else {
+  //         console.log("Location not Found")
+  //       }
+  //     })
+  //   }
+  //   console.log("done");
+  //   this.setState({
+  //     loading: false,
+  //     detected: true,
+  //     modalVisible: true,
+  //   })
+  // }
+
+
+
 
   // ========================================================================
   //  MODAL CONTROLS
   // ========================================================================
 
-  closeModal = () => this.setState({ modalVisible: false })
+  closeModal = () => {
+    // LayoutAnimation.spring();
+    this.setState({ modalVisible: false })
+  }
 
-  openModal = () => this.setState({ modalVisible: true })
+  openModal = () => {
+    // var CustomLayoutSpring = {
+    //   duration: 400,
+    //   create: {
+    //     type: LayoutAnimation.Types.easeIneaseOut,
+    //     property: LayoutAnimation.Properties.scaleXY,
+    //     springDamping: 0.7,
+    //   },
+    //   update: {
+    //     type: LayoutAnimation.Types.easeIneaseOut,
+    //     springDamping: 0.7,
+    //   },
+    // };
+    // LayoutAnimation.configureNext(CustomLayoutSpring);
+    this.setState({ modalVisible: true })
+  }
+
+  componentDidMount() {
+    // console.log(LayoutAnimation);
+    // LayoutAnimation.linear();
+    this.setState({})
+
+    this.animateModalButtonAppear()
+
+  }
+
+  animateModalButtonAppear = () => {
+    const { diameter, radius, top } = this.state.modalButtonAnimations
+
+    // Animated.timing(                  // Animate over time
+    //   this.state.fadeAnim,            // The animated value to drive
+    //   {
+    //     toValue: 1,                   // Animate to opacity: 1 (opaque)
+    //     duration: 10000,              // Make it take a while
+    //   }
+    // ).start();
+    Animated.parallel([
+      // after decay, in parallel:
+      // Animated.spring(top, {
+      //   toValue: '10%',
+      //   duration: 2000,
+      //    // return to start
+      // }),
+      Animated.timing(diameter, {
+        // and twirl
+        toValue: 74,
+        duration: 2000,
+      }),
+      Animated.timing(radius, {
+        // and twirl
+        toValue: 37,
+        duration: 2000,
+      }),
+    ]).start();
+
+
+    // Animated.sequence([
+    //   // decay, then spring to start and twirl
+    //   Animated.decay(position, {
+    //     // coast to a stop
+    //     velocity: {x: gestureState.vx, y: gestureState.vy}, // velocity from gesture release
+    //     deceleration: 0.997,
+    //   }),
+    //   Animated.parallel([
+    //     // after decay, in parallel:
+    //     Animated.spring(position, {
+    //       toValue: {x: 0, y: 0}, // return to start
+    //     }),
+    //     Animated.timing(twirl, {
+    //       // and twirl
+    //       toValue: 360,
+    //     }),
+    //   ]),
+    // ]).start(); // start the sequence group
+  }
 
   render(){
     const { navigation } = this.props
@@ -119,16 +381,45 @@ class DetectionMode extends Component {
             ref={(ref) => { this.camera = ref }}
             type={Camera.Constants.Type.back}
           >
-            <TouchableWithoutFeedback onPress={this.closeModal}>
+            {/*<TouchableWithoutFeedback onPress={this.closeModal}>
+            */}
               <View style={styles.container}>
+                <ActivityIndicator
+                  size="large"
+                  color={white}
+                  animating={this.state.loading}
+                />
+
+              <Animated.View
+
+                style={this.state.detected
+                        ? [styles.modalButton, {
+                            width: this.state.modalButtonAnimations.diameter,
+                            height: this.state.modalButtonAnimations.diameter,
+                            borderRadius: this.state.modalButtonAnimations.radius,
+                            top: this.state.modalButtonAnimations.top,
+                            opacity: this.state.modalButtonAnimations.opacity,
+                          }]
+                        : {}}
+              >
+                  <TouchableOpacity
+                    style={{flex: 1}}
+                    onPress={this.state.modalVisible ? this.closeModal : this.openModal}
+                    >
+                  </TouchableOpacity>
+
+                </Animated.View>
 
                 <LandmarkDetailsModal
                   visible={this.state.modalVisible}
-                  />
+                  locations={this.state.locations}
+                />
 
-                <View style={styles.textBack}>
-                  <Text style={styles.text}>{this.state.location}</Text>
-                </View>
+                {/*
+                  <View style={styles.textBack}>
+                    <Text style={styles.text}>{this.state.location}</Text>
+                  </View>
+                */}
 
 
                 <TouchableOpacity onPress={this.detectLandmark}>
@@ -144,7 +435,9 @@ class DetectionMode extends Component {
                   />
 
               </View>
-            </TouchableWithoutFeedback>
+
+            {/*</TouchableWithoutFeedback>
+            */}
           </Camera>
         </View>
       )
@@ -199,5 +492,16 @@ const styles = StyleSheet.create({
   },
   modalView: {
     flex: 0.5,
+  },
+  modalButton: {
+    position: 'absolute',
+    // height: this.state.modalButtonAnimations.height,
+    // width: this.state.modalButtonAnimations.height,
+    // borderRadius: this.state.modalButtonAnimations.radius,
+    borderWidth: 2,
+    borderColor: white,
+    // top: this.state.modalButtonAnimations.top,
+    zIndex: 2,
+    backgroundColor: purple,
   }
 })

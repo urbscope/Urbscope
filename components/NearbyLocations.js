@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, LayoutAnimation } from 'react-native'
 import ChangeModeSwitch from './ChangeModeSwitch'
 import ExplorationModeSwitch from './ExplorationModeSwitch'
 import { Constants, Location, Camera, Permissions } from 'expo'
@@ -16,8 +16,14 @@ class NearbyLocations extends Component {
     location: null,
   }
 
+  componentDidMount() {
+    LayoutAnimation.linear()
+    this.setState({});
+  }
+
   async componentDidMount() {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
+
     this.setState({ hasCameraPermission: status === 'granted' });
 
     this.getLocationAsync()
