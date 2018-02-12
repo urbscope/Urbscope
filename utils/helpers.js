@@ -3,9 +3,10 @@
 export const fixDetectedLandmarks = (res) => {
 
   let landmarks = res.responses[0].landmarkAnnotations
+  let result = []
 
   if (landmarks !== undefined) {
-    return landmarks.map( lm => {
+    result = landmarks.map( lm => {
       return {
         mid: lm.mid,
         description: lm.description,
@@ -13,16 +14,24 @@ export const fixDetectedLandmarks = (res) => {
         longitude: lm.locations[0].latLng.longitude,
       }
     })
+
+    return result.reduce( (resultLocations, current) => {
+      if (current.description !== undefined){
+        let exists = resultLocations.find( x => x.description === current.description)
+        if (!exists){
+          return resultLocations.concat(current)
+        }
+      }
+      return resultLocations
+    }, [])
+
   } else {
     return null
   }
 }
 
-export const fixLandmarkDetails = (res) => {
+export const fixLandmarkDetailsFS = (res) => {
   let landmark = res.response.venues[0]
-
-  // console.log(res)
-  // console.log(landmark)
 
   if (landmark !== undefined) {
     return landmark
@@ -41,5 +50,15 @@ export const fixLandmarkDetails = (res) => {
   } else {
     return null
   }
+}
 
+export const fixLandmarkDetail = (res) => {
+
+  let detail = null
+  
+  if (res.itemListElement.length > 0 ){
+    detail = res.itemListElement[0].result
+  }
+
+  return detail
 }

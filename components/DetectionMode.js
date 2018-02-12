@@ -16,23 +16,28 @@ import vision from "react-cloud-vision-api"
 
 import ChangeModeSwitch from './ChangeModeSwitch'
 import LandmarkDetailsModal from './LandmarkDetailsModal'
+import Loading from './Loading'
 
-import { purple, white } from '../utils/colors'
+import { purple, white, red } from '../utils/colors'
 import { fixDetectedLandmarks, fixLandmarkDetails } from '../utils/helpers'
 
-import { CLOUD_VISION_API_KEY } from '../utils/CloudVisionAPI'
-import { FS_CLIENT_ID, FS_CLIENT_PW } from '../utils/FoursquareAPI'
+
+import { GOOGLE_API } from '../utils/keysAPI'
+// import { FS_CLIENT_ID, FS_CLIENT_PW } from '../utils/FoursquareAPI'
 
 // Initalize the FourSquare API
-var foursquare = require('react-foursquare')({
-  clientID: 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH',
-  clientSecret: '1LL20JSTUVM1BM4G30E0KMN1QBKU3ZDVLMO1OP5QIPWCQEOK'
-})
+
+// var foursquare = require('react-foursquare')({
+//   clientID: 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH',
+//   clientSecret: '1LL20JSTUVM1BM4G30E0KMN1QBKU3ZDVLMO1OP5QIPWCQEOK'
+// })
 
 // Initalize the CloudVision API
-vision.init({ auth: CLOUD_VISION_API_KEY })
+vision.init({ auth: GOOGLE_API })
 
-const ScreenWidth = Dimensions.get('window')
+// Get Screen Dimensions
+const ScreenHeight = Dimensions.get('window').height
+const ScreenWidth  = Dimensions.get('window').width
 
 
 // ===========================================================================
@@ -44,15 +49,16 @@ class DetectionMode extends Component {
     errorMessage: null,
     loading: false,
     locations: [],
-    locationDetails: null,
-    detected: true,
+    detected: false,
     modalVisible: false,
     modalButtonAnimations: {
-      diameter: new Animated.Value(200),
+      diameter: new Animated.Value(360),
       height: 200,
-      radius: new Animated.Value(100),
-      top: '30%',
-      opacity: 1,
+      radius: new Animated.Value(180),
+      top: new Animated.Value( ScreenHeight - (ScreenHeight/2) - 200),
+      opacity: new Animated.Value(0),
+      fontOpacity: new Animated.Value(0),
+      fontSize: new Animated.Value(1),
     }
   }
 
@@ -64,8 +70,6 @@ class DetectionMode extends Component {
     this.setState({ hasCameraPermission: status === 'granted' });
   }
 
-  //
-
 
 
 
@@ -74,24 +78,12 @@ class DetectionMode extends Component {
   // ========================================================================
   detectLandmark = async () => {
     console.log("take photo");
-    // LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
-    // this.setState({
-    //   modalButtonAnimations: {
-    //     diameter: 2,
-    //     radius: 1,
-    //     top: '6%',
-    //     opacity: 0,
-    //   },
-    // })
+    this.animateModalButtonDisappear()
+
 
     this.setState({
       loading: true,
       detected: false,
-      // modalButtonAnimations: {
-      //   diameter: 200,
-      //   radius: 100,
-      //   top: '30%',
-      // },
     })
 
     let photo = null;
@@ -115,17 +107,9 @@ class DetectionMode extends Component {
 
       // handling response
       let fixedRes = fixDetectedLandmarks(res)
-      // console.log(this.state);
-      // console.log(fixedRes);
+
       if (fixedRes !== null ) {
 
-
-        // this.setState({ location : fixedRes[0].description })
-
-        // var locations = []
-        // this.setState((prevState) => ({
-        //   locations: prevState.locations.push(location)
-        // }))
 
         this.setState({
           locations: fixedRes,
@@ -133,66 +117,8 @@ class DetectionMode extends Component {
           detected: true,
         })
 
-        // var CustomLayoutSpring = {
-        //   duration: 1000,
-        //   create: {
-        //     type: LayoutAnimation.Types.linear,
-        //     property: LayoutAnimation.Properties.opacity,
-        //   },
-        //   update: {
-        //     type: LayoutAnimation.Types.curveEaseInEaseOut,
-        //   },
-        // };
-        //
-        // LayoutAnimation.configureNext(CustomLayoutSpring);
-        // this.setState({
-        //   modalButtonAnimations: {
-        //     diameter: 74,
-        //     radius: 37,
-        //     top: '5%',
-        //   },
-        // })
+        this.animateModalButtonAppear()
 
-        // fixedRes.forEach( location => {
-        //   console.log(location);
-        //   foursquare.venues.getVenues({
-        //     ll: ''+location.latitude+','+location.longitude,
-        //     query: location.description,
-        //     radius: 100,
-        //     limit: 1
-        //   }).then(res => {
-        //     let fixedDetail = fixLandmarkDetails(res)
-        //
-        //     if (fixedDetail ) {
-        //       this.setState((prevState) => ({
-        //         locations: prevState.locations.push(fixedDetail),
-        //       }))
-        //       console.log("This is the name of the object added");
-        //       console.log(" ");
-        //       console.log(fixedDetail.name)
-        //       console.log(" ");
-        //     } else {
-        //       console.log("Location not Found")
-        //     }
-        //
-        //   })
-        // })
-
-        // for (const location of fixedRes){
-        //   await getLocationDetails(location)
-        // }
-        // this.getLocationDetails(fixedRes)
-
-
-        // this.setState({
-        //   loading: false,
-        //   detected: true,
-        //   modalVisible: true,
-        // })
-
-        // this.setState({ locations })
-        // console.log("NEW STATEE");
-        // console.log(this.state);
 
       } else {
         Alert.alert("Sorry. This particular landmark couldn't be detected.")
@@ -205,62 +131,7 @@ class DetectionMode extends Component {
       console.log('Error: ', e)
     })
 
-
-
-
-  // foursquare.venues.getVenues({
-  //   ll: '51.500782,-0.12462600000000001',
-  //   query: 'house of parliament',
-  //   radius: 100,
-  //   limit: 1
-  // }).then(res => {
-  //   let fixedDetail = fixLandmarkDetails(res)
-  //
-  //   if (fixedDetail !== null ) {
-  //     // locations.push(location)
-  //     console.log(fixedDetail)
-  //   } else {
-  //     console.log("Location not Found")
-  //   }
-  // })
-    // console.log(photo);
   }
-
-  // ========================================================================
-  //  GET DETAILS FOR LANDMARKS
-  // ========================================================================
-
-  // getLocationDetails = async (data) => {
-  //   for (const location of data){
-  //     console.log(location);
-  //     await foursquare.venues.getVenues({
-  //       ll: ''+location.latitude+','+location.longitude,
-  //       query: 'Houses of parliament',
-  //       radius: 100,
-  //       limit: 1
-  //     }).then(async (res) => {
-  //       let fixedDetail = fixLandmarkDetails(res)
-  //
-  //       if (fixedDetail ) {
-  //         this.setState((prevState) => ({
-  //           locations: prevState.locations.push(fixedDetail),
-  //         }))
-  //         console.log("This is the name of the object added");
-  //         console.log(" ");
-  //         console.log(fixedDetail.name)
-  //         console.log(" ");
-  //       } else {
-  //         console.log("Location not Found")
-  //       }
-  //     })
-  //   }
-  //   console.log("done");
-  //   this.setState({
-  //     loading: false,
-  //     detected: true,
-  //     modalVisible: true,
-  //   })
-  // }
 
 
 
@@ -288,86 +159,117 @@ class DetectionMode extends Component {
     //   },
     // };
     // LayoutAnimation.configureNext(CustomLayoutSpring);
-    this.setState({ modalVisible: true })
+    if (this.state.detected){
+      this.setState({ modalVisible: true })
+    }
   }
 
   componentDidMount() {
     // console.log(LayoutAnimation);
-    // LayoutAnimation.linear();
+    LayoutAnimation.linear();
     this.setState({})
 
-    this.animateModalButtonAppear()
+    // this.animateModalButtonAppear()
 
   }
 
   animateModalButtonAppear = () => {
-    const { diameter, radius, top } = this.state.modalButtonAnimations
+    const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
 
-    // Animated.timing(                  // Animate over time
-    //   this.state.fadeAnim,            // The animated value to drive
-    //   {
-    //     toValue: 1,                   // Animate to opacity: 1 (opaque)
-    //     duration: 10000,              // Make it take a while
-    //   }
-    // ).start();
-    Animated.parallel([
-      // after decay, in parallel:
-      // Animated.spring(top, {
-      //   toValue: '10%',
-      //   duration: 2000,
-      //    // return to start
-      // }),
-      Animated.timing(diameter, {
-        // and twirl
-        toValue: 74,
-        duration: 2000,
+    Animated.stagger(200, [
+      Animated.parallel([
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 400,
+        }),
+        Animated.timing(diameter, {
+          toValue: 86,
+          duration: 600,
+        }),
+        Animated.timing(radius, {
+          toValue: 43,
+          duration: 600,
+        }),
+        Animated.timing(fontSize, {
+          toValue: 40,
+          duration: 600,
+        }),
+      ]),
+      Animated.spring(top, {
+        toValue: (50),
+        friction: 4,
+        tension: 50,
       }),
-      Animated.timing(radius, {
-        // and twirl
-        toValue: 37,
-        duration: 2000,
-      }),
+      Animated.sequence([
+        Animated.timing(fontOpacity, {
+          toValue: 1,
+          duration: 600,
+        }),
+        Animated.timing(fontSize, {
+          toValue: 80,
+          duration: 800,
+        }),
+        Animated.timing(fontSize, {
+          toValue: 40,
+          duration: 400,
+        }),
+      ])
+    ]).start();
+
+  }
+
+  animateModalButtonDisappear = () => {
+    const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
+
+    Animated.stagger(500, [
+      Animated.parallel([
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 200,
+        }),
+        Animated.timing(diameter, {
+          toValue: 0,
+          duration: 500,
+        }),
+        Animated.timing(radius, {
+          toValue: 0,
+          duration: 500,
+        }),
+        Animated.timing(fontSize, {
+          toValue: 0,
+          duration: 500,
+        }),
+        Animated.timing(fontOpacity, {
+          toValue: 0,
+          duration: 500,
+        }),
+      ]),
+      Animated.parallel([
+        Animated.timing(diameter, {
+          toValue: 360,
+          duration: 1,
+        }),
+        Animated.timing(radius, {
+          toValue: 180,
+          duration: 1,
+        }),
+        Animated.timing(top, {
+          toValue: ScreenHeight - (ScreenHeight/2) - 200,
+          duration: 1,
+        }),
+      ])
     ]).start();
 
 
-    // Animated.sequence([
-    //   // decay, then spring to start and twirl
-    //   Animated.decay(position, {
-    //     // coast to a stop
-    //     velocity: {x: gestureState.vx, y: gestureState.vy}, // velocity from gesture release
-    //     deceleration: 0.997,
-    //   }),
-    //   Animated.parallel([
-    //     // after decay, in parallel:
-    //     Animated.spring(position, {
-    //       toValue: {x: 0, y: 0}, // return to start
-    //     }),
-    //     Animated.timing(twirl, {
-    //       // and twirl
-    //       toValue: 360,
-    //     }),
-    //   ]),
-    // ]).start(); // start the sequence group
   }
 
   render(){
+
     const { navigation } = this.props
 
-    const { hasCameraPermission } = this.state
+    const { hasCameraPermission, locations } = this.state
 
-
-    // if (this.state.image !== '') {
-    //   console.log("goes into IMage View");
-    //   return(
-    //     <View style={{ flex: 1 }}>
-    //       <Image
-    //         style={{flex: 1}}
-    //         source={{uri: this.state.image}}
-    //         />
-    //     </View>
-    //   )
-    // }
-
+    const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
 
     if (hasCameraPermission === null) {
      return <View />;
@@ -384,28 +286,27 @@ class DetectionMode extends Component {
             {/*<TouchableWithoutFeedback onPress={this.closeModal}>
             */}
               <View style={styles.container}>
-                <ActivityIndicator
-                  size="large"
-                  color={white}
-                  animating={this.state.loading}
-                />
+                <Loading loading={this.state.loading} />
 
-              <Animated.View
+                <Animated.View
 
-                style={this.state.detected
-                        ? [styles.modalButton, {
-                            width: this.state.modalButtonAnimations.diameter,
-                            height: this.state.modalButtonAnimations.diameter,
-                            borderRadius: this.state.modalButtonAnimations.radius,
-                            top: this.state.modalButtonAnimations.top,
-                            opacity: this.state.modalButtonAnimations.opacity,
-                          }]
-                        : {}}
-              >
+                  style={/*this.state.detected
+                          ?*/ [styles.modalButton, {
+                              width: diameter,
+                              height: diameter,
+                              borderRadius: radius,
+                              top,
+                              opacity,
+                            }]
+                          /*: {}*/}
+                >
                   <TouchableOpacity
-                    style={{flex: 1}}
+                    style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
                     onPress={this.state.modalVisible ? this.closeModal : this.openModal}
-                    >
+                  >
+                    <Animated.Text style={[styles.modalButtonText, { fontSize, opacity: fontOpacity }]}>
+                      {locations.length}
+                    </Animated.Text>
                   </TouchableOpacity>
 
                 </Animated.View>
@@ -498,10 +399,16 @@ const styles = StyleSheet.create({
     // height: this.state.modalButtonAnimations.height,
     // width: this.state.modalButtonAnimations.height,
     // borderRadius: this.state.modalButtonAnimations.radius,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: white,
     // top: this.state.modalButtonAnimations.top,
     zIndex: 2,
-    backgroundColor: purple,
+    backgroundColor: red,
+  },
+  modalButtonText: {
+    fontFamily: 'AppleSDGothicNeo-Thin',
+    // fontSize: 40,
+    marginTop: 5,
+    color: white
   }
 })

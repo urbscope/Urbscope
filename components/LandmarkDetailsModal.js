@@ -4,63 +4,136 @@ import { View,
          StyleSheet,
          TouchableOpacity,
          ScrollView,
+         LayoutAnimation,
+         Animated,
          Dimensions,
          Modal } from 'react-native'
 
-import { purple, white } from '../utils/colors'
+import { purple, white, modalBackground } from '../utils/colors'
 
-const { width } = Dimensions.get('window');
+import LandmarkDetails from './LandmarkDetails'
+
+// import LandmarkDetails from './LandmarkDetails'
+// import LandmarkDetailsModal from './LandmarkDetailsModal'
+
+const ScreenHeight = Dimensions.get('window').height
+const ScreenWidth  = Dimensions.get('window').width
 
 class LandmarkDetailsModal extends Component {
 
-  // In ScrollView
-  // snapToInterval={width - 60}
-  // snapToAlignment={"center"}
+  state = {
+    height: new Animated.Value(0),
+    width: new Animated.Value(0),
+    opacity: new Animated.Value(0),
+  }
+
+  modalAppear = () => {
+    const { height, width, opacity } = this.state
+
+    // Animated.sequence([
+      Animated.stagger(200, [
+        Animated.timing(width, {
+          toValue: 2,
+          duration: 300,
+        }),
+        Animated.timing(height, {
+          toValue: (ScreenHeight * 7)/10,
+          duration: 450,
+        }),
+        Animated.spring(width, {
+          toValue: (ScreenWidth * 9)/10,
+          friction: 4,
+          tension: 50,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 400,
+        }),
+      ]).start()
+    // ])
+
+    LayoutAnimation.linear();
+    this.setState({ displayComponents : true })
+  }
+
+  modalDisappear = () => {
+    const { height, width, opacity } = this.state
+
+    // LayoutAnimation.linear();
+    this.setState({ displayComponents : false })
+
+    Animated.stagger(300, [
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 400,
+      }),
+      Animated.timing(width, {
+        toValue: 0,
+        duration: 400,
+      }),
+      Animated.spring(height, {
+        toValue: 0,
+        friction: 20,
+        tension: 60,
+      }),
+    ]).start();
+  }
+  componentWillReceiveProps(nextProps) {
+
+    if (nextProps.visible === true){
+      this.modalAppear()
+      console.log("I will be ", this.props.visible);
+    } else {
+      this.modalDisappear()
+      console.log("I will be  ", this.props.visible);
+    }
+  }
+
+  componentDidMount () {
+  }
 
   render(){
     console.log(this.props);
     let locations = this.props.locations
+    const { height, width, opacity } = this.state
 
     if (locations.length === 0 ) {
-      locations = [{description: "There was a problem with loading that!"}]
+      locations = [{description: 'problem'}]
     }
 
     // if (this.props.visible && locations.length !== 0 ) {
-    if (this.props.visible ) {
+    // if (this.props.visible ) {
       return(
-        <View style={styles.container}>
+        <Animated.View style={[styles.container, {height, width}]}>
 
-          <ScrollView
-            ref={(scrollView) => { this.scrollView = scrollView}}
-            horizontal= {true}
-            decelerationRate={0}
-            showsHorizontalScrollIndicator={false}
-            style={styles.scroll}
-          >
+          <Animated.ScrollView
+              ref={(scrollView) => { this.scrollView = scrollView}}
+              horizontal= {true}
+              decelerationRate={0}
+              showsHorizontalScrollIndicator={false}
+              style={[styles.scroll, {opacity}]}
+            >
 
-            {locations.map(item => (
-              <View style={locations.length === 1
-                            ? styles.childViewSingle
-                            : styles.childView}
-                    key={item.description}
-              >
-                <Text>{item.description}</Text>
-              </View>
-            ))}
+              {locations.map(item => (
+                <LandmarkDetails
+                  key={item.description}
+                  location={item}
+                  multiple={locations.length === 1 ? false : true}
+                  />
+              ))}
 
-            <View style={{width: 20}} />
+              <View style={{width: 20}} />
 
-          </ScrollView>
+            </Animated.ScrollView>
 
-
-        </View>
+        </Animated.View>
       )
 
-    } else {
-      return (
-        <View/>
-      )
-    }
+    // } else {
+    //   return (
+    //     <View/>
+    //   )
+    // }
   }
 }
 
@@ -70,67 +143,18 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     position: 'absolute',
-    height: '86%',
-    width: '90%',
-    top: '10%',
+    // height: '80%',
+    // width: '90%',
+    top: 93,
     zIndex: 1,
-    borderColor: white,
-    borderWidth: 2,
+    // borderColor: white,
+    // borderWidth: 2,
     borderRadius: 10,
-    backgroundColor: 'rgba(255, 255, 255, 1)',
-    // paddingVertical: 10,
+    backgroundColor: modalBackground,
   },
   scroll: {
-    // flexGrow: 1,
-    // flexDirection: 'row',
-    // backgroundColor: 'gray',
     backgroundColor: 'transparent',
     paddingHorizontal: 20,
     paddingVertical: 20,
-  },
-  commonView: {
-    padding: 20,
-
-  },
-  childView: {
-    marginTop: 100,
-    backgroundColor: '#eee',
-    width: width - 100,
-    // margin: 10,
-    marginRight: 20,
-    borderColor: '#ddd',
-    shadowColor: '#444',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    padding: 15,
-  },
-  childViewSingle: {
-    marginTop: 100,
-    backgroundColor: '#eee',
-    width: width - 80,
-    // margin: 10,
-    // marginRight: 1,
-    borderColor: '#ddd',
-    shadowColor: '#444',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    padding: 15,
-  },
-  view2: {
-    marginTop: 100,
-    backgroundColor: 'red',
-    width: width - 80,
-    margin: 10,
-    height: 200,
-    borderRadius: 10,
-    //paddingHorizontal : 30
   },
 })

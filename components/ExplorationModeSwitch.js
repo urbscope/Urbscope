@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { NavigationActions } from 'react-navigation'
-import { purple, white } from '../utils/colors'
+import { buttonActive, buttonActiveOutline, activeTint, inactiveTint } from '../utils/colors'
 
 class ExplorationModeSwitch extends Component {
 
@@ -11,7 +11,7 @@ class ExplorationModeSwitch extends Component {
       index: 0,
       actions: [ NavigationActions.navigate({ routeName: 'Recommendations'}) ]
     }))
-    
+
     console.log("go to Recommendations");
   }
 
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     width: '50%',
     borderRadius: 2,
     borderWidth: 1,
-    borderColor: purple,
+    borderColor: buttonActive,
   },
   squareButton2: {
     justifyContent: 'center',
@@ -97,18 +97,18 @@ const styles = StyleSheet.create({
     width: '50%',
     borderRadius: 2,
     borderWidth: 1,
-    borderColor: purple,
+    borderColor: buttonActive,
   },
   selected: {
-    backgroundColor: purple
+    backgroundColor: buttonActive
   },
   unselected: {
     backgroundColor: 'rgba(255, 255, 255, 0.6)',
   },
   selectedText: {
-    color: white
+    color: activeTint
   },
   unselectedText: {
-    color: purple,
+    color: inactiveTint,
   }
 })
