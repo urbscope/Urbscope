@@ -3,6 +3,7 @@ import { View,
          Text,
          StyleSheet,
          TouchableOpacity,
+         TouchableHighlight,
          TouchableWithoutFeedback,
          Alert,
          Animated,
@@ -12,11 +13,14 @@ import { View,
          SafeAreaView } from 'react-native'
 import { Constants, Location, Camera, Permissions } from 'expo'
 
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+
 import vision from "react-cloud-vision-api"
 
 import ChangeModeSwitch from './ChangeModeSwitch'
 import LandmarkDetailsModal from './LandmarkDetailsModal'
 import Loading from './Loading'
+import Settings from './Settings'
 
 import { purple, white, red } from '../utils/colors'
 import { fixDetectedLandmarks, fixLandmarkDetails } from '../utils/helpers'
@@ -51,6 +55,7 @@ class DetectionMode extends Component {
     locations: [],
     detected: false,
     modalVisible: false,
+    settingVisible: true,
     modalButtonAnimations: {
       diameter: new Animated.Value(360),
       height: 200,
@@ -141,27 +146,21 @@ class DetectionMode extends Component {
   // ========================================================================
 
   closeModal = () => {
-    // LayoutAnimation.spring();
     this.setState({ modalVisible: false })
   }
 
   openModal = () => {
-    // var CustomLayoutSpring = {
-    //   duration: 400,
-    //   create: {
-    //     type: LayoutAnimation.Types.easeIneaseOut,
-    //     property: LayoutAnimation.Properties.scaleXY,
-    //     springDamping: 0.7,
-    //   },
-    //   update: {
-    //     type: LayoutAnimation.Types.easeIneaseOut,
-    //     springDamping: 0.7,
-    //   },
-    // };
-    // LayoutAnimation.configureNext(CustomLayoutSpring);
     if (this.state.detected){
       this.setState({ modalVisible: true })
     }
+  }
+  closeSettings = () => {
+    this.setState({ settingVisible: false })
+  }
+
+
+  openSettings = () => {
+    this.setState({ settingVisible: true })
   }
 
   componentDidMount() {
@@ -267,7 +266,7 @@ class DetectionMode extends Component {
 
     const { navigation } = this.props
 
-    const { hasCameraPermission, locations } = this.state
+    const { hasCameraPermission, locations, modalVisible, settingVisible } = this.state
 
     const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
 
@@ -312,7 +311,7 @@ class DetectionMode extends Component {
                 </Animated.View>
 
                 <LandmarkDetailsModal
-                  visible={this.state.modalVisible}
+                  visible={modalVisible}
                   locations={this.state.locations}
                 />
 
@@ -323,17 +322,44 @@ class DetectionMode extends Component {
                 */}
 
 
-                <TouchableOpacity onPress={this.detectLandmark}>
-                  <View style={styles.button}>
-                    <Text style={styles.buttonText}>Get Information</Text>
+                <TouchableOpacity
+                  onPress={modalVisible
+                            ? () => {}
+                            : this.detectLandmark}
+                  style={styles.buttonDetect}
+                >
+                  <View style={styles.buttonDetectView}>
+                    <Ionicons
+                      name='ios-compass-outline'
+                      size={80}
+                      style={styles.buttonDetectIcon}
+                      />
                   </View>
                 </TouchableOpacity>
+
 
                 <ChangeModeSwitch
                   currentScreen={navigation.state.routeName}
                   changeScreen={navigation.navigate}
                   dispatch={navigation.dispatch}
                   />
+
+                <TouchableOpacity
+                  onPress={settingVisible
+                            ? this.closeSettings
+                            : this.openSettings}
+                    style={styles.buttonSettings}
+                  >
+                    <Ionicons
+                      name='ios-settings-outline'
+                      size={50}
+                      style={styles.buttonSettingsIcon}
+                    />
+                </TouchableOpacity>
+
+                <Settings
+                  visible={settingVisible}
+                />
 
               </View>
 
@@ -371,6 +397,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.6)',
   },
+  buttonDetect: {
+    position: 'absolute',
+    bottom: ScreenHeight/16,
+    left: ScreenWidth/2 - 50,
+    height: 100,
+    width: 100,
+    borderRadius: 50,
+    borderColor: red,
+    borderWidth: 3,
+  },
+  buttonDetectView: {
+    flex: 1,
+    borderRadius: 50,
+    backgroundColor: 'rgba(183, 24, 69, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonDetectIcon: {
+    color: red,
+  },
   buttonText: {
     fontSize: 20,
   },
@@ -402,7 +448,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: white,
     // top: this.state.modalButtonAnimations.top,
-    zIndex: 2,
+    zIndex: 9,
     backgroundColor: red,
   },
   modalButtonText: {
@@ -410,5 +456,15 @@ const styles = StyleSheet.create({
     // fontSize: 40,
     marginTop: 5,
     color: white
+  },
+
+  buttonSettings: {
+    position: 'absolute',
+    zIndex: 11,
+    top: 20,
+    right: 25,
+  },
+  buttonSettingsIcon: {
+    color: red,
   }
 })

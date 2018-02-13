@@ -19,7 +19,7 @@ import { GOOGLE_API } from '../utils/keysAPI'
 import * as KnowledgeGraphAPI from '../utils/kgsAPI'
 
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 class LandmarkDetails extends Component {
   state = {
@@ -32,7 +32,6 @@ class LandmarkDetails extends Component {
       KnowledgeGraphAPI.getDetailWithName(this.props.location.description)
       .then( res => {
         let details = fixLandmarkDetail(res)
-        console.log("USE WITH NAME");
         if (details) {
           this.setState({
             loading: false,
@@ -42,7 +41,6 @@ class LandmarkDetails extends Component {
           KnowledgeGraphAPI.getDetailWithID(this.props.location.mid)
             .then( res => {
               let details = fixLandmarkDetail(res)
-              console.log("USE WITH ID");
               if (details) {
                 this.setState({
                   loading: false,
@@ -56,8 +54,6 @@ class LandmarkDetails extends Component {
   }
 
   render(){
-    // console.log(this.state);
-
 
     const { location, multiple } = this.props
     const { loading } = this.state
@@ -73,45 +69,41 @@ class LandmarkDetails extends Component {
             source={image
                     ? {uri: image.contentUrl}
                     : {uri: ''}}
-            style={styles.landmarkImage}
+            style={height > 700
+                    ? styles.landmarkImage
+                    : styles.landmarkImageltX }
           />
 
-          <View style={styles.header}>
+          <View style={height > 700
+                  ? styles.header
+                  : styles.headerltX }>
             <Text style={name.length > 23
-                          ? { fontSize: 23 }
+                          ? { fontSize: 20 }
                           : styles.landmarkName }>{name}</Text>
           </View>
 
-          { detailedDescription.articleBody.length < 500 &&
-            <View style={styles.body}>
-              <Text style={detailedDescription.articleBody.length < 360
-                  ? styles.landmarkDetails
-                  : {fontSize: 13, textAlign: 'center'}}>
-                  {detailedDescription.articleBody}
-                </Text>
-              </View>
-          }
-          { detailedDescription.articleBody.length >= 500 &&
-            <ScrollView
-              contentContainerStyle={{
-                flexGrow: 1,
-                padding: 17,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              pinchGestureEnabled={true}
-            >
-              <Text style={{fontSize: 13, textAlign: 'center'}}>
-                  {detailedDescription.articleBody}
-              </Text>
-            </ScrollView>
-          }
+
+          <ScrollView
+            contentContainerStyle={{
+              flexGrow: 1,
+              padding: 17,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={height > 700
+                ? {fontSize: 15, textAlign: 'center'}
+                : {fontSize: 14, textAlign: 'center'}}>
+                {detailedDescription.articleBody}
+            </Text>
+          </ScrollView>
+
 
           {detailedDescription.url &&
             <TouchableOpacity
-                style={detailedDescription.url
+                style={height > 700
                         ? styles.wikipediaLink
-                        : {opacity: 0} }
+                        : styles.wikipediaLinkltX}
                 onPress={ () => {
                   Linking.openURL(detailedDescription.url)
                 }}
@@ -124,9 +116,9 @@ class LandmarkDetails extends Component {
 
           {url &&
              <TouchableOpacity
-                style={url
+                style={height > 700
                         ? styles.footer
-                        : {height: 0, opacity: 0} }
+                        : styles.footerltX}
                 onPress={ () => {
                   Linking.openURL(url)
                 }}
@@ -204,12 +196,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  headerltX: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    // flex: 0.3,
+    height: 47,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   landmarkName: {
     fontSize: 28,
   },
   landmarkImage: {
     // flex: 1,
     height: 190
+  },
+  landmarkImageltX: {
+    // flex: 1,
+    height: 130
   },
   body: {
     flex: 1,
@@ -229,6 +233,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  wikipediaLinkltX: {
+    height: 35,
+    // flex: 0.2,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   wikipediaLinkText: {
     fontSize: 16,
     color: cardButtonText
@@ -236,6 +248,14 @@ const styles = StyleSheet.create({
   footer: {
     // flex: 0.2,
     height: 40,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  footerltX: {
+    // flex: 0.2,
+    height: 35,
     borderTopWidth: 1,
     borderTopColor: '#ccc',
     justifyContent: 'center',

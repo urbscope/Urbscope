@@ -82,10 +82,8 @@ class LandmarkDetailsModal extends Component {
 
     if (nextProps.visible === true){
       this.modalAppear()
-      console.log("I will be ", this.props.visible);
     } else {
       this.modalDisappear()
-      console.log("I will be  ", this.props.visible);
     }
   }
 
@@ -93,7 +91,6 @@ class LandmarkDetailsModal extends Component {
   }
 
   render(){
-    console.log(this.props);
     let locations = this.props.locations
     const { height, width, opacity } = this.state
 
@@ -128,12 +125,6 @@ class LandmarkDetailsModal extends Component {
 
         </Animated.View>
       )
-
-    // } else {
-    //   return (
-    //     <View/>
-    //   )
-    // }
   }
 }
 
