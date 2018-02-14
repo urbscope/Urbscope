@@ -8,7 +8,7 @@ import { View,
          PickerIOS,
          Dimensions } from 'react-native'
 
-import { red, white } from '../utils/colors'
+import { red, white, teal, cream, yellow, lightRed, darkRed } from '../utils/colors'
 
 var ScreenWidth = Dimensions.get('window').width
 var ScreenHeight = Dimensions.get('window').height
@@ -54,10 +54,16 @@ class Settings extends React.Component {
             duration: 250,
           }),
         ]),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 500,
-        }),
+        Animated.stagger(200 ,[
+          Animated.timing(opacity, {
+            toValue: 1,
+            duration: 500,
+          }),
+          Animated.timing(opacity2, {
+            toValue: 1,
+            duration: 400,
+          }),
+        ])
       ])
     ]).start()
 
@@ -68,10 +74,16 @@ class Settings extends React.Component {
 
     Animated.sequence([
       Animated.stagger(200, [
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 400,
-        }),
+        Animated.stagger( 200,[
+          Animated.timing(opacity2, {
+            toValue: 0,
+            duration: 400,
+          }),
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: 400,
+          }),
+        ]),
         Animated.parallel([
           Animated.timing(borderRadius, {
             toValue: 20,
@@ -139,9 +151,10 @@ class Settings extends React.Component {
                 minimumTrackTintColor={red}
                 onValueChange={(dectionLimit) => this.setState({dectionLimit})}
               />
-            <Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center'}}>
-              Maximum number of landmark that can be detected in Detection Mode.
-            </Text>
+              <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
+                Maximum number of landmark that can be detected in Detection Mode.
+              </Animated.Text>
+
             </View>
 
             <View style={styles.sectionHeader}>
@@ -162,9 +175,9 @@ class Settings extends React.Component {
                 minimumTrackTintColor={red}
                 onValueChange={(nearbyRadius) => this.setState({nearbyRadius})}
               />
-              <Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center'}}>
+            <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
                 Maximum number of landmark that are displayed in Nearby Location mode.
-              </Text>
+              </Animated.Text>
 
             </View>
 
@@ -183,9 +196,9 @@ class Settings extends React.Component {
                 onValueChange={(nearbyLimit) => this.setState({nearbyLimit})}
               />
 
-              <Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center'}}>
+            <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
                 Maximum number of landmark that are displayed in Nearby Location mode.
-              </Text>
+              </Animated.Text>
 
             </View>
 
@@ -208,13 +221,11 @@ class Settings extends React.Component {
                 <PickerIOS.Item label="Religious" value="religious" />
                 <PickerIOS.Item label="Night Life" value="nightlife" />
               </PickerIOS>
-              <Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center'}}>
+              <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
                 The landmarks from selected category will be displayed in Nearby Location mode.
-              </Text>
+              </Animated.Text>
 
             </View>
-
-
 
           </Animated.ScrollView>
         </Animated.View>
