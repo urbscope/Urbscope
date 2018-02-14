@@ -55,7 +55,7 @@ class DetectionMode extends Component {
     locations: [],
     detected: false,
     modalVisible: false,
-    settingVisible: true,
+    settingVisible: false,
     modalButtonAnimations: {
       diameter: new Animated.Value(360),
       height: 200,
@@ -154,6 +154,7 @@ class DetectionMode extends Component {
       this.setState({ modalVisible: true })
     }
   }
+
   closeSettings = () => {
     this.setState({ settingVisible: false })
   }
@@ -344,6 +345,7 @@ class DetectionMode extends Component {
                   dispatch={navigation.dispatch}
                   />
 
+
                 <TouchableOpacity
                   onPress={settingVisible
                             ? this.closeSettings
@@ -353,10 +355,13 @@ class DetectionMode extends Component {
                     <Ionicons
                       name='ios-settings-outline'
                       size={50}
-                      style={styles.buttonSettingsIcon}
+                      color={white}
                     />
                 </TouchableOpacity>
 
+                {
+
+                }
                 <Settings
                   visible={settingVisible}
                 />
@@ -461,8 +466,15 @@ const styles = StyleSheet.create({
   buttonSettings: {
     position: 'absolute',
     zIndex: 11,
-    top: 20,
-    right: 25,
+    top: 15,
+    right: 15,
+    height: 60,
+    width: 58,
+    borderRadius: 20,
+    backgroundColor: red,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 4,
   },
   buttonSettingsIcon: {
     color: red,

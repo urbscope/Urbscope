@@ -4,10 +4,11 @@ import { View,
          Text,
          ScrollView,
          Slider,
+         Animated,
          PickerIOS,
          Dimensions } from 'react-native'
 
-import { red } from '../utils/colors'
+import { red, white } from '../utils/colors'
 
 var ScreenWidth = Dimensions.get('window').width
 var ScreenHeight = Dimensions.get('window').height
@@ -19,25 +20,111 @@ class Settings extends React.Component {
     nearbyLimit: 10,
     nearbyRadius: 1000,
     category: 'religious',
+    animation: {
+      containerHeight: new Animated.Value(60),
+      containerWidth: new Animated.Value(58),
+      opacity: new Animated.Value(0),
+      opacity2: new Animated.Value(0),
+      zIndex: new Animated.Value(-10),
+      borderRadius: new Animated.Value(20),
+    }
+  }
+
+  modalAppear = () => {
+    const { containerHeight, containerWidth, opacity, zIndex, borderRadius, opacity2 } = this.state.animation
+
+    Animated.sequence([
+      Animated.timing(zIndex, {
+        toValue: 10,
+        duration: 1,
+      }),
+      Animated.stagger(450, [
+        Animated.timing(containerHeight, {
+          toValue: ScreenHeight * 60 / 100,
+          duration: 450,
+        }),
+        Animated.parallel([
+          Animated.spring(containerWidth, {
+            toValue: ScreenWidth * 80 / 100,
+            friction: 4,
+            tension: 50,
+          }),
+          Animated.timing(borderRadius, {
+            toValue: 0,
+            duration: 250,
+          }),
+        ]),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 500,
+        }),
+      ])
+    ]).start()
+
+  }
+
+  modalDisappear = () => {
+    const { containerHeight, containerWidth, opacity, zIndex, borderRadius, opacity2 } = this.state.animation
+
+    Animated.sequence([
+      Animated.stagger(200, [
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 400,
+        }),
+        Animated.parallel([
+          Animated.timing(borderRadius, {
+            toValue: 20,
+            duration: 250,
+          }),
+          Animated.timing(containerWidth, {
+            toValue: 58,
+            duration: 400,
+          }),
+        ]),
+        Animated.spring(containerHeight, {
+          toValue: 60,
+          friction: 20,
+          tension: 60,
+        }),
+      ]),
+      Animated.timing(zIndex, {
+        toValue: -10,
+        duration: 1,
+      }),
+    ]).start();
+
+  }
+
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.visible === true){
+      this.modalAppear()
+    } else {
+      this.modalDisappear()
+    }
   }
 
   render () {
     const { dectionLimit, nearbyRadius, category, nearbyLimit } = this.state
+    const { containerHeight, containerWidth, opacity, opacity2, zIndex, borderRadius } = this.state.animation
 
-    if (this.props.visible) {
+    // if (this.props.visible) {
       return (
-        <View style={styles.container}>
-          <View style={styles.heading}>
-            <Text style={styles.headingText}>Settings</Text>
-          </View>
+        <Animated.View style={[styles.container, {height: containerHeight, width: containerWidth, zIndex}]}>
 
-          <ScrollView
-            style={{flex: 1}}
+          <Animated.View style={[styles.heading, {borderRadius}]}>
+            <Animated.Text style={[styles.headingText, {opacity}]}>Settings</Animated.Text>
+          </Animated.View>
+
+          <Animated.ScrollView
+            style={{flex: 1, opacity }}
             contentContainerStyle={styles.scroll}
           >
             <View style={styles.sectionHeader}>
               <Text style={{fontSize: 19, color: red}}>Detection Settings</Text>
             </View>
+
             {/*Detection Location Radius */}
             <View style={[styles.itemLast, { borderBottomWidth: 0.5, borderBottomColor: red }]}>
               <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
@@ -81,8 +168,30 @@ class Settings extends React.Component {
 
             </View>
 
-            {/* Category */}
+            {/*Nearby Location Limit */}
             <View style={styles.item}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text style={{fontSize: 15}}>Maximum Nearby Landmarks: </Text>
+                <Text style={{fontSize: 16, marginRight: 5}}>{nearbyLimit}</Text>
+              </View>
+              <Slider
+                step={1}
+                value={nearbyLimit}
+                minimumValue={1}
+                maximumValue={10}
+                minimumTrackTintColor={red}
+                onValueChange={(nearbyLimit) => this.setState({nearbyLimit})}
+              />
+
+              <Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center'}}>
+                Maximum number of landmark that are displayed in Nearby Location mode.
+              </Text>
+
+            </View>
+
+
+            {/* Category */}
+            <View style={styles.itemLast}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Text style={{fontSize: 15}}>Select Category: </Text>
               </View>
@@ -105,35 +214,16 @@ class Settings extends React.Component {
 
             </View>
 
-            {/*Nearby Location Limit */}
-            <View style={styles.itemLast}>
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text style={{fontSize: 15}}>Maximum Nearby Landmarks: </Text>
-                <Text style={{fontSize: 16, marginRight: 5}}>{nearbyLimit}</Text>
-              </View>
-              <Slider
-                step={1}
-                value={nearbyLimit}
-                minimumValue={1}
-                maximumValue={10}
-                minimumTrackTintColor={red}
-                onValueChange={(nearbyLimit) => this.setState({nearbyLimit})}
-              />
 
-              <Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center'}}>
-                Maximum number of landmark that are displayed in Nearby Location mode.
-              </Text>
 
-            </View>
-
-          </ScrollView>
-        </View>
+          </Animated.ScrollView>
+        </Animated.View>
       )
-    } else {
-      return (
-        <View />
-      )
-    }
+    // } else {
+    //   return (
+    //     <View />
+    //   )
+    // }
   }
 }
 
@@ -145,8 +235,8 @@ const styles = StyleSheet.create({
     top: 15,
     right: 15,
     zIndex: 10,
-    height: ScreenHeight * 60 / 100,
-    width: ScreenWidth * 80 / 100,
+    // height: ScreenHeight * 60 / 100,
+    // width: ScreenWidth * 80 / 100,
     backgroundColor: '#eee',
     borderRadius: 20,
   },
@@ -157,11 +247,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: red,
     padding: 15,
+    backgroundColor: red,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
 
   },
   headingText: {
     fontSize: 25,
-    color: red,
+    color: white,
   },
   scroll: {
     // padding: 15,xsitemLast

@@ -18,3 +18,9 @@ export const inactiveTint = purple
 export const buttonActiveOutline = '#fff'
 export const cardBackground = '#eee'
 export const cardButtonText= red
+
+export const teal     = '#468966'
+export const cream    = '#FFF0A5'
+export const yellow   = '#FFB03B'
+export const lightRed = '#B64926'
+export const darkRed  = '#8E2800'
