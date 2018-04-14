@@ -2,10 +2,10 @@ import React, {Component} from 'react'
 import {Dimensions, View, Text, StyleSheet, LayoutAnimation} from 'react-native'
 import ChangeModeSwitch from './ChangeModeSwitch'
 import ExplorationModeSwitch from './ExplorationModeSwitch'
-import {Constants, Location, Camera, Permissions} from 'expo'
+import {Constants, Location, Camera, Permissions, MapView} from 'expo'
 import {venues} from 'react-foursquare'
-import MapView, {Marker} from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions';
+import Marker from '../utils/CustomMarker'
 
 
 var foursquare = require('react-foursquare')({
@@ -23,22 +23,22 @@ class NearbyLocations extends Component {
         destination: null
     }
 
+
+
     componentDidMount() {
         LayoutAnimation.linear()
-        this.setState({});
+
     }
 
     async componentDidMount() {
         const {status} = await Permissions.askAsync(Permissions.CAMERA);
-
         this.setState({hasCameraPermission: status === 'granted'});
 
-        //TODO:should cancel on unmount
-        this.getLocationAsync()
+        let location = await this._getLocationAsync();
 
 
         foursquare.venues.explore({
-            "ll": '41.006330,28.978198',
+            "ll":  this.formatLocation(location,false),
             "query": 'History',
             radius: 1000,
             limit: 3
@@ -46,7 +46,6 @@ class NearbyLocations extends Component {
             let items = res.response.groups[0].items;
             let markers = items.map(obj => {
                 coords = obj.venue.location
-                console.log(obj.venue.name.toString())
                 return {
                     name: obj.venue.name.toString(),
                     location: {latitude: coords.lat, longitude: coords.lng},
@@ -59,27 +58,31 @@ class NearbyLocations extends Component {
         })
     }
 
-    getLocationAsync = async () => {
-        let {status} = await Permissions.askAsync(Permissions.LOCATION);
+    _getLocationAsync = async () => {
+        let { status } = await Permissions.askAsync(Permissions.LOCATION);
         if (status !== 'granted') {
             this.setState({
                 errorMessage: 'Permission to access location was denied',
             });
         }
 
-        Location.watchPositionAsync({
-            enableHighAccuracy: true,
-            timeInterval: 900000,
-            distanceInterval: 500,
-        }, (location) => {
-            //console.log(location);
-            try {
-                this.setState({location})
-            } catch (e) {
-                console.error("No setState", e);
-            }
-        })
+        let location = await Location.getCurrentPositionAsync({});
+        this.setState({ location });
+        return location;
     };
+
+    formatLocation(location, asObject){
+        if (!location)
+            return null;
+        if (asObject)
+            return  {latitude: location.coords.latitude, longitude: location.coords.longitude};
+        else
+            return "" + location.coords.latitude + "," + location.coords.longitude;
+    }
+
+    componentWillUnmount() {
+        console.log(this.state.markers)
+    }
 
     render() {
 
@@ -89,8 +92,11 @@ class NearbyLocations extends Component {
 
         const {hasCameraPermission, location} = this.state
 
-        //const latlong = {latitude: location.coords.latitude, longitude: location.coords.longitude};
-        const latlong = {"latitude": 41.006330, "longitude": 28.978198};
+        let latlong = null;
+        if (location != null) {
+             latlong = {latitude: location.coords.latitude, longitude: location.coords.longitude};
+        }
+        // const latlong = {"latitude": 41.006330, "longitude": 28.978198};
 
 
         if ((hasCameraPermission === null) && (location === null)) {
@@ -120,6 +126,11 @@ class NearbyLocations extends Component {
                                 dispatch={navigation.dispatch}
                             />
                             <MapView ref={ref => this.mapRef = ref} style={styles.map}
+                                     provider = {MapView.PROVIDER_GOOGLE}
+                                     showsUserLocation = {true}
+                                     showsMyLocationButton={true}
+                                     followsUserLocation={true}
+                                     onPress={()=>this.setState({destination: null})}
                                      initialRegion={{
                                          latitude: 41.006330,
                                          longitude: 28.978198,
@@ -137,19 +148,14 @@ class NearbyLocations extends Component {
                                 strokeColor="hotpink"
                             />
 
-                                {!!location.coords.altitude && !!location.coords.longitude && <Marker
-                                    coordinate={latlong}
-                                    title={"Your Location"}
-                                    pinColor="green"
-                                />}
                                 {this.state.markers.map(marker => (
                                     <Marker
                                         key={marker.key}
                                         coordinate={marker.location}
                                         title={marker.name}
-                                        onPress = {(e)=>{
+                                        onPress={e => {
                                             this.setState({
-                                                destination: e.nativeEvent.coordinate
+                                                destination: e
                                             });
                                         }}
                                     />
