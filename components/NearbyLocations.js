@@ -13,6 +13,8 @@ var foursquare = require('react-foursquare')({
     clientSecret: '1LL20JSTUVM1BM4G30E0KMN1QBKU3ZDVLMO1OP5QIPWCQEOK'
 })
 
+const { URL, URLSearchParams } = require('url');
+
 let GOOGLE_MAPS_APIKEY = "AIzaSyCOFvXSiK0tMiDIXbWpUaj5s89lMh55Ov4";
 
 class NearbyLocations extends Component {
@@ -36,8 +38,44 @@ class NearbyLocations extends Component {
 
         let location = await this._getLocationAsync();
 
-
-        foursquare.venues.explore({
+		var url = "https://urbserver.herokuapp.com/landmark/?"
+			+ "inLL=" + this.formatLocation(location,false)
+			+ "&inQuery=" + 'food'
+			+ "&inLimit=" + 10
+			+ "&inOpenNow=" + 1
+			+ "&inRadius=" + 5000
+		console.log( url);
+		
+		fetch(url).then(response => {
+			if (response.status === 200) {
+				return response.json();
+			} else {
+				throw new Error('Landmark search error!');
+			}
+		})
+		.then( responseJson => {
+		
+			console.debug( "--->>> responseJson: " + JSON.stringify(responseJson));
+			
+			let items = responseJson.landmarks;
+		    let markers = items.map(obj => {
+					coords = {lat: obj.latitude, lng: obj.longitude}
+					console.debug(obj.name.toString())
+			    	return {
+					    name: obj.name.toString(),
+					    location: {latitude: coords.lat, longitude: coords.lng},
+					    key: obj.name.toString()
+			    	}
+        	})
+        	this.setState({
+	            markers: markers
+        	})
+		})
+		.catch( error => {
+		  console.error(error);
+		});
+			
+        /*foursquare.venues.explore({
             "ll":  this.formatLocation(location,false),
             "query": 'History',
             radius: 1000,
@@ -55,7 +93,7 @@ class NearbyLocations extends Component {
             this.setState({
                 markers: markers
             })
-        })
+        })*/
     }
 
     _getLocationAsync = async () => {
