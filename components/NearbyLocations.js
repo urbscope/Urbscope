@@ -13,8 +13,6 @@ var foursquare = require('react-foursquare')({
     clientSecret: '1LL20JSTUVM1BM4G30E0KMN1QBKU3ZDVLMO1OP5QIPWCQEOK'
 })
 
-const { URL, URLSearchParams } = require('url');
-
 let GOOGLE_MAPS_APIKEY = "AIzaSyCOFvXSiK0tMiDIXbWpUaj5s89lMh55Ov4";
 
 class NearbyLocations extends Component {
