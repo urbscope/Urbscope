@@ -36,26 +36,40 @@ class NearbyLocations extends Component {
 
         let location = await this._getLocationAsync();
 
+		var url = "https://urbserver.herokuapp.com/landmark?"
+			+ "inLL=" + this.formatLocation(location,false)
+			+ "&inQuery=" + 'food'
+			+ "&inLimit=" + 3
+			+ "&inOpenNow=" + 1
+			+ "&inRadius=" + 5000
+		console.log( url);
+		
+		fetch(url).then(response => {
+			if (response.status === 200) {
+				return response.json();
+			} else {
+				throw new Error('Landmark search error!');
+			}
+		})
+		.then( responseJson => {
 
-        foursquare.venues.explore({
-            "ll":  this.formatLocation(location,false),
-            "query": 'History',
-            radius: 1000,
-            limit: 3
-        }).then(res => {
-            let items = res.response.groups[0].items;
-            let markers = items.map(obj => {
-                coords = obj.venue.location
-                return {
-                    name: obj.venue.name.toString(),
-                    location: {latitude: coords.lat, longitude: coords.lng},
-                    key: obj.venue.name.toString()
-                }
-            })
-            this.setState({
-                markers: markers
-            })
-        })
+		    let items = responseJson.landmarks;
+		    let markers = items.map(obj => {
+					coords = {lat: obj.latitude, lng: obj.longitude}
+			    	return {
+					    name: obj.name.toString(),
+					    location: {latitude: coords.lat, longitude: coords.lng},
+					    key: obj.name.toString()
+			    	}
+        	})
+        	this.setState({
+	            markers: markers
+        	})
+		})
+		.catch( error => {
+		  console.error(error);
+		});
+
     }
 
     _getLocationAsync = async () => {
@@ -81,7 +95,6 @@ class NearbyLocations extends Component {
     }
 
     componentWillUnmount() {
-        console.log(this.state.markers)
     }
 
     render() {
@@ -96,8 +109,6 @@ class NearbyLocations extends Component {
         if (location != null) {
              latlong = {latitude: location.coords.latitude, longitude: location.coords.longitude};
         }
-        // const latlong = {"latitude": 41.006330, "longitude": 28.978198};
-
 
         if ((hasCameraPermission === null) && (location === null)) {
             return <View/>;
