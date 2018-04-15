@@ -21,7 +21,6 @@
     "react-foursquare": "^1.0.3",
     "react-native": "https://github.com/expo/react-native/archive/sdk-26.0.0.tar.gz",
     "react-native-maps-directions": "^1.6.0",
-    "react-native-svg": "^6.1.3",
     "react-navigation": "1.5.8"
   }
 }
