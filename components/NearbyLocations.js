@@ -53,7 +53,7 @@ class NearbyLocations extends Component {
 		})
 		.then( responseJson => {
 
-			let items = responseJson.landmarks;
+		    let items = responseJson.landmarks;
 		    let markers = items.map(obj => {
 					coords = {lat: obj.latitude, lng: obj.longitude}
 			    	return {
