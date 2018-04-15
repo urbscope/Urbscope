@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, LayoutAnimation } from 'react-native'
 import ChangeModeSwitch from './ChangeModeSwitch'
 import ExplorationModeSwitch from './ExplorationModeSwitch'
 import { Camera, Permissions } from 'expo'
@@ -12,6 +12,11 @@ class Recommendations extends Component {
   async componentWillMount() {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ hasCameraPermission: status === 'granted' });
+  }
+
+  componentDidMount () {
+    LayoutAnimation.linear();
+    this.setState({})
   }
 
   render(){

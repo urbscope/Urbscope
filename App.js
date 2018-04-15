@@ -66,7 +66,7 @@ const MainNavigtor = StackNavigator({
   //   screen: Tabs,
   // }
 }, {
-  initialRouteName: 'DetectionMode',
+  initialRouteName: 'NearbyLocations',
   navigationOptions: {
     header: null,
   },

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { NavigationActions } from 'react-navigation'
-import { purple, white } from '../utils/colors'
+import { buttonActive, buttonActiveOutline } from '../utils/colors'
 
 class ChangeModeSwitch extends Component {
 
@@ -30,7 +30,7 @@ class ChangeModeSwitch extends Component {
       index: 0,
       actions: [ NavigationActions.navigate({ routeName: 'NearbyLocations'}) ]
     }))
-    
+
     // this.props.dispatch(NavigationActions.replace({
     //   key: 'DetectionMode',
     //   newKey: 'NearbyLocations',
@@ -87,11 +87,11 @@ const styles = StyleSheet.create({
     width: 60,
     borderRadius: 30,
     borderWidth: 3,
-    borderColor: white,
+    borderColor: buttonActiveOutline,
     marginTop: 10,
   },
   selected: {
-    backgroundColor: purple
+    backgroundColor: buttonActive
   },
   unselected: {
     backgroundColor: 0,
