@@ -2,6 +2,7 @@
 
 // Google API key for CloudVision and Knowledge Graph
 export const GOOGLE_API = "AIzaSyAiezXiOJMvOtSK4eMoXKfUvX4yY4RW5SQ"
+export const GOOGLE_MAPS_TEMP = "AIzaSyBvVT08HZLZycneXl1jc8qI_KFiqNMUl2M"
 
 // FourSquare API key
 export const FS_CLIENT_ID = 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH'

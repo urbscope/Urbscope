@@ -12,7 +12,6 @@ import { View,
          ActivityIndicator,
          SafeAreaView } from 'react-native'
 import { Constants, Location, Camera, Permissions } from 'expo'
-
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 
 import vision from "react-cloud-vision-api"
@@ -24,17 +23,7 @@ import Settings from './Settings'
 
 import { purple, white, red } from '../utils/colors'
 import { fixDetectedLandmarks, fixLandmarkDetails } from '../utils/helpers'
-
-
 import { GOOGLE_API } from '../utils/keysAPI'
-// import { FS_CLIENT_ID, FS_CLIENT_PW } from '../utils/FoursquareAPI'
-
-// Initalize the FourSquare API
-
-// var foursquare = require('react-foursquare')({
-//   clientID: 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH',
-//   clientSecret: '1LL20JSTUVM1BM4G30E0KMN1QBKU3ZDVLMO1OP5QIPWCQEOK'
-// })
 
 // Initalize the CloudVision API
 vision.init({ auth: GOOGLE_API })
@@ -67,6 +56,13 @@ class DetectionMode extends Component {
     }
   }
 
+  componentDidMount() {
+    // console.log(LayoutAnimation);
+    LayoutAnimation.linear();
+    this.setState({})
+    // this.animateModalButtonAppear()
+  }
+
   // ========================================================================
   //  ASK FOR CAMERA PERMISSIONS
   // ========================================================================
@@ -75,16 +71,12 @@ class DetectionMode extends Component {
     this.setState({ hasCameraPermission: status === 'granted' });
   }
 
-
-
-
   // ========================================================================
   // Detect Landmark using Google's Cloud Vision api
   // ========================================================================
   detectLandmark = async () => {
-    console.log("take photo");
-    this.animateModalButtonDisappear()
 
+    this.animateModalButtonDisappear()
 
     this.setState({
       loading: true,
@@ -115,15 +107,12 @@ class DetectionMode extends Component {
 
       if (fixedRes !== null ) {
 
-
         this.setState({
           locations: fixedRes,
           loading: false,
           detected: true,
         })
-
         this.animateModalButtonAppear()
-
 
       } else {
         Alert.alert("Sorry. This particular landmark couldn't be detected.")
@@ -135,16 +124,11 @@ class DetectionMode extends Component {
     }, (e) => {
       console.log('Error: ', e)
     })
-
   }
-
-
-
 
   // ========================================================================
   //  MODAL CONTROLS
   // ========================================================================
-
   closeModal = () => {
     this.setState({ modalVisible: false })
   }
@@ -164,14 +148,10 @@ class DetectionMode extends Component {
     this.setState({ settingVisible: true })
   }
 
-  componentDidMount() {
-    // console.log(LayoutAnimation);
-    LayoutAnimation.linear();
-    this.setState({})
 
-    // this.animateModalButtonAppear()
-
-  }
+  // ========================================================================
+  //  ANIMATIONS FOR BUTTON
+  // ========================================================================
 
   animateModalButtonAppear = () => {
     const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
@@ -259,9 +239,11 @@ class DetectionMode extends Component {
         }),
       ])
     ]).start();
-
-
   }
+
+  // ========================================================================
+  //  RENDER METHOD
+  // ========================================================================
 
   render(){
 

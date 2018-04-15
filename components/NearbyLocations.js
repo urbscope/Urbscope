@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { View, Text, StyleSheet, LayoutAnimation } from 'react-native'
 import ChangeModeSwitch from './ChangeModeSwitch'
 import ExplorationModeSwitch from './ExplorationModeSwitch'
-import { Constants, Location, Camera, Permissions } from 'expo'
+import { Constants, Location, Camera, Permissions, MapView } from 'expo'
 import { venues } from 'react-foursquare'
 
 var foursquare = require('react-foursquare')({
@@ -36,7 +36,7 @@ class NearbyLocations extends Component {
       radius: 1000,
       limit: 10
     }).then(res => {
-        console.log(res.response.groups[0].items)
+        // console.log(res.response.groups[0].items)
       })
   }
 
@@ -64,42 +64,58 @@ class NearbyLocations extends Component {
 
   render(){
 
-    const { navigation } = this.props
 
-    const { hasCameraPermission, location } = this.state
 
-    if ((hasCameraPermission === null) && (location === null)) {
-      return <View />;
-    } else if (hasCameraPermission === false) {
-      return <Text>No access to camera</Text>;
-    } else if ((location === null)) {
-      return (
-        <View>
-          <Text> Wait for location</Text>
-        </View>
-      )
-    } else {
-      return (
+    return (
         <View style={{ flex: 1 }}>
-          <Camera style={styles.camera} type={Camera.Constants.Type.back}>
-            <View
-              style={styles.container}>
-              <ExplorationModeSwitch
-                currentScreen={navigation.state.routeName}
-                changeScreen={navigation.navigate}
-                dispatch={navigation.dispatch}
-              />
-              <Text style={styles.coords}>{location.coords.latitude}, {location.coords.longitude}</Text>
-              <ChangeModeSwitch
-                currentScreen={navigation.state.routeName}
-                changeScreen={navigation.navigate}
-                dispatch={navigation.dispatch}
-             />
-           </View>
-         </Camera>
+          <MapView
+          style={{ flex: 1 }}
+          initialRegion={{
+            latitude: 37.78825,
+            longitude: -122.4324,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
        </View>
      )
-    }
+
+    // const { navigation } = this.props
+    //
+    // const { hasCameraPermission, location } = this.state
+
+    // if ((hasCameraPermission === null) && (location === null)) {
+    //   return <View />;
+    // } else if (hasCameraPermission === false) {
+    //   return <Text>No access to camera</Text>;
+    // } else if ((location === null)) {
+    //   return (
+    //     <View>
+    //       <Text> Wait for location</Text>
+    //     </View>
+    //   )
+    // } else {
+    //
+     //  return (
+     //    <View style={{ flex: 1 }}>
+     //      <Camera style={styles.camera} type={Camera.Constants.Type.back}>
+     //        <View
+     //          style={styles.container}>
+     //          <ExplorationModeSwitch
+     //            currentScreen={navigation.state.routeName}
+     //            changeScreen={navigation.navigate}
+     //            dispatch={navigation.dispatch}
+     //          />
+     //          <Text style={styles.coords}>{location.coords.latitude}, {location.coords.longitude}</Text>
+     //          <ChangeModeSwitch
+     //            currentScreen={navigation.state.routeName}
+     //            changeScreen={navigation.navigate}
+     //            dispatch={navigation.dispatch}
+     //         />
+     //       </View>
+     //     </Camera>
+     //   </View>
+     // )
 
   }
 }
