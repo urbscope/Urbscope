@@ -6,6 +6,9 @@ import {Constants, Location, Camera, Permissions, MapView} from 'expo'
 import {venues} from 'react-foursquare'
 import MapViewDirections from 'react-native-maps-directions';
 import Marker from '../utils/CustomMarker'
+import * as polyline from '@mapbox/polyline';
+import geolib from 'geolib';
+
 
 
 var foursquare = require('react-foursquare')({
@@ -16,24 +19,34 @@ var foursquare = require('react-foursquare')({
 let GOOGLE_MAPS_APIKEY = "AIzaSyCOFvXSiK0tMiDIXbWpUaj5s89lMh55Ov4";
 
 class NearbyLocations extends Component {
-    state = {
-        hasCameraPermission: null,
-        location: null,
-        markers: [],
-        destination: null
-    }
 
+    constructor(props){
+        super(props);
+        this.state = {
+            hasCameraPermission: null,
+            location: null,
+            markers: [],
+            destination: null
+        };
+
+        this.heading = null;
+        this.targetBearing = null; //Angle between current location and targetDestination
+        this.arrowRotation = null;
+
+    }
 
 
     componentDidMount() {
         LayoutAnimation.linear()
-
+        console.log("sync componentDidMount");
     }
 
     async componentDidMount() {
         const {status} = await Permissions.askAsync(Permissions.CAMERA);
         this.setState({hasCameraPermission: status === 'granted'});
 
+        this._watchHeadingAsync();
+        this._watchTargetBearingAsync();
         let location = await this._getLocationAsync();
 
 		var url = "https://urbserver.herokuapp.com/landmark?"
@@ -85,17 +98,87 @@ class NearbyLocations extends Component {
         return location;
     };
 
-    formatLocation(location, asObject){
+
+    //Will get device heading, sets as this.heading. If Navigation is taking place, ie, this.targetBearing not null:
+    // set this.arrowRotation = 360 - this.heading + targetBearing;
+    _watchHeadingAsync = async()=>{
+        this.headingWatch = await Location.watchHeadingAsync((res)=>{
+            this.heading = res.magHeading;
+
+            //If Navigate is on, calculate arrowRotation angle
+            if (this.targetBearing) {
+                this.arrowRotation = 360 - this.heading + this.targetBearing;
+                if (this.arrowRotation > 360)
+                    this.arrowRotation -= 360;
+                // console.log(this.arrowRotation);
+            }
+        });
+    };
+
+
+    formatLocation(location, asObject = true){
         if (!location)
             return null;
-        if (asObject)
-            return  {latitude: location.coords.latitude, longitude: location.coords.longitude};
-        else
-            return "" + location.coords.latitude + "," + location.coords.longitude;
+        else if (asObject) {
+            if (location.coords)
+                return {latitude: location.coords.latitude, longitude: location.coords.longitude};
+            else
+                return {latitude: location.latitude, longitude: location.longitude};
+        }
+        else {
+            if (location.coords)
+                return "" + location.coords.latitude + "," + location.coords.longitude;
+            else
+                return "" + location.latitude + "," + location.longitude;
+        }
     }
 
     componentWillUnmount() {
+        this.headingWatch.remove();
+        //clearInterval(this.targetBearingWatchId);
     }
+
+    getTargetBearing = async()=>{
+
+        let startLoc = this.formatLocation(this.state.location, false);
+        let destinationLoc = this.formatLocation(this.state.destination, false);
+        if (!destinationLoc || !startLoc){
+            console.log("location null. returning");
+            return;
+        }
+
+        try {
+            let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?mode=walking&origin=${ startLoc }&destination=${ destinationLoc }`);
+            let respJson = await resp.json();
+
+            if (!respJson.routes || !respJson.routes[0] || !respJson.routes[0].overview_polyline || !respJson.routes[0].overview_polyline.points)
+            {
+                console.log(respJson);
+                console.log("respjson polylines null.returning");
+                return;
+            }
+            respJson = respJson.routes[0].overview_polyline.points;
+            let points = polyline.decode(respJson);
+            if (!points || !points[1])
+                return;
+
+            let pointCoords= {latitude: points[1][0], longitude: points[1][1]};
+            this.targetBearing = geolib.getRhumbLineBearing(this.formatLocation(this.state.location), pointCoords);
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+
+    _watchTargetBearingAsync =  async()=> {
+        //Periodically updates targetBearing
+        this.targetBearingWatchId = setInterval(async ()=> {
+            console.log("targetBearingWatchId firing now")
+            this.getTargetBearing();
+        }, 15000);
+    };
+
 
     render() {
 
@@ -141,7 +224,10 @@ class NearbyLocations extends Component {
                                      showsUserLocation = {true}
                                      showsMyLocationButton={true}
                                      followsUserLocation={true}
-                                     onPress={()=>this.setState({destination: null})}
+                                     onPress={()=>{
+                                         this.targetBearing = null;
+                                         this.setState({destination: null});
+                                     }}
                                      initialRegion={{
                                          latitude: 41.006330,
                                          longitude: 28.978198,
@@ -167,7 +253,7 @@ class NearbyLocations extends Component {
                                         onPress={e => {
                                             this.setState({
                                                 destination: e
-                                            });
+                                            },this.getTargetBearing);
                                         }}
                                     />
                                 ))}
@@ -180,6 +266,8 @@ class NearbyLocations extends Component {
         }
 
     }
+
+
 }
 
 export default NearbyLocations

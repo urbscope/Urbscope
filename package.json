@@ -15,7 +15,9 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@mapbox/polyline": "^1.0.0",
     "expo": "^26.0.0",
+    "geolib": "^2.0.24",
     "react": "16.3.0-alpha.1",
     "react-cloud-vision-api": "^0.3.0",
     "react-foursquare": "^1.0.3",
