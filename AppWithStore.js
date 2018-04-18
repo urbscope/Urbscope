@@ -42,14 +42,13 @@ class AppWithStore extends React.Component {
 
 
 
-  componentDidMount () {
-    this.props.loadSettings()
+  async componentDidMount () {
+    await this.props.loadSettings()
 
-    setTimeout( () => {
       if (Object.keys(this.props.settings).length === 0) {
         this.defaultSettings()
       }
-    }, 10000);
+
 
   }
 

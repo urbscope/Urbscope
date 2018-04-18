@@ -5,12 +5,11 @@ import ExplorationModeSwitch from './ExplorationModeSwitch'
 import { Constants, Location, Camera, Permissions, MapView } from 'expo'
 import { venues } from 'react-foursquare'
 import MapViewDirections from 'react-native-maps-directions';
-import Marker from '../utils/CustomMarker'
+import Marker from './CustomMarker'
 import * as polyline from '@mapbox/polyline';
 import geolib from 'geolib';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { connect } from 'react-redux'
-import Marker from './CustomMarker'
 import DirectionMeter from './DirectionMeter'
 import Settings from './Settings'
 import { purple, white, red } from '../utils/colors'
@@ -41,10 +40,10 @@ class NearbyLocations extends Component {
     }
 
 
-    componentDidMount() {
-        LayoutAnimation.linear()
-        console.log("sync componentDidMount");
-    }
+    // componentDidMount() {
+    //     LayoutAnimation.linear()
+    //     console.log("sync componentDidMount");
+    // }
 
     async componentDidMount() {
         const {status} = await Permissions.askAsync(Permissions.CAMERA);
@@ -61,7 +60,7 @@ class NearbyLocations extends Component {
 			+ "&inOpenNow=" + 1
 			+ "&inRadius=" + 5000
 		console.log( url);
-		
+
 		fetch(url).then(response => {
 			if (response.status === 200) {
 				return response.json();
@@ -236,7 +235,7 @@ class NearbyLocations extends Component {
               />
 
               <DirectionMeter />
-        
+
               <MapView ref={ref => this.mapRef = ref} style={styles.map}
                                      provider = {MapView.PROVIDER_GOOGLE}
                                      showsUserLocation = {true}
@@ -290,6 +289,7 @@ class NearbyLocations extends Component {
                     color={white}
                   />
               </TouchableOpacity>
+
               <Settings
                 visible={settingVisible}
               />
@@ -300,7 +300,7 @@ class NearbyLocations extends Component {
       )
     }
 }
-
+}
 
 
 const styles = StyleSheet.create({
