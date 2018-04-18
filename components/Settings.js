@@ -4,9 +4,13 @@ import { View,
          Text,
          ScrollView,
          Slider,
+         TouchableOpacity,
          Animated,
          PickerIOS,
          Dimensions } from 'react-native'
+
+import { connect } from 'react-redux'
+import { setSettings } from '../actions'
 
 import { red, white, teal, cream, yellow, lightRed, darkRed } from '../utils/colors'
 
@@ -16,10 +20,10 @@ var ScreenHeight = Dimensions.get('window').height
 class Settings extends React.Component {
 
   state = {
-    dectionLimit: 5,
-    nearbyLimit: 10,
-    nearbyRadius: 1000,
-    category: 'religious',
+    dectionLimit: this.props.settings.dectionLimit,
+    nearbyLimit: this.props.settings.nearbyLimit,
+    nearbyRadius: this.props.settings.nearbyRadius,
+    category: this.props.settings.category,
     animation: {
       containerHeight: new Animated.Value(60),
       containerWidth: new Animated.Value(58),
@@ -30,6 +34,7 @@ class Settings extends React.Component {
     }
   }
 
+
   modalAppear = () => {
     const { containerHeight, containerWidth, opacity, zIndex, borderRadius, opacity2 } = this.state.animation
 
@@ -38,30 +43,30 @@ class Settings extends React.Component {
         toValue: 10,
         duration: 1,
       }),
-      Animated.stagger(450, [
+      Animated.stagger(400, [
         Animated.timing(containerHeight, {
-          toValue: ScreenHeight * 60 / 100,
+          toValue: ScreenHeight * 83 / 100,
           duration: 450,
         }),
         Animated.parallel([
           Animated.spring(containerWidth, {
-            toValue: ScreenWidth * 80 / 100,
-            friction: 4,
-            tension: 50,
+            toValue: ScreenWidth -30,
+            friction: 8,
+            tension: 70,
           }),
           Animated.timing(borderRadius, {
             toValue: 0,
-            duration: 250,
+            duration: 200,
           }),
         ]),
         Animated.stagger(200 ,[
           Animated.timing(opacity, {
             toValue: 1,
-            duration: 500,
+            duration: 1000,
           }),
           Animated.timing(opacity2, {
             toValue: 1,
-            duration: 400,
+            duration: 1000,
           }),
         ])
       ])
@@ -73,31 +78,29 @@ class Settings extends React.Component {
     const { containerHeight, containerWidth, opacity, zIndex, borderRadius, opacity2 } = this.state.animation
 
     Animated.sequence([
-      Animated.stagger(200, [
-        Animated.stagger( 200,[
-          Animated.timing(opacity2, {
-            toValue: 0,
-            duration: 400,
-          }),
-          Animated.timing(opacity, {
-            toValue: 0,
-            duration: 400,
-          }),
-        ]),
-        Animated.parallel([
-          Animated.timing(borderRadius, {
-            toValue: 20,
-            duration: 250,
-          }),
-          Animated.timing(containerWidth, {
-            toValue: 58,
-            duration: 400,
-          }),
-        ]),
+      Animated.parallel([
+        Animated.timing(opacity2, {
+          toValue: 0,
+          duration: 250,
+        }),
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 250,
+        }),
+      ]),
+      Animated.stagger(150, [
+        Animated.timing(containerWidth, {
+          toValue: 58,
+          duration: 250,
+        }),
         Animated.spring(containerHeight, {
           toValue: 60,
           friction: 20,
-          tension: 60,
+          tension: 70,
+        }),
+        Animated.timing(borderRadius, {
+          toValue: 20,
+          duration: 450,
         }),
       ]),
       Animated.timing(zIndex, {
@@ -106,19 +109,56 @@ class Settings extends React.Component {
       }),
     ]).start();
 
+
   }
 
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.visible === true){
-      this.modalAppear()
-    } else {
+    let newSettings = {
+      dectionLimit: this.state.dectionLimit,
+      nearbyLimit: this.state.nearbyLimit,
+      nearbyRadius: this.state.nearbyRadius,
+      category: this.state.category,
+    }
+
+    if (nextProps.visible === true && this.props.visible === false ){
+      this.setState({
+        dectionLimit: this.props.settings.dectionLimit,
+        nearbyLimit: this.props.settings.nearbyLimit,
+        nearbyRadius: nextProps.settings.nearbyRadius,
+        category: nextProps.settings.category,
+      }, () => {
+        this.modalAppear()
+      })
+
+    } else if (this.props.visible === true && nextProps.visible === false) {
       this.modalDisappear()
+      this.props.changeSettings(newSettings)
+
     }
   }
 
+  defaultSettings = () => {
+    let newSettings = {
+      dectionLimit: 5,
+      nearbyLimit: 10,
+      nearbyRadius: 1000,
+      category: 'religious'
+    }
+    this.setState({
+      dectionLimit: 5,
+      nearbyLimit: 10,
+      nearbyRadius: 1000,
+      category: 'religious'
+    }, () => this.props.changeSettings(newSettings))
+
+  }
+
+
   render () {
+
     const { dectionLimit, nearbyRadius, category, nearbyLimit } = this.state
+    const { settings } = this.props
     const { containerHeight, containerWidth, opacity, opacity2, zIndex, borderRadius } = this.state.animation
 
     // if (this.props.visible) {
@@ -141,11 +181,14 @@ class Settings extends React.Component {
             <View style={[styles.itemLast, { borderBottomWidth: 0.5, borderBottomColor: red }]}>
               <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
                 <Text style={{fontSize: 15}}>Maximum Detected Landmarks: </Text>
-                <Text style={{fontSize: 16}}>{dectionLimit}</Text>
+                { (dectionLimit === null || dectionLimit === 0 || dectionLimit === undefined)
+                    ? <Text style={{fontSize: 16}}>{settings.dectionLimit}</Text>
+                    : <Text style={{fontSize: 16}}>{dectionLimit}</Text>
+                }
               </View>
               <Slider
                 step={1}
-                value={dectionLimit}
+                value={dectionLimit === null ? settings.dectionLimit : dectionLimit }
                 minimumValue={1}
                 maximumValue={5}
                 minimumTrackTintColor={red}
@@ -165,19 +208,22 @@ class Settings extends React.Component {
             <View style={styles.item}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Text style={{fontSize: 15}}>Radius of Nearby Landmarks: </Text>
-                <Text style={{fontSize: 16, marginRight: 5}}>{nearbyRadius/1000} km</Text>
+                { (nearbyRadius === null || nearbyRadius === 0 || nearbyRadius === undefined)
+                    ? <Text style={{fontSize: 16}}>{settings.nearbyRadius/1000} km</Text>
+                    : <Text style={{fontSize: 16}}>{nearbyRadius/1000} km</Text>
+                }
               </View>
               <Slider
                 step={500}
-                value={nearbyRadius}
+                value={nearbyRadius === null ? settings.nearbyRadius : nearbyRadius}
                 minimumValue={500}
                 maximumValue={5000}
                 minimumTrackTintColor={red}
                 onValueChange={(nearbyRadius) => this.setState({nearbyRadius})}
               />
             <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
-                Maximum number of landmark that are displayed in Nearby Location mode.
-              </Animated.Text>
+              Maximum number of landmark that are displayed in Nearby Location mode.
+            </Animated.Text>
 
             </View>
 
@@ -185,11 +231,14 @@ class Settings extends React.Component {
             <View style={styles.item}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Text style={{fontSize: 15}}>Maximum Nearby Landmarks: </Text>
-                <Text style={{fontSize: 16, marginRight: 5}}>{nearbyLimit}</Text>
+                { (nearbyLimit === null || nearbyLimit === 0 || nearbyLimit === undefined)
+                    ? <Text style={{fontSize: 16}}>{settings.nearbyLimit}</Text>
+                    : <Text style={{fontSize: 16}}>{nearbyLimit}</Text>
+                }
               </View>
               <Slider
                 step={1}
-                value={nearbyLimit}
+                value={nearbyLimit === null ? settings.nearbyLimit : nearbyLimit}
                 minimumValue={1}
                 maximumValue={10}
                 minimumTrackTintColor={red}
@@ -211,7 +260,7 @@ class Settings extends React.Component {
 
               <PickerIOS
                 style={styles.picker}
-                selectedValue={category}
+                selectedValue={category === null ? settings.category : category}
                 onValueChange={category => this.setState({category})}
                 itemStyle={{color: red}}
               >
@@ -224,8 +273,16 @@ class Settings extends React.Component {
               <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
                 The landmarks from selected category will be displayed in Nearby Location mode.
               </Animated.Text>
-
             </View>
+
+            <TouchableOpacity
+              style={styles.resetButton}
+              onPress={this.defaultSettings}
+            >
+              <Text style={styles.resetButtonText}>
+                Reset to Default
+              </Text>
+            </TouchableOpacity>
 
           </Animated.ScrollView>
         </Animated.View>
@@ -238,7 +295,6 @@ class Settings extends React.Component {
   }
 }
 
-export default Settings
 
 const styles = StyleSheet.create({
   container: {
@@ -293,5 +349,30 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.3,
     marginVertical: 10,
   },
+  resetButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    borderTopWidth: 0.5,
+    borderTopColor: red,
+  },
+  resetButtonText: {
+    color: red,
+    fontSize: 16,
+    textAlign: 'center'
+  },
 
 })
+
+mapStateToProps = (state) => {
+  return {
+    settings: state
+  }
+}
+
+mapDispatchToProps = (dispatch) => {
+  return {
+    changeSettings: (settings) => dispatch(setSettings(settings))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Settings)

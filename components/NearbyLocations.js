@@ -1,15 +1,19 @@
 import React, {Component} from 'react'
-import {Dimensions, View, Text, StyleSheet, LayoutAnimation} from 'react-native'
+import { Dimensions, View, Text, StyleSheet, LayoutAnimation, TouchableOpacity } from 'react-native'
 import ChangeModeSwitch from './ChangeModeSwitch'
 import ExplorationModeSwitch from './ExplorationModeSwitch'
-import {Constants, Location, Camera, Permissions, MapView} from 'expo'
-import {venues} from 'react-foursquare'
+import { Constants, Location, Camera, Permissions, MapView } from 'expo'
+import { venues } from 'react-foursquare'
 import MapViewDirections from 'react-native-maps-directions';
 import Marker from '../utils/CustomMarker'
 import * as polyline from '@mapbox/polyline';
 import geolib from 'geolib';
-
-
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { connect } from 'react-redux'
+import Marker from './CustomMarker'
+import DirectionMeter from './DirectionMeter'
+import Settings from './Settings'
+import { purple, white, red } from '../utils/colors'
 
 var foursquare = require('react-foursquare')({
     clientID: 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH',
@@ -26,7 +30,8 @@ class NearbyLocations extends Component {
             hasCameraPermission: null,
             location: null,
             markers: [],
-            destination: null
+            destination: null,
+            settingVisible: false,
         };
 
         this.heading = null;
@@ -76,14 +81,14 @@ class NearbyLocations extends Component {
 			    	}
         	})
         	this.setState({
-	            markers: markers
+              markers: markers
         	})
-		})
-		.catch( error => {
-		  console.error(error);
-		});
+  	})
+  	.catch( error => {
+  	  console.error(error);
+  	});
 
-    }
+  }
 
     _getLocationAsync = async () => {
         let { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -135,7 +140,7 @@ class NearbyLocations extends Component {
 
     componentWillUnmount() {
         this.headingWatch.remove();
-        //clearInterval(this.targetBearingWatchId);
+        clearInterval(this.targetBearingWatchId);
     }
 
     getTargetBearing = async()=>{
@@ -180,46 +185,59 @@ class NearbyLocations extends Component {
     };
 
 
-    render() {
 
-        const screenWidth = Dimensions.get('window').width
-        const screenHeight = Dimensions.get('window').height
-        const {navigation} = this.props
+  closeSettings = () => {
+    this.setState({ settingVisible: false })
+  }
 
-        const {hasCameraPermission, location} = this.state
 
-        let latlong = null;
-        if (location != null) {
-             latlong = {latitude: location.coords.latitude, longitude: location.coords.longitude};
-        }
+  openSettings = () => {
+    this.setState({ settingVisible: true })
+  }
 
-        if ((hasCameraPermission === null) && (location === null)) {
-            return <View/>;
-        } else if (hasCameraPermission === false) {
-            return <Text>No access to camera</Text>;
-        } else if ((location === null)) {
-            return (
-                <View>
-                    <Text> Wait for location</Text>
-                </View>
-            )
-        } else {
-            return (
-                <View style={{flex: 1}}>
-                    <Camera style={styles.camera} type={Camera.Constants.Type.back}>
-                        <View
-                            style={styles.container}>
-                            <ExplorationModeSwitch
-                                currentScreen={navigation.state.routeName}
-                                changeScreen={navigation.navigate}
-                                dispatch={navigation.dispatch}
-                            />
-                            <ChangeModeSwitch
-                                currentScreen={navigation.state.routeName}
-                                changeScreen={navigation.navigate}
-                                dispatch={navigation.dispatch}
-                            />
-                            <MapView ref={ref => this.mapRef = ref} style={styles.map}
+  render() {
+
+    const screenWidth = Dimensions.get('window').width
+    const screenHeight = Dimensions.get('window').height
+    const { navigation } = this.props
+
+    const { hasCameraPermission, location, settingVisible } = this.state
+
+    let latlong = null;
+    if (location != null) {
+         latlong = {latitude: location.coords.latitude, longitude: location.coords.longitude};
+    }
+
+    if ((hasCameraPermission === null) && (location === null)) {
+        return <View/>;
+    } else if (hasCameraPermission === false) {
+        return <Text>No access to camera</Text>;
+    } else if ((location === null)) {
+        return (
+            <View>
+                <Text> Wait for location</Text>
+            </View>
+        )
+    } else {
+      return (
+        <View style={{flex: 1}}>
+          <Camera style={styles.camera} type={Camera.Constants.Type.back}>
+            <View
+              style={styles.container}>
+              <ExplorationModeSwitch
+                  currentScreen={navigation.state.routeName}
+                  changeScreen={navigation.navigate}
+                  dispatch={navigation.dispatch}
+              />
+              <ChangeModeSwitch
+                  currentScreen={navigation.state.routeName}
+                  changeScreen={navigation.navigate}
+                  dispatch={navigation.dispatch}
+              />
+
+              <DirectionMeter />
+        
+              <MapView ref={ref => this.mapRef = ref} style={styles.map}
                                      provider = {MapView.PROVIDER_GOOGLE}
                                      showsUserLocation = {true}
                                      showsMyLocationButton={true}
@@ -259,18 +277,31 @@ class NearbyLocations extends Component {
                                 ))}
 
                             </MapView>
-                        </View>
-                    </Camera>
-                </View>
-            )
-        }
 
+              <TouchableOpacity
+                onPress={settingVisible
+                          ? this.closeSettings
+                          : this.openSettings}
+                  style={styles.buttonSettings}
+                >
+                  <Ionicons
+                    name='ios-settings-outline'
+                    size={50}
+                    color={white}
+                  />
+              </TouchableOpacity>
+              <Settings
+                visible={settingVisible}
+              />
+
+            </View>
+          </Camera>
+        </View>
+      )
     }
-
-
 }
 
-export default NearbyLocations
+
 
 const styles = StyleSheet.create({
     container: {
@@ -299,4 +330,27 @@ const styles = StyleSheet.create({
         width: '94%',
         height: 300
     },
+    buttonSettings: {
+      position: 'absolute',
+      zIndex: 11,
+      top: 15,
+      right: 15,
+      height: 60,
+      width: 58,
+      borderRadius: 20,
+      backgroundColor: red,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingTop: 4,
+    },
 })
+
+
+mapStateToProps = (state) => {
+  return {
+    settings: state
+  }
+}
+
+
+export default connect(mapStateToProps)(NearbyLocations)
