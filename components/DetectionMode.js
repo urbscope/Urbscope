@@ -62,6 +62,7 @@ class DetectionMode extends Component {
     // console.log(LayoutAnimation);
     LayoutAnimation.linear();
     this.setState({})
+      console.log("settings in detection", this.props.settings);
     // this.animateModalButtonAppear()
   }
 

@@ -36,7 +36,7 @@ class AppWithStore extends React.Component {
       nearbyLimit: 10,
       nearbyRadius: 1000,
       category: 'religious'
-    }
+    };
     this.props.changeSettings(newSettings)
   }
 
