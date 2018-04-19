@@ -14,6 +14,8 @@ import { View,
 import { Constants, Location, Camera, Permissions } from 'expo'
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 
+import { connect } from 'react-redux'
+
 import vision from "react-cloud-vision-api"
 
 import ChangeModeSwitch from './ChangeModeSwitch'
@@ -60,6 +62,7 @@ class DetectionMode extends Component {
     // console.log(LayoutAnimation);
     LayoutAnimation.linear();
     this.setState({})
+      console.log("settings in detection", this.props.settings);
     // this.animateModalButtonAppear()
   }
 
@@ -341,9 +344,6 @@ class DetectionMode extends Component {
                     />
                 </TouchableOpacity>
 
-                {
-
-                }
                 <Settings
                   visible={settingVisible}
                 />
@@ -359,7 +359,6 @@ class DetectionMode extends Component {
   }
 }
 
-export default DetectionMode
 
 const styles = StyleSheet.create({
   container: {
@@ -462,3 +461,13 @@ const styles = StyleSheet.create({
     color: red,
   }
 })
+
+
+
+mapStateToProps = (state) => {
+  return {
+    settings: state
+  }
+}
+
+export default connect(mapStateToProps)(DetectionMode)
