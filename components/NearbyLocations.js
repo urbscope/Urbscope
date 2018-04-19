@@ -96,13 +96,11 @@ class NearbyLocations extends Component {
         this._watchHeadingAsync();
         this._watchTargetBearingAsync();
         let location = await this._getLocationAsync();
-        if (!markers && this.props.settings)
+        if (!this.state.markers && this.props.settings)
             this.updateMarkers(this.props.settings);
 
 
     }
-
-
 
     _getLocationAsync = async () => {
         let {status} = await Permissions.askAsync(Permissions.LOCATION);
@@ -135,7 +133,6 @@ class NearbyLocations extends Component {
     };
 
 
-
     formatLocation(location, asObject = true) {
         if (!location)
             return null;
@@ -160,8 +157,8 @@ class NearbyLocations extends Component {
 
     getTargetBearing = async () => {
 
-        let startLoc = NearbyLocations.formatLocation(this.state.location, false);
-        let destinationLoc = NearbyLocations.formatLocation(this.state.destination, false);
+        let startLoc = this.formatLocation(this.state.location, false);
+        let destinationLoc = this.formatLocation(this.state.destination, false);
         if (!destinationLoc || !startLoc) {
             console.log("location null. returning");
             return;
@@ -182,7 +179,7 @@ class NearbyLocations extends Component {
                 return;
 
             let pointCoords = {latitude: points[1][0], longitude: points[1][1]};
-            this.targetBearing = geolib.getRhumbLineBearing(NearbyLocations.formatLocation(this.state.location), pointCoords);
+            this.targetBearing = geolib.getRhumbLineBearing(this.formatLocation(this.state.location), pointCoords);
 
         } catch (error) {
             console.error(error);
