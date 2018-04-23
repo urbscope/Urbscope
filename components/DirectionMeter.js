@@ -72,7 +72,7 @@ export default DirectionMeter
 const styles = StyleSheet.create({
     container: {
       top: ScreenHeight*0.1,
-      left: 0,
+      left: ScreenWidth/2 - 100 - ScreenHeight*0.05,
       width: 100 + ScreenHeight*0.05,
       height: 100 + ScreenHeight*0.05,
       alignItems: 'stretch',

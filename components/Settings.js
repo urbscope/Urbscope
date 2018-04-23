@@ -6,13 +6,21 @@ import { View,
          Slider,
          TouchableOpacity,
          Animated,
-         PickerIOS,
+         Picker,
          Dimensions } from 'react-native'
 
 import { connect } from 'react-redux'
-import { setSettings } from '../actions'
+import { setSettings, changeColor } from '../actions'
 
-import { red, white, teal, cream, yellow, lightRed, darkRed } from '../utils/colors'
+import { red, white, teal, black, purple, yellow, } from '../utils/colors'
+
+import { CATEGORIES_ALL,
+         CATEGORIES_MUSEUM,
+         CATEGORIES_NATURAL,
+         CATEGORIES_RELIGIOUS,
+         CATEGORIES_NIGHTLIFE,
+         CATEGORIES_HISTORY, } from '../utils/helpers'
+import { DEFAULT_SETTINGS } from '../utils/helpers'
 
 var ScreenWidth = Dimensions.get('window').width
 var ScreenHeight = Dimensions.get('window').height
@@ -24,6 +32,7 @@ class Settings extends React.Component {
     nearbyLimit: this.props.settings.nearbyLimit,
     nearbyRadius: this.props.settings.nearbyRadius,
     category: this.props.settings.category,
+    themeColor: this.props.settings.themeColor,
     animation: {
       containerHeight: new Animated.Value(60),
       containerWidth: new Animated.Value(58),
@@ -119,6 +128,7 @@ class Settings extends React.Component {
       nearbyLimit: this.state.nearbyLimit,
       nearbyRadius: this.state.nearbyRadius,
       category: this.state.category,
+      themeColor: this.props.themeColor,
     }
 
     if (nextProps.visible === true && this.props.visible === false ){
@@ -127,6 +137,7 @@ class Settings extends React.Component {
         nearbyLimit: this.props.settings.nearbyLimit,
         nearbyRadius: nextProps.settings.nearbyRadius,
         category: nextProps.settings.category,
+        themeColor: this.props.settings.themeColor,
       }, () => {
         this.modalAppear()
       })
@@ -139,18 +150,13 @@ class Settings extends React.Component {
   }
 
   defaultSettings = () => {
-    let newSettings = {
-      dectionLimit: 5,
-      nearbyLimit: 10,
-      nearbyRadius: 1000,
-      category: 'religious'
-    }
     this.setState({
-      dectionLimit: 5,
-      nearbyLimit: 10,
-      nearbyRadius: 1000,
-      category: 'religious'
-    }, () => this.props.changeSettings(newSettings))
+      dectionLimit: DEFAULT_SETTINGS.dectionLimit,
+      nearbyLimit: DEFAULT_SETTINGS.nearbyLimit,
+      nearbyRadius: DEFAULT_SETTINGS.nearbyLimit,
+      category: DEFAULT_SETTINGS.category,
+      themeColor:DEFAULT_SETTINGS.themeColor,
+    }, () => this.props.changeSettings(DEFAULT_SETTINGS))
 
   }
 
@@ -158,14 +164,17 @@ class Settings extends React.Component {
   render () {
 
     const { dectionLimit, nearbyRadius, category, nearbyLimit } = this.state
-    const { settings } = this.props
+    const { settings, themeColor } = this.props
     const { containerHeight, containerWidth, opacity, opacity2, zIndex, borderRadius } = this.state.animation
+
+    // console.log('settings', settings);
+    // console.log('state', this.state);
 
     // if (this.props.visible) {
       return (
         <Animated.View style={[styles.container, {height: containerHeight, width: containerWidth, zIndex}]}>
 
-          <Animated.View style={[styles.heading, {borderRadius}]}>
+          <Animated.View style={[styles.heading, {borderRadius, borderBottomColor: themeColor, backgroundColor: themeColor}]}>
             <Animated.Text style={[styles.headingText, {opacity}]}>Settings</Animated.Text>
           </Animated.View>
 
@@ -173,12 +182,12 @@ class Settings extends React.Component {
             style={{flex: 1, opacity }}
             contentContainerStyle={styles.scroll}
           >
-            <View style={styles.sectionHeader}>
-              <Text style={{fontSize: 19, color: red}}>Detection Settings</Text>
+            <View style={[styles.sectionHeader, {borderBottomColor: themeColor}]}>
+              <Text style={{fontSize: 19, color: themeColor}}>Detection Settings</Text>
             </View>
 
             {/*Detection Location Radius */}
-            <View style={[styles.itemLast, { borderBottomWidth: 0.5, borderBottomColor: red }]}>
+            <View style={[styles.itemLast, { borderBottomWidth: 0.5, borderBottomColor: themeColor }]}>
               <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
                 <Text style={{fontSize: 15}}>Maximum Detected Landmarks: </Text>
                 { (dectionLimit === null || dectionLimit === 0 || dectionLimit === undefined)
@@ -191,7 +200,7 @@ class Settings extends React.Component {
                 value={dectionLimit === null ? settings.dectionLimit : dectionLimit }
                 minimumValue={1}
                 maximumValue={5}
-                minimumTrackTintColor={red}
+                minimumTrackTintColor={themeColor}
                 onValueChange={(dectionLimit) => this.setState({dectionLimit})}
               />
               <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
@@ -200,8 +209,8 @@ class Settings extends React.Component {
 
             </View>
 
-            <View style={styles.sectionHeader}>
-              <Text style={{fontSize: 19, color: red}}>Exploration Settings</Text>
+            <View style={[styles.sectionHeader, {borderBottomColor: themeColor}]}>
+              <Text style={{fontSize: 19, color: themeColor}}>Exploration Settings</Text>
             </View>
 
             {/*Nearby Location Radius */}
@@ -218,7 +227,7 @@ class Settings extends React.Component {
                 value={nearbyRadius === null ? settings.nearbyRadius : nearbyRadius}
                 minimumValue={500}
                 maximumValue={5000}
-                minimumTrackTintColor={red}
+                minimumTrackTintColor={themeColor}
                 onValueChange={(nearbyRadius) => this.setState({nearbyRadius})}
               />
             <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
@@ -241,11 +250,11 @@ class Settings extends React.Component {
                 value={nearbyLimit === null ? settings.nearbyLimit : nearbyLimit}
                 minimumValue={1}
                 maximumValue={10}
-                minimumTrackTintColor={red}
+                minimumTrackTintColor={themeColor}
                 onValueChange={(nearbyLimit) => this.setState({nearbyLimit})}
               />
 
-            <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
+              <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
                 Maximum number of landmark that are displayed in Nearby Location mode.
               </Animated.Text>
 
@@ -253,30 +262,71 @@ class Settings extends React.Component {
 
 
             {/* Category */}
-            <View style={styles.itemLast}>
+            <View style={styles.item}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Text style={{fontSize: 15}}>Select Category: </Text>
               </View>
 
-              <PickerIOS
-                style={styles.picker}
-                selectedValue={category === null ? settings.category : category}
+              <Picker
+                style={[styles.picker, {borderTopColor: themeColor, borderBottomColor: themeColor}]}
+                selectedValue={category}
                 onValueChange={category => this.setState({category})}
-                itemStyle={{color: red}}
+                itemStyle={{color: themeColor}}
               >
-                <PickerIOS.Item label="History" value="history" />
-                <PickerIOS.Item label="Arts and Meuseums" value="meuseum" />
-                <PickerIOS.Item label="Natural Outdoors" value="natural" />
-                <PickerIOS.Item label="Religious" value="religious" />
-                <PickerIOS.Item label="Night Life" value="nightlife" />
-              </PickerIOS>
+                <Picker.Item label="All" value={CATEGORIES_ALL} />
+                <Picker.Item label="Arts and Meuseums" value={CATEGORIES_MUSEUM} />
+                <Picker.Item label="History" value={CATEGORIES_HISTORY} />
+                <Picker.Item label="Natural Outdoors" value={CATEGORIES_NATURAL} />
+                <Picker.Item label="Night Life" value={CATEGORIES_NIGHTLIFE} />
+                <Picker.Item label="Religious" value={CATEGORIES_RELIGIOUS} />
+              </Picker>
               <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
                 The landmarks from selected category will be displayed in Nearby Location mode.
               </Animated.Text>
             </View>
 
+            <View style={styles.itemLast}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text style={{fontSize: 15}}>Theme: </Text>
+              </View>
+              <View style={styles.themeList}>
+                <TouchableOpacity
+                  style={(themeColor === red)
+                          ? [styles.themeButton, {backgroundColor: red, borderWidth: 2}]
+                          : [styles.themeButton, {backgroundColor: red}]}
+                  onPress={() => this.props.changeColor(red)}
+                />
+                <TouchableOpacity
+                  style={(themeColor === teal)
+                          ? [styles.themeButton, {backgroundColor: teal, borderWidth: 2}]
+                          : [styles.themeButton, {backgroundColor: teal}]}
+                  onPress={() => this.props.changeColor(teal)}
+                />
+                <TouchableOpacity
+                  style={(themeColor === purple)
+                          ? [styles.themeButton, {backgroundColor: purple, borderWidth: 2}]
+                          : [styles.themeButton, {backgroundColor: purple}]}
+                  onPress={() => this.props.changeColor(purple)}
+                />
+                <TouchableOpacity
+                  style={(themeColor === yellow)
+                          ? [styles.themeButton, {backgroundColor: yellow, borderWidth: 2}]
+                          : [styles.themeButton, {backgroundColor: yellow}]}
+                  onPress={() => this.props.changeColor(yellow)}
+                />
+                <TouchableOpacity
+                  style={(themeColor === black)
+                          ? [styles.themeButton, {backgroundColor: black, borderWidth: 2}]
+                          : [styles.themeButton, {backgroundColor: black}]}
+                  onPress={() => this.props.changeColor(black)}
+                />
+
+              </View>
+
+            </View>
+
             <TouchableOpacity
-              style={styles.resetButton}
+              style={[styles.resetButton, {borderTopColor: red}]}
               onPress={this.defaultSettings}
             >
               <Text style={styles.resetButtonText}>
@@ -312,9 +362,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     // alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: red,
     padding: 15,
-    backgroundColor: red,
+    // borderBottomColor: red,
+    // backgroundColor: red,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
 
@@ -330,7 +380,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 10,
-    borderBottomColor: red,
     borderBottomWidth: 0.5,
   },
   item: {
@@ -343,9 +392,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   picker: {
-    borderTopColor: red,
     borderTopWidth: 0.3,
-    borderBottomColor: red,
     borderBottomWidth: 0.3,
     marginVertical: 10,
   },
@@ -353,25 +400,38 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 12,
     borderTopWidth: 0.5,
-    borderTopColor: red,
   },
   resetButtonText: {
     color: red,
     fontSize: 16,
     textAlign: 'center'
   },
+  themeList: {
+    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  themeButton: {
+    width: 35,
+    height: 30,
+    borderRadius: 5,
+    paddingTop: 10,
+    borderColor: '#444',
+  }
 
 })
 
 mapStateToProps = (state) => {
   return {
-    settings: state
+    settings: state.settings,
+    themeColor: state.themeColor,
   }
 }
 
 mapDispatchToProps = (dispatch) => {
   return {
-    changeSettings: (settings) => dispatch(setSettings(settings))
+    changeSettings: (settings, callback) => dispatch(setSettings(settings, callback)),
+    changeColor: (color) => dispatch(changeColor(color))
   }
 }
 

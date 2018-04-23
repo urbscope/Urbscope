@@ -70,6 +70,7 @@ class DetectionMode extends Component {
   //  ASK FOR CAMERA PERMISSIONS
   // ========================================================================
   async componentWillMount() {
+    LayoutAnimation.linear();
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ hasCameraPermission: status === 'granted' });
   }
@@ -250,19 +251,24 @@ class DetectionMode extends Component {
 
   render(){
 
-    const { navigation } = this.props
+    const { navigation, themeColor } = this.props
 
     const { hasCameraPermission, locations, modalVisible, settingVisible } = this.state
 
     const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
 
+
     if (hasCameraPermission === null) {
-     return <View />;
+     return <View style={{flex:1, backgroundColor: 'black'}}/>;
     } else if (hasCameraPermission === false) {
-      return <Text>No access to camera</Text>;
+      return (
+        <View style={{flex:1, backgroundColor: 'black'}}>
+          <Text>No access to camera</Text>
+        </View>
+      );
     } else {
       return (
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
           <Camera
             style={styles.camera}
             ref={(ref) => { this.camera = ref }}
@@ -282,6 +288,7 @@ class DetectionMode extends Component {
                               borderRadius: radius,
                               top,
                               opacity,
+                              backgroundColor: themeColor
                             }]
                           /*: {}*/}
                 >
@@ -312,7 +319,7 @@ class DetectionMode extends Component {
                   onPress={modalVisible
                             ? () => {}
                             : this.detectLandmark}
-                  style={styles.buttonDetect}
+                  style={[styles.buttonDetect, {backgroundColor: themeColor}]}
                 >
                   <View style={styles.buttonDetectView}>
                     <Ionicons
@@ -325,6 +332,7 @@ class DetectionMode extends Component {
 
 
                 <ChangeModeSwitch
+                  replaceScreen={navigation.replace}
                   currentScreen={navigation.state.routeName}
                   changeScreen={navigation.navigate}
                   dispatch={navigation.dispatch}
@@ -335,7 +343,7 @@ class DetectionMode extends Component {
                   onPress={settingVisible
                             ? this.closeSettings
                             : this.openSettings}
-                    style={styles.buttonSettings}
+                    style={[styles.buttonSettings, {backgroundColor: themeColor}]}
                   >
                     <Ionicons
                       name='ios-settings-outline'
@@ -353,7 +361,7 @@ class DetectionMode extends Component {
             {/*</TouchableWithoutFeedback>
             */}
           </Camera>
-        </View>
+        </SafeAreaView>
       )
     }
   }
@@ -390,18 +398,18 @@ const styles = StyleSheet.create({
     height: 100,
     width: 100,
     borderRadius: 50,
-    borderColor: red,
-    borderWidth: 3,
+    borderColor: '#eee',
+    borderWidth: 1,
   },
   buttonDetectView: {
     flex: 1,
     borderRadius: 50,
-    backgroundColor: 'rgba(183, 24, 69, 0.2)',
+    // backgroundColor: 'rgba(183, 24, 69, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   buttonDetectIcon: {
-    color: red,
+    color: '#eee',
   },
   buttonText: {
     fontSize: 20,
@@ -435,7 +443,7 @@ const styles = StyleSheet.create({
     borderColor: white,
     // top: this.state.modalButtonAnimations.top,
     zIndex: 9,
-    backgroundColor: red,
+    // backgroundColor: red,
   },
   modalButtonText: {
     fontFamily: 'AppleSDGothicNeo-Thin',
@@ -452,7 +460,7 @@ const styles = StyleSheet.create({
     height: 60,
     width: 58,
     borderRadius: 20,
-    backgroundColor: red,
+    // backgroundColor: red,
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 4,
@@ -466,7 +474,8 @@ const styles = StyleSheet.create({
 
 mapStateToProps = (state) => {
   return {
-    settings: state
+    settings: state.settings,
+    themeColor: state.themeColor,
   }
 }
 

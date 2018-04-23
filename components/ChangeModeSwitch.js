@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { NavigationActions } from 'react-navigation'
+import { connect } from 'react-redux'
+
 import { buttonActive, buttonActiveOutline } from '../utils/colors'
 
 class ChangeModeSwitch extends Component {
@@ -8,10 +10,12 @@ class ChangeModeSwitch extends Component {
   goToDetection = () => {
     // this.props.changeScreen('DetectionMode')
 
-    this.props.dispatch(NavigationActions.reset({
-      index: 0,
-      actions: [ NavigationActions.navigate({ routeName: 'DetectionMode'}) ]
-    }))
+    // this.props.dispatch(NavigationActions.reset({
+    //   index: 0,
+    //   actions: [ NavigationActions.navigate({ routeName: 'DetectionMode'}) ]
+    // }))
+
+    this.props.replaceScreen('DetectionMode')
 
     // this.props.dispatch(NavigationActions.replace({
     //   key: 'NearbyLocations',
@@ -26,10 +30,12 @@ class ChangeModeSwitch extends Component {
 
     // this.props.changeScreen('NearbyLocations')
 
-    this.props.dispatch(NavigationActions.reset({
-      index: 0,
-      actions: [ NavigationActions.navigate({ routeName: 'NearbyLocations'}) ]
-    }))
+    // this.props.dispatch(NavigationActions.reset({
+    //   index: 0,
+    //   actions: [ NavigationActions.navigate({ routeName: 'NearbyLocations'}) ]
+    // }))
+    
+    this.props.replaceScreen('NearbyLocations')
 
     // this.props.dispatch(NavigationActions.replace({
     //   key: 'DetectionMode',
@@ -43,17 +49,17 @@ class ChangeModeSwitch extends Component {
   doNothing = () => {}
 
   render(){
-
-    const { currentScreen } = this.props
+    console.log(this.props);
+    const { currentScreen, themeColor } = this.props
 
     let isSelectedDetection
     let isSelectedExploration
     if (currentScreen === 'DetectionMode'){
-      isSelectedDetection = styles.selected
-      isSelectedExploration = styles.unselected
+      isSelectedDetection = { backgroundColor: themeColor }
+      isSelectedExploration = { backgroundColor: 0 }
     } else {
-      isSelectedDetection = styles.unselected
-      isSelectedExploration = styles.selected
+      isSelectedDetection = { backgroundColor: 0 }
+      isSelectedExploration = { backgroundColor: themeColor }
     }
 
     return (
@@ -74,7 +80,6 @@ class ChangeModeSwitch extends Component {
   }
 }
 
-export default ChangeModeSwitch
 
 const styles = StyleSheet.create({
   container: {
@@ -97,3 +102,13 @@ const styles = StyleSheet.create({
     backgroundColor: 0,
   }
 })
+
+
+
+mapStateToProps = (state) => {
+  return {
+    themeColor: state.themeColor,
+  }
+}
+
+export default connect(mapStateToProps)(ChangeModeSwitch)

@@ -1,13 +1,16 @@
 import React from 'react'
-import { StyleSheet, Text, SafeAreaView, View, TouchableOpacity, Dimensions } from 'react-native'
+import { StyleSheet, Text, SafeAreaView, View, TouchableOpacity, Dimensions, AsyncStorage } from 'react-native'
 import { StackNavigator, TabNavigator } from 'react-navigation'
 import { Camera, Permissions } from 'expo'
+
 import { purple, white } from './utils/colors'
+import { DEFAULT_SETTINGS } from './utils/helpers'
 
 import DetectionMode from './components/DetectionMode'
 import NearbyLocations from './components/NearbyLocations'
 import Recommendations from './components/Recommendations'
 import ExplorationMode from './components/ExplorationMode'
+import SplashLoading from './components/SplashLoading'
 
 import { connect } from 'react-redux'
 import { loadSettings, setSettings } from './actions'
@@ -30,48 +33,83 @@ const MainNavigtor = StackNavigator({
 
 class AppWithStore extends React.Component {
 
-  defaultSettings = () => {
-    let newSettings = {
-      dectionLimit: 5,
-      nearbyLimit: 10,
-      nearbyRadius: 1000,
-      category: 'religious'
-    };
-    this.props.changeSettings(newSettings)
+  state = {
+    loading: true,
   }
 
+  // defaultSettings = () => {
+  //   let newSettings = {
+  //     dectionLimit: 5,
+  //     nearbyLimit: 10,
+  //     nearbyRadius: 1000,
+  //     category: 'religious',
+  //     themeColor: 'red',
+  //   }
+  //   this.props.changeSettings(newSettings)
+  // }
 
 
-  async componentDidMount () {
-    await this.props.loadSettings()
 
-      if (Object.keys(this.props.settings).length === 0) {
-        this.defaultSettings()
+  componentDidMount () {
+    // AsyncStorage.clear()
+
+    this.props.loadSettings(() => {
+      // console.log("load settings init");
+      // console.log(this.props);
+
+      if (this.props.settings === null || this.props.settings === undefined) {
+        this.props.changeSettings(DEFAULT_SETTINGS, () => {
+          this.setState({ loading: false })
+          // console.log("load default when props null or undefined");
+        })
+      } else {
+        if (Object.keys(this.props.settings).length === 0 ) {
+          this.props.changeSettings(DEFAULT_SETTINGS, () => {
+            this.setState({ loading: false })
+            // console.log("load default when props empty");
+          })
+        } else {
+          // console.log("load settings success");
+          this.setState({ loading: false })
+        }
       }
+    })
 
 
+    // await this.props.loadSettings()
+
+      // if (Object.keys(this.props.settings).length === 0) {
+      //   this.defaultSettings()
+      // }
   }
 
   render() {
-    return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <MainNavigtor/>
-      </SafeAreaView>
-    )
+    if (this.state.loading) {
+      return (
+        <SplashLoading />
+      )
+    } else {
+      return (
+        <SafeAreaView style={{ flex: 1 }}>
+          <MainNavigtor/>
+        </SafeAreaView>
+      )
+    }
   }
 }
 
 
 mapStateToProps = (state) => {
   return {
-    settings: state
+    settings: state.settings,
+    themeColor: state.themeColor,
   }
 }
 
 mapDispatchToProps = (dispatch) => {
   return {
-    loadSettings: () => dispatch(loadSettings()),
-    changeSettings: (settings) => dispatch(setSettings(settings))
+    loadSettings: (callback) => dispatch(loadSettings(callback)),
+    changeSettings: (settings, callback) => dispatch(setSettings(settings, callback))
   }
 }
 

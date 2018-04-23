@@ -1,3 +1,4 @@
+import { red, white, teal, black, purple, yellow, lightRed, darkRed } from './colors'
 
 
 export const fixDetectedLandmarks = (res) => {
@@ -52,13 +53,30 @@ export const fixLandmarkDetailsFS = (res) => {
   }
 }
 
+
+
 export const fixLandmarkDetail = (res) => {
 
   let detail = null
-  
+
   if (res.itemListElement.length > 0 ){
     detail = res.itemListElement[0].result
   }
 
   return detail
+}
+
+export const CATEGORIES_ALL       = 'all'
+export const CATEGORIES_MUSEUM    = 'museum'
+export const CATEGORIES_NATURAL   = 'natural'
+export const CATEGORIES_RELIGIOUS = 'religious'
+export const CATEGORIES_NIGHTLIFE = 'nightlife'
+export const CATEGORIES_HISTORY   = 'history'
+
+export const DEFAULT_SETTINGS = {
+  dectionLimit: 5,
+  nearbyLimit: 10,
+  nearbyRadius: 1000,
+  category: CATEGORIES_ALL,
+  themeColor: yellow,
 }

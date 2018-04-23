@@ -2,7 +2,7 @@ import * as LocalStorage from '../utils/localStorageAPI'
 
 export const CHANGE_SETTINGS  = "CHANGE_SETTINGS"
 export const LOAD_SETTINGS = "LOAD_SETTINGS"
-
+export const CHANGE_COLOR = "CHANGE_COLOR"
 
 export function setSettingsSuccess (settings) {
   return {
@@ -18,21 +18,35 @@ export function loadSettingsSuccess (settings) {
   }
 }
 
+export function changeColor (color) {
+  return {
+    type: CHANGE_COLOR,
+    color
+  }
+}
+
 // ============================================================================
 // THUNK MIDDLEWARE
 // ============================================================================
 
-export function loadSettings () {
+export function loadSettings ( callback ) {
+  callback = callback || function () {};
+
   return (dispatch) => {
     LocalStorage.getSettings().then((settings) => {
       dispatch(loadSettingsSuccess(settings))
+      dispatch(changeColor(settings.themeColor))
+      callback()
     })
   }
 }
 
-export function setSettings (settings) {
+export function setSettings (settings, callback) {
+  callback = callback || function () {};
+
   return (dispatch) => {
     LocalStorage.setSettings(settings).then( () =>
       dispatch(setSettingsSuccess(settings)))
+      callback()
   }
 }
