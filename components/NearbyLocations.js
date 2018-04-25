@@ -96,7 +96,6 @@ class NearbyLocations extends Component {
     //TODO: add relevant category + ALL category
     let url = "https://urbserver.herokuapp.com/landmark?"
     + "inLL=" + this.formatLocation(location, false)
-    + "&inQuery=" + settings.category
     + "&inLimit=" + settings.nearbyLimit
     + "&inOpenNow=" + 0
     + "&inRadius=" + settings.nearbyRadius;

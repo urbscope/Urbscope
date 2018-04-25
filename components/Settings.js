@@ -14,12 +14,28 @@ import { setSettings, changeColor } from '../actions'
 
 import { red, white, teal, black, purple, yellow, } from '../utils/colors'
 
-import { CATEGORIES_ALL,
-         CATEGORIES_MUSEUM,
-         CATEGORIES_NATURAL,
-         CATEGORIES_RELIGIOUS,
-         CATEGORIES_NIGHTLIFE,
-         CATEGORIES_HISTORY, } from '../utils/helpers'
+import {
+    CATEGORIES_TOURISTIC_SITES,
+    CATEGORIES_AMPHITHEATERS,
+    CATEGORIES_AQUARIUMS,
+    CATEGORIES_ART_GALLERIES,
+    CATEGORIES_CONCERT_HALLS,
+    CATEGORIES_EXHIBITS,
+    CATEGORIES_HISTORIC_SITES,
+    CATEGORIES_MUSEUMS,
+    CATEGORIES_PUBLIC_ART,
+    CATEGORIES_STADIUMS,
+    CATEGORIES_ZOOS,
+    CATEGORIES_RESTAURANTS,
+    CATEGORIES_NIGHTLIFE_SPOTS,
+    CATEGORIES_OUTDOORS_AND_RECREATION,
+    CATEGORIES_TRAVEL_AND_TRANSPORT,
+    CATEGORIES_AIRPORTS,
+    CATEGORIES_BUS_STATIONS,
+    CATEGORIES_TOURIST_INFORMATION_CENTERS,
+    CATEGORIES_TRAIN_STATIONS,
+} from '../utils/helpers';
+
 import { DEFAULT_SETTINGS } from '../utils/helpers'
 
 var ScreenWidth = Dimensions.get('window').width
@@ -273,12 +289,25 @@ class Settings extends React.Component {
                 onValueChange={category => this.setState({category})}
                 itemStyle={{color: themeColor}}
               >
-                <Picker.Item label="All" value={CATEGORIES_ALL} />
-                <Picker.Item label="Arts and Meuseums" value={CATEGORIES_MUSEUM} />
-                <Picker.Item label="History" value={CATEGORIES_HISTORY} />
-                <Picker.Item label="Natural Outdoors" value={CATEGORIES_NATURAL} />
-                <Picker.Item label="Night Life" value={CATEGORIES_NIGHTLIFE} />
-                <Picker.Item label="Religious" value={CATEGORIES_RELIGIOUS} />
+                <Picker.Item label="Touristic Sites" value={CATEGORIES_TOURISTIC_SITES} />
+                <Picker.Item label="Amphitheaters" value={CATEGORIES_AMPHITHEATERS} />
+                <Picker.Item label="Aquariums" value={CATEGORIES_AQUARIUMS} />
+                <Picker.Item label="Art Galleries" value={CATEGORIES_ART_GALLERIES} />
+                <Picker.Item label="Concert Halls" value={CATEGORIES_CONCERT_HALLS} />
+                <Picker.Item label="Exhibits" value={CATEGORIES_EXHIBITS} />
+                <Picker.Item label="Historic Sites" value={CATEGORIES_HISTORIC_SITES} />
+                <Picker.Item label="Museums" value={CATEGORIES_MUSEUMS} />
+                <Picker.Item label="Public Art" value={CATEGORIES_PUBLIC_ART} />
+                <Picker.Item label="Stadiums" value={CATEGORIES_STADIUMS} />
+                <Picker.Item label="Zoos" value={CATEGORIES_ZOOS} />
+                <Picker.Item label="Restaurants" value={CATEGORIES_RESTAURANTS} />
+                <Picker.Item label="Nightlife Spots" value={CATEGORIES_NIGHTLIFE_SPOTS} />
+                <Picker.Item label="Outdoors & Recreation" value={CATEGORIES_OUTDOORS_AND_RECREATION} />
+                <Picker.Item label="Travel & Transport" value={CATEGORIES_TRAVEL_AND_TRANSPORT} />
+                <Picker.Item label="Airports" value={CATEGORIES_AIRPORTS} />
+                <Picker.Item label="Bus Stations" value={CATEGORIES_BUS_STATIONS} />
+                <Picker.Item label="Tourist Information Centers" value={CATEGORIES_TOURIST_INFORMATION_CENTERS} />
+                <Picker.Item label="Train Stations" value={CATEGORIES_TRAIN_STATIONS} />
               </Picker>
               <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
                 The landmarks from selected category will be displayed in Nearby Location mode.
