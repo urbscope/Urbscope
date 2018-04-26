@@ -97,7 +97,7 @@ class NearbyLocations extends Component {
     let url = "https://urbserver.herokuapp.com/landmark?"
     + "inLL=" + this.formatLocation(location, false)
     + "&inLimit=" + settings.nearbyLimit
-    + "&inOpenNow=" + 0
+    + "&inCat=" + settings.category
     + "&inRadius=" + settings.nearbyRadius;
 
     // console.log("here");
