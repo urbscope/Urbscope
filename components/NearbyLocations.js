@@ -102,8 +102,6 @@ class NearbyLocations extends Component {
     + "&inCat=" + settings.category
     + "&inRadius=" + settings.nearbyRadius;
 
-    // console.log("here");
-    // console.log(url);
 
     fetch(url).then(response => {
       if (response.status === 200) {
@@ -158,8 +156,9 @@ componentDidMount() {
     this._watchHeadingAsync();
     this._watchTargetBearingAsync();
     let location = await this._getLocationAsync();
-    if (!this.state.markers && this.props.settings)
-    this.updateMarkers(this.props.settings);
+    if (this.props.settings) {
+        this.updateMarkers(this.props.settings);
+    }
   }
 
 
@@ -342,12 +341,14 @@ componentDidMount() {
                     this.targetBearing = null;
                     this.setState({destination: null});
                   }}
-                  initialRegion={{
-                    latitude: 41.006330,
-                    longitude: 28.978198,
-                    latitudeDelta: 0.0039985333537870815,
-                    longitudeDelta: 0.006226077675815844
-                  }}
+
+                   onMapReady={()=>this.mapRef.animateToRegion({
+                       latitude: location.coords.latitude,
+                       longitude: location.coords.longitude,
+                       latitudeDelta: 0.005,
+                       longitudeDelta: 0.005
+                   })}
+
                   >
 
                   <MapViewDirections
