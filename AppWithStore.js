@@ -24,7 +24,7 @@ const MainNavigtor = StackNavigator({
   //   screen: Tabs,
   // }
 }, {
-  initialRouteName: 'NearbyLocations',
+  initialRouteName: 'Recommendations',
   navigationOptions: {
     header: null,
   },

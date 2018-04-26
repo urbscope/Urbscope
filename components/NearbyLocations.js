@@ -20,6 +20,7 @@ import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { connect } from 'react-redux'
 import DirectionMeter from './DirectionMeter'
 import Settings from './Settings'
+
 import { purple, white, red } from '../utils/colors'
 
 var foursquare = require('react-foursquare')({

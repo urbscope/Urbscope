@@ -1,5 +1,5 @@
 import { AsyncStorage } from 'react-native'
-import { SETTINGS_STORAGE_KEY } from './keysAPI'
+import { SETTINGS_STORAGE_KEY, VISITED_STORAGE_KEY } from './keysAPI'
 
 export function setSettings ( settings ) {
   return AsyncStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
