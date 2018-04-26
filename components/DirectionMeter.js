@@ -4,16 +4,39 @@ import * as THREE from 'three'
 import ExpoTHREE from 'expo-three'
 import Expo from 'expo'
 
+import { connect } from 'react-redux';
+
 const ScreenHeight = Dimensions.get('window').height
 const ScreenWidth  = Dimensions.get('window').width
 
 class DirectionMeter extends Component {
 
+  constructor(props) {
+    super(props)
+
+    this.hasColorChanged = false;
+    this.hasDirectionChanged = false;
+    this.currentBearing = 0;
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.themeColor !== this.props.themeColor) {
+      this.hasColorChanged = true
+    }
+    if (Math.abs( nextProps.bearing - this.currentBearing ) <  0.05) {
+      this.shouldDirectionChanged = false
+    }
+    else{
+      this.shouldDirectionChanged = true
+    }
+  }
 
   _onGLContextCreate = async (gl) => {
 
 
     const scene = new THREE.Scene();
+    // scene.background = new THREE.Color( 0x222222 );
+
     const camera = new THREE.PerspectiveCamera(
       75,
       gl.drawingBufferWidth / gl.drawingBufferHeight,
@@ -21,35 +44,209 @@ class DirectionMeter extends Component {
       1000
     );
 
-
     const renderer = ExpoTHREE.createRenderer({ gl });
     renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
+
+    scene.add( new THREE.AmbientLight( 0xaaaaaa ) );
+
+
+		var light = new THREE.PointLight( 0xeeeeee );
+    light.position.z = 70;
+		light.position.y = 30;
+		scene.add( light );
+
+
+    var length = 2, width = 1;
+
+    var shape = new THREE.Shape();
+    shape.moveTo( -10, -38 );
+    shape.lineTo( -10,  0 );
+    shape.quadraticCurveTo( -10, 15, -26, 2)
+    shape.quadraticCurveTo( -30, -1, -27, 3)
+    // shape.lineTo( -30,  0 );
+
+    //TOP POINT
+    shape.lineTo(  -3,  37 );
+    shape.quadraticCurveTo( 0, 40, 3, 37)
+    shape.lineTo(  27,  3 );
+
+    shape.quadraticCurveTo( 30, -1, 26, 2)
+
+    shape.quadraticCurveTo( 10, 15, 10, 0)
+
+    shape.lineTo(  10, -38 );
+    shape.quadraticCurveTo( 10, -40, 9, -39)
+    shape.quadraticCurveTo( 0, -30, -9, -39)
+    shape.quadraticCurveTo( -10, -40, -10, -38)
+
+
+    var extrudeSettings = {
+      curveSegments: 20,
+    	steps: 10,
+    	amount: 15,
+    	bevelEnabled: true,
+    	bevelThickness: 0.1,
+    	bevelSize: 0.1,
+    	bevelSegments: 20
+    };
+
+    var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
     const texture = await ExpoTHREE.loadAsync(
-      require('../assets/icon.png')
+      require('../assets/wood.jpg')
     );
 
-    const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-    // const material = new THREE.MeshBasicMaterial({ map: texture });
+    var material = new THREE.MeshStandardMaterial( {color: this.props.themeColor} );
+    // var material = new THREE.MeshBasicMaterial({ map: texture });
 
-    const cube = new THREE.Mesh(geometry, material);
+    var cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
 
-    camera.position.z = 2;
+    // console.log(cube);
+
+    cube.rotation.x = - 0.28 * Math.PI;
+
+
+    camera.position.z = 80;
+
+
+
+    // camera.position.x = -30;
+
+
+
+  //   rotate = () => {
+  //     // if (this.currentBearing > 2 * Math.PI) {
+  //     //   this.currentBearing = this.currentBearing - 2 * Math.PI;
+  //     // }
+  //     //
+  //     // if (this.currentBearing < - 2 * Math.PI) {
+  //     //   this.currentBearing = this.currentBearing + 2 * Math.PI;
+  //     // }
+  //
+  //     let rotateClockwise = true;
+  //
+  //
+  //     // this.currentBearing = this.currentBearing % (2*Math.PI)
+  //
+  //     // if (this.currentBearing < - Math.PI ) {
+  //     //   this.currentBearing = this.currentBearing + 2 * Math.PI
+  //     // }
+  //     // else if ( this.currentBearing > Math.PI) {
+  //     //   this.currentBearing = this.currentBearing - 2 * Math.PI
+  //     // }
+  //
+  //
+  //     // if (Math.abs(this.props.bearing - this.currentBearing) > Math.abs(2*Math.PI - this.props.bearing + this.currentBearing)) {
+  //     //   rotateClockwise = false;
+  //     // } else {
+  //     //   rotateClockwise = true;
+  //     // }
+  //     if (this.currentBearing > this.props.bearing) {
+  //       rotateClockwise = false;
+  //     } else {
+  //       rotateClockwise = true;
+  //     }
+  //
+  //
+  //
+  //     // if (this.props.bearing > Math.PI) {
+  //     //   if (this.currentBearing < 0 || this.props.bearing > Math.P) {
+  //     //     if (this.props.bearing - 2*Math.PI > this.currentBearing) {
+  //     //       cube.rotation.z -= 0.02;
+  //     //     } else {
+  //     //       cube.rotation.z += 0.02;
+  //     //     }
+  //     //   } else {
+  //     //     if ( this.props.bearing - this.currentBearing  > this.currentBearing - this.props.bearing + 2*Math.PI) {
+  //     //       cube.rotation.z -= 0.02;
+  //     //     } else {
+  //     //       cube.rotation.z += 0.02;
+  //     //     }
+  //     //   }
+  //     //
+  //     //
+  //     // } else {
+  //     //   if (this.props.bearing > this.currentBearing) {
+  //     //     cube.rotation.z -= 0.02;
+  //     //   }
+  //     //   else if (this.props.bearing < this.currentBearing) {
+  //     //     cube.rotation.z += 0.02;
+  //     //   }
+  //     // }
+  //
+  //
+  //     // if (this.props.bearing > this.currentBearing) {
+  //     //   rotate = true;
+  //     // }
+  //     // else if (this.props.bearing < this.currentBearing) {
+  //     //   rotate = true;
+  //     // }
+  //
+  //     console.log('bearing', this.props.bearing);
+  //     console.log('current', this.currentBearing);
+  //
+  //     if (this.props.bearing > Math.PI) {
+  //
+  //       if (Math.abs( this.props.bearing - 2* Math.PI - this.currentBearing ) <  0.05) {
+  //         this.shouldDirectionChanged = false
+  //       } else{
+  //         this.shouldDirectionChanged = true
+  //       }
+  //     } else {
+  //       if (Math.abs( this.props.bearing - this.currentBearing ) <  0.05) {
+  //         this.shouldDirectionChanged = false
+  //       } else{
+  //         this.shouldDirectionChanged = true
+  //       }
+  //     }
+  //
+  //     if (this.shouldDirectionChanged) {
+  //       if (rotateClockwise) {
+  //         cube.rotation.z -= 0.02;
+  //       } else {
+  //         cube.rotation.z += 0.02;
+  //       }
+  //       // this.shouldDirectionChnaged = false;
+  //     }
+  //     this.currentBearing = - cube.rotation.z
+  //   }
+  //
 
     const animate = () => {
       requestAnimationFrame(animate);
 
-      cube.rotation.x += 0.02;
-      // cube.rotation.y += 0.04;
+
+      if (this.hasColorChanged) {
+        cube.material = new THREE.MeshStandardMaterial( {color: this.props.themeColor} )
+        this.hasColorChanged = false
+      }
+
+      // cube.rotation.x += 0.02;
+      // cube.rotation.z += 0.02;
+
+      // if (cube.rotation.y > 45) {
+      //   cube.rotation.y -= 0.04;
+      // } else if (cube.rotation.y < -45) {
+      //   cube.rotation.y += 0.04;
+      // } else {
+      //   cube.rotation.y -= 0.04;
+      // }
+
+      // controls.update();
+
+      cube.rotation.z = this.props.bearing * Math.PI / 180;
+
+      // rotate();
 
       renderer.render(scene, camera);
 
       gl.endFrameEXP();
     }
     animate();
+
+
   }
 
   render () {
@@ -67,7 +264,7 @@ class DirectionMeter extends Component {
   }
 }
 
-export default DirectionMeter
+// export default DirectionMeter
 
 const styles = StyleSheet.create({
     container: {
@@ -90,3 +287,11 @@ const styles = StyleSheet.create({
       color: '#fff',
     }
 })
+
+mapStateToProps = (state) => {
+  return {
+    themeColor: state.themeColor
+  }
+}
+
+export default connect(mapStateToProps)(DirectionMeter)

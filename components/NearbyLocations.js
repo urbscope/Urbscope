@@ -40,6 +40,8 @@ class NearbyLocations extends Component {
     super(props);
 
     this.state = {
+      heading: 240,
+      north: 0,
       hasCameraPermission: null,
       location: null,
       markers: [],
@@ -180,6 +182,7 @@ componentDidMount() {
   // set this.arrowRotation = 360 - this.heading + targetBearing;
   _watchHeadingAsync = async () => {
     this.headingWatch = await Location.watchHeadingAsync((res) => {
+      this.setState({north: res.magHeading})
       this.heading = res.magHeading;
 
       //If Navigate is on, calculate arrowRotation angle
@@ -314,7 +317,11 @@ componentDidMount() {
                 dispatch={navigation.dispatch}
                 />
 
-              <DirectionMeter/>
+              <DirectionMeter
+                bearing={this.state.north}
+                north={this.heading}
+              />
+
 
               <Animated.View
                 style={[styles.mapWindow, imageStyle]}>
@@ -324,6 +331,7 @@ componentDidMount() {
                   <View style={styles.mapWindowDragLine}>
                   </View>
                 </View>
+
 
                 <MapView ref={ref => this.mapRef = ref} style={styles.map}
                   provider={MapView.PROVIDER_GOOGLE}
