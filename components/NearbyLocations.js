@@ -131,24 +131,9 @@ class NearbyLocations extends Component {
 
   }
 
-componentDidMount() {
+async componentDidMount() {
     LayoutAnimation.linear();
-    this.setState({})
 
-    //
-    // const {status} = await Permissions.askAsync(Permissions.CAMERA);
-    // this.setState({hasCameraPermission: status === 'granted'});
-    //
-    // this._watchHeadingAsync();
-    // this._watchTargetBearingAsync();
-    // let location = await this._getLocationAsync();
-    // if (!markers && this.props.settings)
-    // this.updateMarkers(this.props.settings);
-  }
-
-
-  async componentWillMount() {
-    LayoutAnimation.linear();
 
     const {status} = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({hasCameraPermission: status === 'granted'});
@@ -161,8 +146,7 @@ componentDidMount() {
     }
   }
 
-
-
+  
   _getLocationAsync = async () => {
     let {status} = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
