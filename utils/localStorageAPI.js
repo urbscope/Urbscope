@@ -12,8 +12,10 @@ export function getSettings ( ) {
 }
 
 export function getVisitedLocations(){
-  return AsyncStorage.getItem(VISITED_STORAGE_KEY).then(entry=>
-    JSON.parse(entry)
+  // AsyncStorage.removeItem(VISITED_STORAGE_KEY);
+  return AsyncStorage.getItem(VISITED_STORAGE_KEY).then(entry=> {
+          return JSON.parse(entry)
+      }
   )
 }
 
@@ -23,8 +25,9 @@ export function updateVisitedLocations(entry) {
     locationID: {
         name:
         description:
+        address:
         rating:
-
+    }
    */
   return AsyncStorage.mergeItem(VISITED_STORAGE_KEY, JSON.stringify(entry), (error)=>console.log(error));
 }

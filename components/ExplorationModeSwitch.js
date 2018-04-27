@@ -12,7 +12,7 @@ class ExplorationModeSwitch extends Component {
       actions: [ NavigationActions.navigate({ routeName: 'Recommendations'}) ]
     }))
 
-    console.log("go to Recommendations");
+    // console.log("go to Recommendations");
   }
 
   goToNearbyLocations = () => {
@@ -22,7 +22,7 @@ class ExplorationModeSwitch extends Component {
       actions: [ NavigationActions.navigate({ routeName: 'NearbyLocations'}) ]
     }))
 
-    console.log("go to NearbyLocations");
+    // console.log("go to NearbyLocations");
   }
 
   doNothing = () => {}

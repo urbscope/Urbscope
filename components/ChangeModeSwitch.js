@@ -23,7 +23,7 @@ class ChangeModeSwitch extends Component {
     // }))
 
 
-    console.log("go to detection");
+    // console.log("go to detection");
   }
 
   goToExploration = () => {
@@ -43,13 +43,13 @@ class ChangeModeSwitch extends Component {
     //   routeName: 'NearbyLocations'
     // }))
 
-    console.log("go to exploration");
+    // console.log("go to exploration");
   }
 
   doNothing = () => {}
 
   render(){
-    console.log(this.props);
+    // console.log(this.props);
     const { currentScreen, themeColor } = this.props
 
     let isSelectedDetection

@@ -7,7 +7,7 @@ import React, {Component} from 'react'
 export default class CustomMarker extends Component {
     onPress = (e)=>{
         e.stopPropagation();
-        this.props.onPress(this.props.coordinate);
+        this.props.onPress({location: this.props.coordinate, id: this.props.id});
     }
 
     render(){

@@ -21,7 +21,7 @@ import { connect } from 'react-redux'
 import DirectionMeter from './DirectionMeter'
 import Settings from './Settings'
 import { purple, white, red } from '../utils/colors'
-//import {getVisitedLocations, updateVisitedLocations} from "../utils/localStorageAPI";
+import {updateVisitedLocations} from "../utils/localStorageAPI";
 
 var foursquare = require('react-foursquare')({
   clientID: 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH',
@@ -44,6 +44,7 @@ class NearbyLocations extends Component {
       hasCameraPermission: null,
       location: null,
       markers: {},
+      selectedMarker: null,
       destination: null,
       heading: 240,
       north: 0,
@@ -205,6 +206,7 @@ async componentDidMount() {
   componentWillUnmount() {
     this.headingWatch.remove();
     clearInterval(this.targetBearingWatchId);
+
   }
 
   getTargetBearingAndDistance = async () => {
@@ -240,9 +242,22 @@ async componentDidMount() {
       let pointCoords = {latitude: points[1][0], longitude: points[1][1]};
       this.targetBearing = geolib.getRhumbLineBearing(this.formatLocation(this.state.location), pointCoords);
 
+      if (distanceToDestination.value <= 100)
+        this.addVisitedLocation();
+
     } catch (error) {
       console.error(error);
     }
+  };
+
+
+  addVisitedLocation = ()=>{
+      let id = this.state.selectedMarker ;
+      if (id){
+          let obj = Object.assign({}, this.state.markers[id], {rating: null, description: null});
+          let entry = { [id]: obj };
+          updateVisitedLocations(entry);
+      }
   };
 
 
@@ -335,7 +350,7 @@ async componentDidMount() {
                   followsUserLocation={true}
                   onPress={() => {
                     this.targetBearing = null;
-                    this.setState({destination: null, distanceToDestinationMeters: null, distanceToDestinationText: null});
+                    this.setState({destination: null, selectedMarker: null, distanceToDestinationMeters: null, distanceToDestinationText: null});
                   }}
 
                    onMapReady={()=>this.mapRef.animateToRegion({
@@ -359,11 +374,13 @@ async componentDidMount() {
                   {Object.values(this.state.markers).map(marker => (
                     <Marker
                       key={marker.key}
+                      id ={marker.key}
                       coordinate={marker.location}
                       title={marker.name}
                       onPress={e => {
                         this.setState({
-                          destination: e
+                          destination: e.location,
+                          selectedMarker: e.id,
                         }, this.getTargetBearingAndDistance);
                       }}
                       />
