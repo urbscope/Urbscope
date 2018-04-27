@@ -35,7 +35,7 @@ export function loadSettings ( callback ) {
   return (dispatch) => {
     LocalStorage.getSettings().then((settings) => {
       dispatch(loadSettingsSuccess(settings));
-      if (settings)
+      if (settings && settings.themeColor)
         dispatch(changeColor(settings.themeColor));
       callback()
     })

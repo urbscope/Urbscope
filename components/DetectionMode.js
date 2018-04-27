@@ -58,21 +58,21 @@ class DetectionMode extends Component {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     // console.log(LayoutAnimation);
     LayoutAnimation.linear();
     this.setState({})
       console.log("settings in detection", this.props.settings);
     // this.animateModalButtonAppear()
+      const { status } = await Permissions.askAsync(Permissions.CAMERA);
+      this.setState({ hasCameraPermission: status === 'granted' });
   }
 
   // ========================================================================
   //  ASK FOR CAMERA PERMISSIONS
   // ========================================================================
   async componentWillMount() {
-    LayoutAnimation.linear();
-    const { status } = await Permissions.askAsync(Permissions.CAMERA);
-    this.setState({ hasCameraPermission: status === 'granted' });
+
   }
 
   // ========================================================================

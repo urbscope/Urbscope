@@ -22,6 +22,7 @@ import DirectionMeter from './DirectionMeter'
 import Settings from './Settings'
 
 import { purple, white, red } from '../utils/colors'
+import {updateVisitedLocations} from "../utils/localStorageAPI";
 
 var foursquare = require('react-foursquare')({
   clientID: 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH',
@@ -41,12 +42,15 @@ class NearbyLocations extends Component {
     super(props);
 
     this.state = {
-      heading: 240,
-      north: 0,
       hasCameraPermission: null,
       location: null,
-      markers: [],
+      markers: {},
+      selectedMarker: null,
       destination: null,
+      heading: 240,
+      north: 0,
+      distanceToDestinationText: null,
+      distanceToDestinationMeters: null,
       settingVisible: false,
       mapViewPosition: new Animated.ValueXY(),
     };
@@ -86,11 +90,11 @@ class NearbyLocations extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (JSON.stringify(this.props.settings) != JSON.stringify(nextProps.settings)){
-      this.updateMarkers(nextProps.settings);
+      this.fetchMarkers(nextProps.settings);
     }
   }
 
-  async updateMarkers( settings ){
+  async fetchMarkers(settings ){
     // console.log(settings);
 
     let location = await this._getLocationAsync();
@@ -103,8 +107,6 @@ class NearbyLocations extends Component {
     + "&inCat=" + settings.category
     + "&inRadius=" + settings.nearbyRadius;
 
-    // console.log("here");
-    // console.log(url);
 
     fetch(url).then(response => {
       if (response.status === 200) {
@@ -115,15 +117,17 @@ class NearbyLocations extends Component {
     })
     .then(responseJson => {
 
-      let items = responseJson.landmarks;
-      let markers = items.map(obj => {
-        coords = {lat: obj.latitude, lng: obj.longitude}
-        return {
-          name: obj.name.toString(),
-          location: {latitude: coords.lat, longitude: coords.lng},
-          key: obj.name.toString()
-        }
-      })
+      let landmarks = responseJson.landmarks;
+      let markers = {};
+      for (obj of landmarks){
+          coords = {lat: obj.latitude, lng: obj.longitude};
+          markers[obj.destinationID] =  {
+              name: obj.name.toString(),
+              location: {latitude: coords.lat, longitude: coords.lng},
+              key: obj.destinationID.toString(),
+              address: obj.address
+          }
+      }
       this.setState({
         markers: markers
       })
@@ -134,24 +138,9 @@ class NearbyLocations extends Component {
 
   }
 
-componentDidMount() {
+async componentDidMount() {
     LayoutAnimation.linear();
-    this.setState({})
 
-    //
-    // const {status} = await Permissions.askAsync(Permissions.CAMERA);
-    // this.setState({hasCameraPermission: status === 'granted'});
-    //
-    // this._watchHeadingAsync();
-    // this._watchTargetBearingAsync();
-    // let location = await this._getLocationAsync();
-    // if (!markers && this.props.settings)
-    // this.updateMarkers(this.props.settings);
-  }
-
-
-  async componentWillMount() {
-    LayoutAnimation.linear();
 
     const {status} = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({hasCameraPermission: status === 'granted'});
@@ -159,10 +148,10 @@ componentDidMount() {
     this._watchHeadingAsync();
     this._watchTargetBearingAsync();
     let location = await this._getLocationAsync();
-    if (!this.state.markers && this.props.settings)
-    this.updateMarkers(this.props.settings);
+    if (this.props.settings) {
+        this.fetchMarkers(this.props.settings);
+    }
   }
-
 
 
   _getLocationAsync = async () => {
@@ -218,9 +207,10 @@ componentDidMount() {
   componentWillUnmount() {
     this.headingWatch.remove();
     clearInterval(this.targetBearingWatchId);
+
   }
 
-  getTargetBearing = async () => {
+  getTargetBearingAndDistance = async () => {
 
     let startLoc = this.formatLocation(this.state.location, false);
     let destinationLoc = this.formatLocation(this.state.destination, false);
@@ -233,11 +223,18 @@ componentDidMount() {
       let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?mode=walking&origin=${ startLoc }&destination=${ destinationLoc }`);
       let respJson = await resp.json();
 
-      if (!respJson.routes || !respJson.routes[0] || !respJson.routes[0].overview_polyline || !respJson.routes[0].overview_polyline.points) {
+      if (!respJson.routes || !respJson.routes[0] || !respJson.routes[0].legs || !respJson.routes[0].overview_polyline || !respJson.routes[0].overview_polyline.points) {
         // console.log(respJson);
         // console.log("respjson polylines null.returning");
         return;
       }
+
+      let distanceToDestination = respJson.routes[0].legs[0].distance;
+        this.setState({
+          distanceToDestinationText: distanceToDestination.text,
+          distanceToDestinationMeters: distanceToDestination.value
+      });
+
       respJson = respJson.routes[0].overview_polyline.points;
       let points = polyline.decode(respJson);
       if (!points || !points[1])
@@ -246,9 +243,22 @@ componentDidMount() {
       let pointCoords = {latitude: points[1][0], longitude: points[1][1]};
       this.targetBearing = geolib.getRhumbLineBearing(this.formatLocation(this.state.location), pointCoords);
 
+      if (distanceToDestination.value <= 100)
+        this.addVisitedLocation();
+
     } catch (error) {
       console.error(error);
     }
+  };
+
+
+  addVisitedLocation = ()=>{
+      let id = this.state.selectedMarker ;
+      if (id){
+          let obj = Object.assign({}, this.state.markers[id], {rating: null, description: null});
+          let entry = { [id]: obj };
+          updateVisitedLocations(entry);
+      }
   };
 
 
@@ -256,7 +266,7 @@ componentDidMount() {
     //Periodically updates targetBearing
     this.targetBearingWatchId = setInterval(async () => {
       // console.log("targetBearingWatchId firing now")
-      this.getTargetBearing();
+      this.getTargetBearingAndDistance();
     }, 15000);
   };
 
@@ -341,14 +351,16 @@ componentDidMount() {
                   followsUserLocation={true}
                   onPress={() => {
                     this.targetBearing = null;
-                    this.setState({destination: null});
+                    this.setState({destination: null, selectedMarker: null, distanceToDestinationMeters: null, distanceToDestinationText: null});
                   }}
-                  initialRegion={{
-                    latitude: 41.006330,
-                    longitude: 28.978198,
-                    latitudeDelta: 0.0039985333537870815,
-                    longitudeDelta: 0.006226077675815844
-                  }}
+
+                   onMapReady={()=>this.mapRef.animateToRegion({
+                       latitude: location.coords.latitude,
+                       longitude: location.coords.longitude,
+                       latitudeDelta: 0.005,
+                       longitudeDelta: 0.005
+                   })}
+
                   >
 
                   <MapViewDirections
@@ -360,15 +372,17 @@ componentDidMount() {
                     strokeColor="hotpink"
                     />
 
-                  {this.state.markers.map(marker => (
+                  {Object.values(this.state.markers).map(marker => (
                     <Marker
                       key={marker.key}
+                      id ={marker.key}
                       coordinate={marker.location}
                       title={marker.name}
                       onPress={e => {
                         this.setState({
-                          destination: e
-                        }, this.getTargetBearing);
+                          destination: e.location,
+                          selectedMarker: e.id,
+                        }, this.getTargetBearingAndDistance);
                       }}
                       />
                   ))}
