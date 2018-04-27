@@ -8,6 +8,7 @@ import { View,
          Animated,
          Picker,
          Dimensions } from 'react-native'
+import { CheckBox } from 'react-native-elements'
 
 import { connect } from 'react-redux'
 import { setSettings, changeColor } from '../actions'
@@ -47,6 +48,27 @@ class Settings extends React.Component {
     dectionLimit: this.props.settings.dectionLimit,
     nearbyLimit: this.props.settings.nearbyLimit,
     nearbyRadius: this.props.settings.nearbyRadius,
+    categories: {
+      [CATEGORIES_TOURISTIC_SITES]: true,
+      [CATEGORIES_AMPHITHEATERS]: false,
+      [CATEGORIES_AQUARIUMS]: false,
+      [CATEGORIES_ART_GALLERIES]: false,
+      [CATEGORIES_CONCERT_HALLS]: false,
+      [CATEGORIES_EXHIBITS]: false,
+      [CATEGORIES_HISTORIC_SITES]: false,
+      [CATEGORIES_MUSEUMS]: false,
+      [CATEGORIES_PUBLIC_ART]: false,
+      [CATEGORIES_STADIUMS]: false,
+      [CATEGORIES_ZOOS]: false,
+      [CATEGORIES_RESTAURANTS]: false,
+      [CATEGORIES_NIGHTLIFE_SPOTS]: false,
+      [CATEGORIES_OUTDOORS_AND_RECREATION]: false,
+      [CATEGORIES_TRAVEL_AND_TRANSPORT]: false,
+      [CATEGORIES_AIRPORTS]: false,
+      [CATEGORIES_BUS_STATIONS]: false,
+      [CATEGORIES_TOURIST_INFORMATION_CENTERS]: false,
+      [CATEGORIES_TRAIN_STATIONS]: false,
+    },
     category: this.props.settings.category,
     themeColor: this.props.settings.themeColor,
     animation: {
@@ -179,9 +201,10 @@ class Settings extends React.Component {
 
   render () {
 
-    const { dectionLimit, nearbyRadius, category, nearbyLimit } = this.state
+    const { dectionLimit, nearbyRadius, category, nearbyLimit, categories } = this.state
     const { settings, themeColor } = this.props
     const { containerHeight, containerWidth, opacity, opacity2, zIndex, borderRadius } = this.state.animation
+
 
     // console.log('settings', settings);
     // console.log('state', this.state);
@@ -283,7 +306,38 @@ class Settings extends React.Component {
                 <Text style={{fontSize: 15}}>Select Category: </Text>
               </View>
 
-              <Picker
+
+              <CheckBox
+                title='Touristic Sites'
+                checked={categories[CATEGORIES_TOURISTIC_SITES]}
+                checkedIcon='check-square'
+                uncheckedIcon='square'
+                onPress={() => this.setState({categories: {
+                  ...this.state.categories,
+                  [CATEGORIES_TOURISTIC_SITES]: !this.state.categories[CATEGORIES_TOURISTIC_SITES]
+                }})}
+              />
+              <CheckBox
+                title='Amphitheaters'
+                checkedIcon='dot-circle-o'
+                uncheckedIcon='circle-o'
+                checked={categories[CATEGORIES_AMPHITHEATERS]}
+              />
+              <CheckBox
+                title='Aquariums'
+                checked={categories[CATEGORIES_AQUARIUMS]}
+              />
+              <CheckBox
+                title='Art Galleries'
+                checked={categories[CATEGORIES_ART_GALLERIES]}
+              />
+              <CheckBox
+                title='Concert Halls'
+                checked={categories[CATEGORIES_CONCERT_HALLS]}
+              />
+
+              {/*
+                <Picker
                 style={[styles.picker, {borderTopColor: themeColor, borderBottomColor: themeColor}]}
                 selectedValue={category}
                 onValueChange={category => this.setState({category})}
@@ -309,6 +363,7 @@ class Settings extends React.Component {
                 <Picker.Item label="Tourist Information Centers" value={CATEGORIES_TOURIST_INFORMATION_CENTERS} />
                 <Picker.Item label="Train Stations" value={CATEGORIES_TRAIN_STATIONS} />
               </Picker>
+              */}
               <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
                 The landmarks from selected category will be displayed in Nearby Location mode.
               </Animated.Text>

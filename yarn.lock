@@ -5887,6 +5887,12 @@ react-native-maps-directions@^1.6.0:
     babel-plugin-module-resolver "^2.3.0"
     babel-preset-react-native "1.9.0"
 
+react-native-rating@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/react-native-rating/-/react-native-rating-2.0.4.tgz#4af61b445fa81d869dee63545507a42ef19948ce"
+  dependencies:
+    prop-types "^15.5.10"
+
 react-native-safe-area-view@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/react-native-safe-area-view/-/react-native-safe-area-view-0.7.0.tgz#38f5ab9368d6ef9e5d18ab64212938af3ec39421"
