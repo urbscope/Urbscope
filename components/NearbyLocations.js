@@ -43,7 +43,7 @@ class NearbyLocations extends Component {
     this.state = {
       hasCameraPermission: null,
       location: null,
-      markers: [],
+      markers: {},
       destination: null,
       heading: 240,
       north: 0,
@@ -115,15 +115,17 @@ class NearbyLocations extends Component {
     })
     .then(responseJson => {
 
-      let items = responseJson.landmarks;
-      let markers = items.map(obj => {
-        coords = {lat: obj.latitude, lng: obj.longitude}
-        return {
-          name: obj.name.toString(),
-          location: {latitude: coords.lat, longitude: coords.lng},
-          key: obj.name.toString()
-        }
-      })
+      let landmarks = responseJson.landmarks;
+      let markers = {};
+      for (obj of landmarks){
+          coords = {lat: obj.latitude, lng: obj.longitude};
+          markers[obj.destinationID] =  {
+              name: obj.name.toString(),
+              location: {latitude: coords.lat, longitude: coords.lng},
+              key: obj.destinationID.toString(),
+              address: obj.address
+          }
+      }
       this.setState({
         markers: markers
       })
@@ -354,7 +356,7 @@ async componentDidMount() {
                     strokeColor="hotpink"
                     />
 
-                  {this.state.markers.map(marker => (
+                  {Object.values(this.state.markers).map(marker => (
                     <Marker
                       key={marker.key}
                       coordinate={marker.location}
