@@ -8,7 +8,6 @@ import { View,
          Animated,
          Picker,
          Dimensions } from 'react-native'
-import { CheckBox } from 'react-native-elements'
 
 import { connect } from 'react-redux'
 import { setSettings, changeColor } from '../actions'
@@ -307,34 +306,6 @@ class Settings extends React.Component {
               </View>
 
 
-              <CheckBox
-                title='Touristic Sites'
-                checked={categories[CATEGORIES_TOURISTIC_SITES]}
-                checkedIcon='check-square'
-                uncheckedIcon='square'
-                onPress={() => this.setState({categories: {
-                  ...this.state.categories,
-                  [CATEGORIES_TOURISTIC_SITES]: !this.state.categories[CATEGORIES_TOURISTIC_SITES]
-                }})}
-              />
-              <CheckBox
-                title='Amphitheaters'
-                checkedIcon='dot-circle-o'
-                uncheckedIcon='circle-o'
-                checked={categories[CATEGORIES_AMPHITHEATERS]}
-              />
-              <CheckBox
-                title='Aquariums'
-                checked={categories[CATEGORIES_AQUARIUMS]}
-              />
-              <CheckBox
-                title='Art Galleries'
-                checked={categories[CATEGORIES_ART_GALLERIES]}
-              />
-              <CheckBox
-                title='Concert Halls'
-                checked={categories[CATEGORIES_CONCERT_HALLS]}
-              />
 
               {/*
                 <Picker
