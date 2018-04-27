@@ -21,6 +21,7 @@ import { connect } from 'react-redux'
 import DirectionMeter from './DirectionMeter'
 import Settings from './Settings'
 import { purple, white, red } from '../utils/colors'
+//import {getVisitedLocations, updateVisitedLocations} from "../utils/localStorageAPI";
 
 var foursquare = require('react-foursquare')({
   clientID: 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH',
@@ -40,12 +41,14 @@ class NearbyLocations extends Component {
     super(props);
 
     this.state = {
-      heading: 240,
-      north: 0,
       hasCameraPermission: null,
       location: null,
       markers: [],
       destination: null,
+      heading: 240,
+      north: 0,
+      distanceToDestinationText: null,
+      distanceToDestinationMeters: null,
       settingVisible: false,
       mapViewPosition: new Animated.ValueXY(),
     };
@@ -85,11 +88,11 @@ class NearbyLocations extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (JSON.stringify(this.props.settings) != JSON.stringify(nextProps.settings)){
-      this.updateMarkers(nextProps.settings);
+      this.fetchMarkers(nextProps.settings);
     }
   }
 
-  async updateMarkers( settings ){
+  async fetchMarkers(settings ){
     // console.log(settings);
 
     let location = await this._getLocationAsync();
@@ -142,11 +145,11 @@ async componentDidMount() {
     this._watchTargetBearingAsync();
     let location = await this._getLocationAsync();
     if (this.props.settings) {
-        this.updateMarkers(this.props.settings);
+        this.fetchMarkers(this.props.settings);
     }
   }
 
-  
+
   _getLocationAsync = async () => {
     let {status} = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
@@ -202,7 +205,7 @@ async componentDidMount() {
     clearInterval(this.targetBearingWatchId);
   }
 
-  getTargetBearing = async () => {
+  getTargetBearingAndDistance = async () => {
 
     let startLoc = this.formatLocation(this.state.location, false);
     let destinationLoc = this.formatLocation(this.state.destination, false);
@@ -215,11 +218,18 @@ async componentDidMount() {
       let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?mode=walking&origin=${ startLoc }&destination=${ destinationLoc }`);
       let respJson = await resp.json();
 
-      if (!respJson.routes || !respJson.routes[0] || !respJson.routes[0].overview_polyline || !respJson.routes[0].overview_polyline.points) {
+      if (!respJson.routes || !respJson.routes[0] || !respJson.routes[0].legs || !respJson.routes[0].overview_polyline || !respJson.routes[0].overview_polyline.points) {
         // console.log(respJson);
         // console.log("respjson polylines null.returning");
         return;
       }
+
+      let distanceToDestination = respJson.routes[0].legs[0].distance;
+        this.setState({
+          distanceToDestinationText: distanceToDestination.text,
+          distanceToDestinationMeters: distanceToDestination.value
+      });
+
       respJson = respJson.routes[0].overview_polyline.points;
       let points = polyline.decode(respJson);
       if (!points || !points[1])
@@ -238,7 +248,7 @@ async componentDidMount() {
     //Periodically updates targetBearing
     this.targetBearingWatchId = setInterval(async () => {
       // console.log("targetBearingWatchId firing now")
-      this.getTargetBearing();
+      this.getTargetBearingAndDistance();
     }, 15000);
   };
 
@@ -323,7 +333,7 @@ async componentDidMount() {
                   followsUserLocation={true}
                   onPress={() => {
                     this.targetBearing = null;
-                    this.setState({destination: null});
+                    this.setState({destination: null, distanceToDestinationMeters: null, distanceToDestinationText: null});
                   }}
 
                    onMapReady={()=>this.mapRef.animateToRegion({
@@ -352,7 +362,7 @@ async componentDidMount() {
                       onPress={e => {
                         this.setState({
                           destination: e
-                        }, this.getTargetBearing);
+                        }, this.getTargetBearingAndDistance);
                       }}
                       />
                   ))}
