@@ -14,7 +14,7 @@ import SplashLoading from './components/SplashLoading'
 
 import { connect } from 'react-redux'
 import { loadSettings, setSettings } from './actions'
-
+import {getUserID, setUserID} from "./utils/localStorageAPI";
 
 const MainNavigtor = StackNavigator({
   DetectionMode: { screen: DetectionMode },
@@ -37,21 +37,18 @@ class AppWithStore extends React.Component {
     loading: true,
   }
 
-  // defaultSettings = () => {
-  //   let newSettings = {
-  //     dectionLimit: 5,
-  //     nearbyLimit: 10,
-  //     nearbyRadius: 1000,
-  //     category: 'religious',
-  //     themeColor: 'red',
-  //   }
-  //   this.props.changeSettings(newSettings)
-  // }
-
-
 
   componentDidMount () {
     // AsyncStorage.clear()
+
+
+
+      getUserID().then(id=>{
+      console.log(id);
+      if (!id)
+        this.createUserID();
+        }
+    );
 
     this.props.loadSettings(() => {
       // console.log("load settings init");
@@ -76,11 +73,7 @@ class AppWithStore extends React.Component {
     })
 
 
-    // await this.props.loadSettings()
 
-      // if (Object.keys(this.props.settings).length === 0) {
-      //   this.defaultSettings()
-      // }
   }
 
   render() {
@@ -96,6 +89,15 @@ class AppWithStore extends React.Component {
       )
     }
   }
+
+   async createUserID() {
+        let uid = Expo.Constants.deviceId;
+        let resp = await fetch(`https://urbserver.herokuapp.com/register/${uid}`);
+        if (resp.status == 200){
+          setUserID(uid);
+        }
+
+    }
 }
 
 
