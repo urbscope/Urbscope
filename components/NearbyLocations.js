@@ -286,6 +286,8 @@ async componentDidMount() {
 
     const { hasCameraPermission, location, settingVisible, mapViewPosition } = this.state
 
+    console.log(navigation);
+    
 
     let [translateX, translateY] = [mapViewPosition.x, mapViewPosition.y];
     let imageStyle = {transform: [{translateX}, {translateY}]};
@@ -316,12 +318,14 @@ async componentDidMount() {
           <Camera style={styles.camera} type={Camera.Constants.Type.back}>
             <View
               style={styles.container}>
+            {/*
               <ExplorationModeSwitch
                 currentScreen={navigation.state.routeName}
                 changeScreen={navigation.navigate}
                 dispatch={navigation.dispatch}
                 />
-              <ChangeModeSwitch
+*/}
+            <ChangeModeSwitch
                 replaceScreen={navigation.replace}
                 currentScreen={navigation.state.routeName}
                 changeScreen={navigation.navigate}

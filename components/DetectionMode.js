@@ -62,7 +62,7 @@ class DetectionMode extends Component {
     // console.log(LayoutAnimation);
     LayoutAnimation.linear();
     this.setState({})
-      console.log("settings in detection", this.props.settings);
+
     // this.animateModalButtonAppear()
       const { status } = await Permissions.askAsync(Permissions.CAMERA);
       this.setState({ hasCameraPermission: status === 'granted' });
@@ -257,6 +257,7 @@ class DetectionMode extends Component {
 
     const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
 
+    console.log(navigation);
 
     if (hasCameraPermission === null) {
      return <View style={{flex:1, backgroundColor: 'black'}}/>;
@@ -322,9 +323,9 @@ class DetectionMode extends Component {
                   style={[styles.buttonDetect, {backgroundColor: themeColor}]}
                 >
                   <View style={styles.buttonDetectView}>
-                    <Ionicons
-                      name='ios-compass-outline'
-                      size={80}
+                    <MaterialIcons
+                      name='camera'
+                      size={50}
                       style={styles.buttonDetectIcon}
                       />
                   </View>
@@ -336,10 +337,31 @@ class DetectionMode extends Component {
                   currentScreen={navigation.state.routeName}
                   changeScreen={navigation.navigate}
                   dispatch={navigation.dispatch}
-                  />
+                />
 
 
                 <TouchableOpacity
+                  onPress={settingVisible
+                    ? this.closeSettings
+                    : this.openSettings}
+                  style={styles.buttonSettingsContainer}
+                >
+                  <View style={styles.buttonSettings}>
+                    <View style={styles.buttonLogoContainer}>
+                      <MaterialIcons
+                        name='explore'
+                        size={30}
+                        color={'#eee'}
+
+                        />
+                    </View>
+
+                    <View style={[styles.buttonLine, {backgroundColor: themeColor}]} />
+
+                  </View>
+                </TouchableOpacity>
+
+                {/**<TouchableOpacity
                   onPress={settingVisible
                             ? this.closeSettings
                             : this.openSettings}
@@ -350,7 +372,7 @@ class DetectionMode extends Component {
                       size={50}
                       color={white}
                     />
-                </TouchableOpacity>
+                </TouchableOpacity>**/}
 
                 <Settings
                   visible={settingVisible}
@@ -400,6 +422,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     borderColor: '#eee',
     borderWidth: 1,
+    opacity: 0.5,
   },
   buttonDetectView: {
     flex: 1,
@@ -452,21 +475,31 @@ const styles = StyleSheet.create({
     color: white
   },
 
-  buttonSettings: {
+  buttonSettingsContainer: {
     position: 'absolute',
+    top: 8,
     zIndex: 11,
-    top: 15,
     right: 15,
+  },
+  buttonSettings: {
     height: 60,
-    width: 58,
-    borderRadius: 20,
-    // backgroundColor: red,
+    width: 60,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'stretch',
+    // borderRadius: 20,
+    // borderWidth: 0.5,
+    marginTop: 10,
+  },
+  buttonLine: {
+    borderTopRightRadius: 20,
+    borderBottomRightRadius: 20,
+    flex: 0.2,
+  },
+  buttonLogoContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 4,
-  },
-  buttonSettingsIcon: {
-    color: red,
   }
 })
 

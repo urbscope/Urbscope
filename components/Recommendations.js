@@ -53,6 +53,20 @@ state = {
       description: 'The best triangles. made by Egyptians',
       rating: 3.9
     },
+    {
+      name: 'Pyramids',
+      id: '2321',
+      thumbnail: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
+      description: 'The best triangles. made by Egyptians',
+      rating: 3.9
+    },
+    {
+      name: 'Pyramids',
+      id: '2321',
+      thumbnail: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
+      description: 'The best triangles. made by Egyptians',
+      rating: 3.9
+    },
   ],
   visitedPlaces: [
     {
@@ -110,14 +124,14 @@ render(){
     return (
       <View style={styles.container}>
 
+        {/*
         <ExplorationModeSwitch
           currentScreen={navigation.state.routeName}
           changeScreen={navigation.navigate}
           dispatch={navigation.dispatch}
-          />
+        />
 
 
-        {/*
          <ChangeModeSwitch
           replaceScreen={navigation.replace}
           currentScreen={navigation.state.routeName}
@@ -127,19 +141,19 @@ render(){
 
       */}
 
-      <View style={{height: 100, zIndex: -1}}>
-      </View>
+
 
       {visitedPlaces.length === 0
         ? <View></View>
         : (<View>
-              <View>
-                <Text>
+
+            <View style={{padding: 10, justifyContent: 'center', alignItems: 'center', borderColor: themeColor, borderBottomWidth: 0.5}}>
+              <Text style={{color: themeColor, fontSize: 25, fontWeight: '200'}}>
                   Visited Placed
                 </Text>
               </View>
-              <View>
-                <Text>
+              <View style={{padding: 5, justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={{color: themeColor, fontSize: 12, fontWeight: '200'}}>
                   For better recommendations, rate the palces you've visited.
                 </Text>
               </View>
@@ -174,8 +188,8 @@ render(){
                             stagger={50}
                             maxScale={1.4}
                             starStyle={{
-                              width: 35,
-                              height: 35,
+                              width: 25,
+                              height: 25,
                               opacity: 0.8
                             }}
                             />
@@ -191,26 +205,57 @@ render(){
       }
 
 
-{/*
-        <View>
-          <Text>
-            Recommended Place2
+
+        <View style={{padding: 10, justifyContent: 'center', alignItems: 'center'}}>
+          <Text style={{color: themeColor, fontSize: 25, fontWeight: '200'}}>
+            Recommendations
           </Text>
         </View>
 
         <ScrollView
-          style={styles.recommendedPlacesList}
+          style={[styles.recommendedPlacesList, {borderColor: themeColor}]}
         >
-           {
-              recommendedPlaces.map((item) => (
-                 <View key = {item.id} style = {styles.recommendedPlacesListItem}>
-                    <Text>{item.name}</Text>
-                 </View>
-              ))
-           }
-        </ScrollView>
-*/}
+        {
+          recommendedPlaces.map((item, index) => (
+            <View key = {item.id} style = {[styles.recommendedPlacesListItem, {borderColor: themeColor}]}>
+              <Image
+                source={{uri: item.thumbnail}}
+                style={[styles.visitedPlacesListItemImage, {borderColor: themeColor}]}
+              />
+              <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'space-around'}}>
+                <Text style={[styles.recommendedPlacesListItemHeading, {color: themeColor}]}>{item.name}</Text>
+                <Text style={styles.recommendedPlacesListItemDescription}>{item.description}</Text>
 
+                <View style={styles.recommendedPlacesListItemRating}>
+                  <Rating
+                    onChange={rating => {
+                      this.ratingEntered(rating, index)
+                    }}
+                    selectedStar={RatingImages.starFilled}
+                    unselectedStar={RatingImages.starEmpty}
+                    initial={item.rating}
+                    editable={true}
+                    config={{
+                      easing: Easing.inOut(Easing.ease),
+                      duration: 350
+                    }}
+                    stagger={50}
+                    maxScale={1.4}
+                    starStyle={{
+                      width: 25,
+                      height: 25,
+                      opacity: 0.8
+                    }}
+                    />
+                </View>
+
+              </View>
+            </View>
+          ))
+        }
+        </ScrollView>
+
+{/*
         <TouchableOpacity
           onPress={settingVisible
             ? this.closeSettings
@@ -227,6 +272,14 @@ render(){
         <Settings
           visible={settingVisible}
         />
+*/}
+
+
+          <View style={{padding: 11, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.5)'}}>
+            <Text style={{}}>
+
+            </Text>
+          </View>
 
         </View>
       )
@@ -258,6 +311,7 @@ const styles = StyleSheet.create({
   },
   visitedPlacesListItem: {
     flexDirection: 'row',
+    alignItems: 'center',
     borderBottomWidth: 0.5,
     height:  100,
 
@@ -270,6 +324,7 @@ const styles = StyleSheet.create({
   },
   visitedPlacesListItemDescription: {
     fontSize: 12,
+    fontWeight: '200',
     // alignSelf: 'center',
     paddingLeft: 10,
     paddingBottom: 10,
@@ -280,19 +335,42 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   visitedPlacesListItemImage: {
+    height: 99,
+    width: 100,
+    borderRightWidth: 0.5,
+    padding: 5,
+  },
+  recommendedPlacesList: {
+    borderTopWidth: 0.5,
+  },
+  recommendedPlacesListItem: {
+    flexDirection: 'row',
+    borderBottomWidth: 0.5,
+    height:  100,
+  },
+  recommendedPlacesListItemHeading: {
+    fontSize: 20,
+    fontWeight: '600',
+    paddingLeft: 10,
+    paddingTop: 5,
+  },
+  recommendedPlacesListItemDescription: {
+    fontSize: 12,
+    fontWeight: '200',
+    // alignSelf: 'center',
+    paddingLeft: 10,
+    paddingBottom: 10,
+  },
+  recommendedPlacesListItemRating: {
+
+    paddingLeft: 10,
+    paddingBottom: 10,
+  },
+  recommendedPlacesListItemImage: {
     height: '100%',
     width: 100,
     borderRightWidth: 0.5,
   },
-  recommendedPlacesList: {
-    marginTop: 20,
-    borderWidth: 0.5,
-    borderColor: '#888',
-    backgroundColor: '#eee',
-  },
-  recommendedPlacesListItem: {
-
-  }
 })
 
 

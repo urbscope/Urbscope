@@ -5,6 +5,9 @@ import { connect } from 'react-redux'
 
 import { buttonActive, buttonActiveOutline } from '../utils/colors'
 
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+
+
 class ChangeModeSwitch extends Component {
 
   goToDetection = () => {
@@ -35,7 +38,7 @@ class ChangeModeSwitch extends Component {
     //   actions: [ NavigationActions.navigate({ routeName: 'NearbyLocations'}) ]
     // }))
 
-    this.props.replaceScreen('NearbyLocations')
+    this.props.replaceScreen('ExplorationMode')
 
     // this.props.dispatch(NavigationActions.replace({
     //   key: 'DetectionMode',
@@ -49,32 +52,60 @@ class ChangeModeSwitch extends Component {
   doNothing = () => {}
 
   render(){
-
+    console.log(this.props);
+    // console.log(this.props);
     const { currentScreen, themeColor } = this.props
 
-    let isSelectedDetection
-    let isSelectedExploration
-    if (currentScreen === 'DetectionMode'){
-      isSelectedDetection = { backgroundColor: themeColor }
-      isSelectedExploration = { backgroundColor: 0 }
-    } else {
-      isSelectedDetection = { backgroundColor: 0 }
-      isSelectedExploration = { backgroundColor: themeColor }
-    }
+    // let isSelectedDetection
+    // let isSelectedExploration
+    // if (currentScreen === 'DetectionMode'){
+    //   isSelectedDetection = { backgroundColor: themeColor }
+    //   isSelectedExploration = { backgroundColor: 0 }
+    // } else {
+    //   isSelectedDetection = { backgroundColor: 0 }
+    //   isSelectedExploration = { backgroundColor: themeColor }
+    // }
 
     return (
       <View style={styles.container}>
         <TouchableOpacity
-          style={[styles.roundButton, isSelectedDetection]}
           onPress={currentScreen === 'DetectionMode' ? this.doNothing : this.goToDetection }
         >
+          <View style={[styles.button]}>
+            <View style={styles.buttonLogoContainer}>
+              <MaterialIcons
+                name='flag'
+                size={30}
+                color={currentScreen === 'DetectionMode' ? '#eee' : '#eee'}
+                />
+            </View>
+            <View style={currentScreen === 'DetectionMode'
+              ? [styles.buttonLine, {backgroundColor: themeColor}]
+              : [styles.buttonLine, {backgroundColor: '#eee'}]} />
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.roundButton, isSelectedExploration]}
           onPress={currentScreen === 'DetectionMode' ? this.goToExploration : this.doNothing }
         >
+          <View style={[styles.button]}>
+            <View style={styles.buttonLogoContainer}>
+              <MaterialIcons
+                name='explore'
+                size={30}
+                color={currentScreen === 'DetectionMode' ? '#eee' : '#eee'}
+
+                />
+            </View>
+
+            <View style={currentScreen === 'DetectionMode'
+              ? [styles.buttonLine, {backgroundColor: '#eee'}]
+              : [styles.buttonLine, {backgroundColor: themeColor}]} />
+
+          </View>
         </TouchableOpacity>
+
+
       </View>
     )
   }
@@ -84,23 +115,28 @@ class ChangeModeSwitch extends Component {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: '10%',
-    right: '2%',
-
+    top:  80,
+    right: 15,
   },
-  roundButton: {
+  button: {
     height: 60,
     width: 60,
-    borderRadius: 30,
-    borderWidth: 3,
-    borderColor: buttonActiveOutline,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'stretch',
+    // borderRadius: 20,
+    // borderWidth: 0.5,
     marginTop: 10,
   },
-  selected: {
-    backgroundColor: buttonActive
+  buttonLine: {
+    borderTopRightRadius: 20,
+    borderBottomRightRadius: 20,
+    flex: 0.2,
   },
-  unselected: {
-    backgroundColor: 0,
+  buttonLogoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   }
 })
 

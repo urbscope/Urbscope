@@ -73,9 +73,8 @@ class Settings extends React.Component {
     themeColor: this.props.settings.themeColor,
     animation: {
       containerHeight: new Animated.Value(60),
-      containerWidth: new Animated.Value(58),
+      containerWidth: new Animated.Value(0),
       opacity: new Animated.Value(0),
-      opacity2: new Animated.Value(0),
       zIndex: new Animated.Value(-10),
       borderRadius: new Animated.Value(20),
     }
@@ -106,16 +105,10 @@ class Settings extends React.Component {
             duration: 200,
           }),
         ]),
-        Animated.stagger(200 ,[
-          Animated.timing(opacity, {
-            toValue: 1,
-            duration: 1000,
-          }),
-          Animated.timing(opacity2, {
-            toValue: 1,
-            duration: 1000,
-          }),
-        ])
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 1000,
+        }),
       ])
     ]).start()
 
@@ -125,23 +118,18 @@ class Settings extends React.Component {
     const { containerHeight, containerWidth, opacity, zIndex, borderRadius, opacity2 } = this.state.animation
 
     Animated.sequence([
-      Animated.parallel([
-        Animated.timing(opacity2, {
-          toValue: 0,
-          duration: 250,
-        }),
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 250,
-        }),
-      ]),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 250,
+      }),
+
       Animated.stagger(150, [
         Animated.timing(containerWidth, {
-          toValue: 58,
+          toValue: 0,
           duration: 250,
         }),
         Animated.spring(containerHeight, {
-          toValue: 60,
+          toValue: 0,
           friction: 20,
           tension: 70,
         }),
@@ -447,6 +435,7 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
     borderBottomWidth: 1,
     padding: 15,
+
     // borderBottomColor: red,
     // backgroundColor: red,
     borderTopLeftRadius: 20,

@@ -268,19 +268,23 @@ class DirectionMeter extends Component {
 
 const styles = StyleSheet.create({
     container: {
-      top: ScreenHeight*0.1,
-      left: ScreenWidth/2 - 100 - ScreenHeight*0.05,
-      width: 100 + ScreenHeight*0.05,
-      height: 100 + ScreenHeight*0.05,
+      top: ScreenHeight*0.02,
+      // left: ScreenHeight*0.1,
+
+
+      left: ScreenWidth*0.25,
+      width: ScreenWidth*0.5,
+      height: ScreenWidth*0.5,
       alignItems: 'stretch',
-      borderWidth: 1,
+      // borderWidth: 1,
       borderColor: '#fff',
-      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      // backgroundColor: 'rgba(255, 255, 255, 0.1)',
       zIndex: 2,
     },
     gl: {
       flex: 1,
-      backgroundColor: 'rgba(200, 0, 200, 0.2)',
+      opacity: 0.8,
+      // backgroundColor: 'rgba(200, 0, 200, 0.2)',
     },
     text: {
       flex: 0.05,
