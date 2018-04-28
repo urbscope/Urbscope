@@ -12,3 +12,4 @@ export const FS_CLIENT_PW = '1LL20JSTUVM1BM4G30E0KMN1QBKU3ZDVLMO1OP5QIPWCQEOK'
 
 export const SETTINGS_STORAGE_KEY = "settingsstorage";
 export const VISITED_STORAGE_KEY = "visitedstorage";
+export const UID_STORAGE_KEY = "uidstorage";

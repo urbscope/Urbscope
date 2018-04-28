@@ -1,6 +1,6 @@
 import { AsyncStorage } from 'react-native'
 
-import { SETTINGS_STORAGE_KEY, VISITED_STORAGE_KEY } from './keysAPI'
+import { SETTINGS_STORAGE_KEY, VISITED_STORAGE_KEY, UID_STORAGE_KEY } from './keysAPI'
 
 export function setSettings ( settings ) {
   return AsyncStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
@@ -20,7 +20,6 @@ export function getVisitedLocations(){
   )
 }
 
-
 export function updateVisitedLocations(entry) {
   /*entry is of form:
     locationID: {
@@ -32,3 +31,15 @@ export function updateVisitedLocations(entry) {
    */
   return AsyncStorage.mergeItem(VISITED_STORAGE_KEY, JSON.stringify(entry), (error)=>console.log(error));
 }
+
+
+export function getUserID(){
+    return AsyncStorage.getItem(UID_STORAGE_KEY).then( entry =>
+        JSON.parse(entry)
+    )
+}
+
+export function setUserID(id){
+    return AsyncStorage.setItem(UID_STORAGE_KEY, id);
+}
+
