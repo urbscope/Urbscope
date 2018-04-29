@@ -23,6 +23,7 @@ import Settings from './Settings'
 
 import { purple, white, red } from '../utils/colors'
 import {updateVisitedLocations} from "../utils/localStorageAPI";
+import NearbyLocationsList from "./NearbyLocationsList";
 
 var foursquare = require('react-foursquare')({
   clientID: 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH',
@@ -122,6 +123,8 @@ class NearbyLocations extends Component {
           coords = {lat: obj.latitude, lng: obj.longitude};
           markers[obj.destinationID] =  {
               name: obj.name.toString(),
+              category: obj.category,
+              picture: obj.picture,
               location: {latitude: coords.lat, longitude: coords.lng},
               key: obj.destinationID.toString(),
               address: obj.address
@@ -176,13 +179,10 @@ async componentDidMount() {
 
       //If Navigate is on, calculate arrowRotation angle
       if (this.targetBearing) {
-        console.log("targetBearing: ", this.targetBearing);
-        console.log("heading: ",  this.heading);
         let arrowRotation = 360 - this.heading + this.targetBearing;
         if (arrowRotation > 360)
           arrowRotation -= 360;
         this.setState({arrowRotation});
-        console.log(arrowRotation);
       }
     });
   };
@@ -242,7 +242,7 @@ async componentDidMount() {
       if (!points || !points[1])
       return;
 
-      let pointCoords = {latitude: points[1][0], longitude: points[1][1]};
+      let pointCoords = {latitude: points[0][0], longitude: points[0][1]};
       this.targetBearing = geolib.getRhumbLineBearing(this.formatLocation(this.state.location), pointCoords);
 
       if (distanceToDestination.value <= 100)
@@ -334,6 +334,18 @@ async componentDidMount() {
                         bearing={this.state.arrowRotation}
                     />
                 }
+
+                {/*
+                    <View>
+                        <NearbyLocationsList locations={Object.values(this.state.markers)} handlePress={(key) => {
+                            let loc = this.state.markers[key].location;
+                            this.setState({
+                                destination: loc,
+                                selectedMarker: key
+                            }, this.getTargetBearingAndDistance);
+                        }}/>
+                    </View>
+                */}
 
 
               <Animated.View
