@@ -14,8 +14,8 @@ import SplashLoading from './components/SplashLoading'
 import TabBarExploration from './components/TabBarExploration'
 
 import { connect } from 'react-redux'
-import { loadSettings, setSettings, getUserID } from './actions'
-import { getUID, setUserID } from "./utils/localStorageAPI";
+import { loadSettings, setSettings } from './actions'
+import {getUserID, setUserID} from "./utils/localStorageAPI";
 console.disableYellowBox = true;
 
 
@@ -155,9 +155,12 @@ class AppWithStore extends React.Component {
 
   async createUserID() {
     let uid = Expo.Constants.deviceId;
+    console.log("generated ID ", uid);
     let resp = await fetch(`https://urbserver.herokuapp.com/register/${uid}`);
     if (resp.status == 200){
       setUserID(uid);
+    }else {
+      console.error("response status: ", res.status);
     }
 
   }
@@ -166,22 +169,21 @@ class AppWithStore extends React.Component {
     // AsyncStorage.clear()
 
 
-    // this.props.loadUserID((id) => console.log(id))
-    this.props.loadUserID()
+    // this.props.loadUserID((id) =>console.log(this.props.userID));
+    // this.props.loadUserID();
 
-      getUserID().then(id=>{
-      if (!id)
-        this.createUserID();
-        }
-    );
-
-    // getUID().then(id => {
-    //   console.log("WORKSSSSS");
-    //   console.log('id: ', id);
+    //   getUserID().then(id=>{
     //   if (!id)
     //     this.createUserID();
-    //   }
+    //     }
     // );
+
+    getUserID().then(id=>{
+        console.log("user id: ", id);
+        if (!id)
+          this.createUserID();
+      }
+    );
 
     this.props.loadSettings(() => {
       // console.log("load settings init");
@@ -210,7 +212,7 @@ class AppWithStore extends React.Component {
   }
 
   render() {
-    console.log(this.props.userID);
+    // console.log(this.props.userID);
     if (this.state.loading) {
       return (
         <SplashLoading />
