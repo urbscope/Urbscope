@@ -111,109 +111,6 @@ class DirectionMeter extends Component {
     camera.position.z = 80;
 
 
-
-    // camera.position.x = -30;
-
-
-
-  //   rotate = () => {
-  //     // if (this.currentBearing > 2 * Math.PI) {
-  //     //   this.currentBearing = this.currentBearing - 2 * Math.PI;
-  //     // }
-  //     //
-  //     // if (this.currentBearing < - 2 * Math.PI) {
-  //     //   this.currentBearing = this.currentBearing + 2 * Math.PI;
-  //     // }
-  //
-  //     let rotateClockwise = true;
-  //
-  //
-  //     // this.currentBearing = this.currentBearing % (2*Math.PI)
-  //
-  //     // if (this.currentBearing < - Math.PI ) {
-  //     //   this.currentBearing = this.currentBearing + 2 * Math.PI
-  //     // }
-  //     // else if ( this.currentBearing > Math.PI) {
-  //     //   this.currentBearing = this.currentBearing - 2 * Math.PI
-  //     // }
-  //
-  //
-  //     // if (Math.abs(this.props.bearing - this.currentBearing) > Math.abs(2*Math.PI - this.props.bearing + this.currentBearing)) {
-  //     //   rotateClockwise = false;
-  //     // } else {
-  //     //   rotateClockwise = true;
-  //     // }
-  //     if (this.currentBearing > this.props.bearing) {
-  //       rotateClockwise = false;
-  //     } else {
-  //       rotateClockwise = true;
-  //     }
-  //
-  //
-  //
-  //     // if (this.props.bearing > Math.PI) {
-  //     //   if (this.currentBearing < 0 || this.props.bearing > Math.P) {
-  //     //     if (this.props.bearing - 2*Math.PI > this.currentBearing) {
-  //     //       cube.rotation.z -= 0.02;
-  //     //     } else {
-  //     //       cube.rotation.z += 0.02;
-  //     //     }
-  //     //   } else {
-  //     //     if ( this.props.bearing - this.currentBearing  > this.currentBearing - this.props.bearing + 2*Math.PI) {
-  //     //       cube.rotation.z -= 0.02;
-  //     //     } else {
-  //     //       cube.rotation.z += 0.02;
-  //     //     }
-  //     //   }
-  //     //
-  //     //
-  //     // } else {
-  //     //   if (this.props.bearing > this.currentBearing) {
-  //     //     cube.rotation.z -= 0.02;
-  //     //   }
-  //     //   else if (this.props.bearing < this.currentBearing) {
-  //     //     cube.rotation.z += 0.02;
-  //     //   }
-  //     // }
-  //
-  //
-  //     // if (this.props.bearing > this.currentBearing) {
-  //     //   rotate = true;
-  //     // }
-  //     // else if (this.props.bearing < this.currentBearing) {
-  //     //   rotate = true;
-  //     // }
-  //
-  //     console.log('bearing', this.props.bearing);
-  //     console.log('current', this.currentBearing);
-  //
-  //     if (this.props.bearing > Math.PI) {
-  //
-  //       if (Math.abs( this.props.bearing - 2* Math.PI - this.currentBearing ) <  0.05) {
-  //         this.shouldDirectionChanged = false
-  //       } else{
-  //         this.shouldDirectionChanged = true
-  //       }
-  //     } else {
-  //       if (Math.abs( this.props.bearing - this.currentBearing ) <  0.05) {
-  //         this.shouldDirectionChanged = false
-  //       } else{
-  //         this.shouldDirectionChanged = true
-  //       }
-  //     }
-  //
-  //     if (this.shouldDirectionChanged) {
-  //       if (rotateClockwise) {
-  //         cube.rotation.z -= 0.02;
-  //       } else {
-  //         cube.rotation.z += 0.02;
-  //       }
-  //       // this.shouldDirectionChnaged = false;
-  //     }
-  //     this.currentBearing = - cube.rotation.z
-  //   }
-  //
-
     const animate = () => {
       requestAnimationFrame(animate);
 
@@ -235,8 +132,8 @@ class DirectionMeter extends Component {
       // }
 
       // controls.update();
-
-      cube.rotation.z = this.props.bearing * Math.PI / 180;
+      //console.log("bearing: ", this.props.bearing);
+      cube.rotation.z = -this.props.bearing * Math.PI / 180;
 
       // rotate();
 

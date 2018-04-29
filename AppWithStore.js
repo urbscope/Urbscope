@@ -16,6 +16,8 @@ import TabBarExploration from './components/TabBarExploration'
 import { connect } from 'react-redux'
 import { loadSettings, setSettings, getUserID } from './actions'
 import { getUID, setUserID } from "./utils/localStorageAPI";
+console.disableYellowBox = true;
+
 
 
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
@@ -81,7 +83,6 @@ const Tabs = TabNavigator({
     // swipeEnabled: true,
   }
 )
-
 const MainNavigtor = StackNavigator({
   DetectionMode: { screen: DetectionMode },
   ExplorationMode: { screen: Tabs },
@@ -168,6 +169,11 @@ class AppWithStore extends React.Component {
     // this.props.loadUserID((id) => console.log(id))
     this.props.loadUserID()
 
+      getUserID().then(id=>{
+      if (!id)
+        this.createUserID();
+        }
+    );
 
     // getUID().then(id => {
     //   console.log("WORKSSSSS");
