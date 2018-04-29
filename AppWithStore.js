@@ -14,8 +14,8 @@ import SplashLoading from './components/SplashLoading'
 import TabBarExploration from './components/TabBarExploration'
 
 import { connect } from 'react-redux'
-import { loadSettings, setSettings } from './actions'
-import {getUserID, setUserID} from "./utils/localStorageAPI";
+import { loadSettings, setSettings, getUserID } from './actions'
+import { getUID, setUserID } from "./utils/localStorageAPI";
 
 
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
@@ -152,18 +152,30 @@ class AppWithStore extends React.Component {
     loading: true,
   }
 
+  async createUserID() {
+    let uid = Expo.Constants.deviceId;
+    let resp = await fetch(`https://urbserver.herokuapp.com/register/${uid}`);
+    if (resp.status == 200){
+      setUserID(uid);
+    }
+
+  }
 
   componentDidMount () {
     // AsyncStorage.clear()
 
 
+    // this.props.loadUserID((id) => console.log(id))
+    this.props.loadUserID()
 
-      getUserID().then(id=>{
-      console.log(id);
-      if (!id)
-        this.createUserID();
-        }
-    );
+
+    // getUID().then(id => {
+    //   console.log("WORKSSSSS");
+    //   console.log('id: ', id);
+    //   if (!id)
+    //     this.createUserID();
+    //   }
+    // );
 
     this.props.loadSettings(() => {
       // console.log("load settings init");
@@ -192,6 +204,7 @@ class AppWithStore extends React.Component {
   }
 
   render() {
+    console.log(this.props.userID);
     if (this.state.loading) {
       return (
         <SplashLoading />
@@ -205,14 +218,6 @@ class AppWithStore extends React.Component {
     }
   }
 
-   async createUserID() {
-        let uid = Expo.Constants.deviceId;
-        let resp = await fetch(`https://urbserver.herokuapp.com/register/${uid}`);
-        if (resp.status == 200){
-          setUserID(uid);
-        }
-
-    }
 }
 
 
@@ -220,13 +225,15 @@ mapStateToProps = (state) => {
   return {
     settings: state.settings,
     themeColor: state.themeColor,
+    userID: state.userID,
   }
 }
 
-mapDispatchToProps = (dispatch) => {
+mapDispatchToProps = (dispatch, { navigation }) => {
   return {
     loadSettings: (callback) => dispatch(loadSettings(callback)),
-    changeSettings: (settings, callback) => dispatch(setSettings(settings, callback))
+    changeSettings: (settings, callback) => dispatch(setSettings(settings, callback)),
+    loadUserID: (callback) => dispatch(getUserID(callback)),
   }
 }
 

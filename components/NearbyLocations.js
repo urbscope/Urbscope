@@ -286,8 +286,8 @@ async componentDidMount() {
 
     const { hasCameraPermission, location, settingVisible, mapViewPosition } = this.state
 
-    console.log(navigation);
-    
+
+
 
     let [translateX, translateY] = [mapViewPosition.x, mapViewPosition.y];
     let imageStyle = {transform: [{translateX}, {translateY}]};
@@ -318,6 +318,7 @@ async componentDidMount() {
           <Camera style={styles.camera} type={Camera.Constants.Type.back}>
             <View
               style={styles.container}>
+
             {/*
               <ExplorationModeSwitch
                 currentScreen={navigation.state.routeName}
@@ -330,6 +331,7 @@ async componentDidMount() {
                 currentScreen={navigation.state.routeName}
                 changeScreen={navigation.navigate}
                 dispatch={navigation.dispatch}
+                changeScreennn={this.props.changeScreennn}
                 />
 
               <DirectionMeter
@@ -395,19 +397,42 @@ async componentDidMount() {
 
               </Animated.View>
 
+
               <TouchableOpacity
                 onPress={settingVisible
                   ? this.closeSettings
                   : this.openSettings}
-                  style={[styles.buttonSettings, {backgroundColor: themeColor}]}
-                  >
-                  <Ionicons
-                    name='ios-settings-outline'
-                    size={50}
-                    color={white}
-                    />
-                </TouchableOpacity>
+                style={styles.buttonSettingsContainer}
+              >
+                <View style={styles.buttonSettings}>
+                  <View style={styles.buttonLogoContainer}>
+                    <MaterialIcons
+                      name='explore'
+                      size={30}
+                      color={'#eee'}
 
+                      />
+                  </View>
+
+                  <View style={[styles.buttonLine, {backgroundColor: themeColor}]} />
+
+                </View>
+              </TouchableOpacity>
+
+{
+              // <TouchableOpacity
+              //   onPress={settingVisible
+              //     ? this.closeSettings
+              //     : this.openSettings}
+              //     style={[styles.buttonSettings, {backgroundColor: themeColor}]}
+              //     >
+              //     <Ionicons
+              //       name='ios-settings-outline'
+              //       size={50}
+              //       color={white}
+              //       />
+              //   </TouchableOpacity>
+}
                 <Settings
                   visible={settingVisible}
                   />
@@ -477,30 +502,43 @@ async componentDidMount() {
       borderRadius: 1,
       borderColor: 'black',
     },
-    buttonSettings: {
+    buttonSettingsContainer: {
       position: 'absolute',
+      top: 5,
       zIndex: 11,
-      top: 15,
       right: 15,
+    },
+    buttonSettings: {
       height: 60,
-      width: 58,
-      borderRadius: 20,
-      // backgroundColor: red,
+      width: 60,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'stretch',
+      // borderRadius: 20,
+      // borderWidth: 0.5,
+      marginTop: 10,
+    },
+    buttonLine: {
+      borderTopRightRadius: 10,
+      borderBottomRightRadius: 10,
+      width: 10,
+    },
+    buttonLogoContainer: {
+      flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      paddingTop: 4,
-    },
+    }
   })
 
 
-    mapStateToProps = (state) => {
-      return {
-        settings: state.settings,
-        themeColor: state.themeColor,
-      }
-    }
+mapStateToProps = (state) => {
+  return {
+    settings: state.settings,
+    themeColor: state.themeColor,
+  }
+}
 
 
 
-    export default connect(mapStateToProps)(NearbyLocations)
-    // export default connect(mapStateToProps)(NearbyLocations)
+export default connect(mapStateToProps)(NearbyLocations)
+// export default connect(mapStateToProps)(NearbyLocations)

@@ -18,13 +18,19 @@ class ChangeModeSwitch extends Component {
     //   actions: [ NavigationActions.navigate({ routeName: 'DetectionMode'}) ]
     // }))
 
-    this.props.replaceScreen('DetectionMode')
+    // this.props.replaceScreen('DetectionMode')
 
+    // this.props.changeScreennn('DetectionMode')
     // this.props.dispatch(NavigationActions.replace({
     //   key: 'NearbyLocations',
     //   routeName: 'DetectionMode'
     // }))
 
+    this.props.dispatch(NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: 'DetectionMode' })],
+
+    }))
 
     // console.log("go to detection");
   }
@@ -38,7 +44,9 @@ class ChangeModeSwitch extends Component {
     //   actions: [ NavigationActions.navigate({ routeName: 'NearbyLocations'}) ]
     // }))
 
-    this.props.replaceScreen('ExplorationMode')
+    // this.props.replaceScreen('ExplorationMode')
+
+    // this.props.changeScreennn('ExplorationMode')
 
     // this.props.dispatch(NavigationActions.replace({
     //   key: 'DetectionMode',
@@ -46,14 +54,20 @@ class ChangeModeSwitch extends Component {
     //   routeName: 'NearbyLocations'
     // }))
 
+
+    this.props.dispatch(NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: 'ExplorationMode' })],
+    }))
+
     // console.log("go to exploration");
   }
 
   doNothing = () => {}
 
   render(){
-    console.log(this.props);
-    // console.log(this.props);
+
+
     const { currentScreen, themeColor } = this.props
 
     // let isSelectedDetection
@@ -80,8 +94,8 @@ class ChangeModeSwitch extends Component {
                 />
             </View>
             <View style={currentScreen === 'DetectionMode'
-              ? [styles.buttonLine, {backgroundColor: themeColor}]
-              : [styles.buttonLine, {backgroundColor: '#eee'}]} />
+              ? [styles.buttonLine, {backgroundColor: '#eee'}]
+              : [styles.buttonLine, {backgroundColor: themeColor}]} />
           </View>
         </TouchableOpacity>
 
@@ -99,8 +113,8 @@ class ChangeModeSwitch extends Component {
             </View>
 
             <View style={currentScreen === 'DetectionMode'
-              ? [styles.buttonLine, {backgroundColor: '#eee'}]
-              : [styles.buttonLine, {backgroundColor: themeColor}]} />
+              ? [styles.buttonLine, {backgroundColor: themeColor}]
+              : [styles.buttonLine, {backgroundColor: '#eee'}]} />
 
           </View>
         </TouchableOpacity>
@@ -115,7 +129,7 @@ class ChangeModeSwitch extends Component {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top:  80,
+    top:  75,
     right: 15,
   },
   button: {
@@ -129,9 +143,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonLine: {
-    borderTopRightRadius: 20,
-    borderBottomRightRadius: 20,
-    flex: 0.2,
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    width: 10,
   },
   buttonLogoContainer: {
     flex: 1,
@@ -148,4 +162,10 @@ mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps)(ChangeModeSwitch)
+mapDispatchToProps = (dispatch, { navigation }) => {
+  return {
+    // changeScreennn: (name, params, actions) => navigation.replace(name, params, actions),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChangeModeSwitch)

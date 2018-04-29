@@ -71,39 +71,49 @@ class Settings extends React.Component {
     category: this.props.settings.category,
     themeColor: this.props.settings.themeColor,
     animation: {
-      containerHeight: new Animated.Value(60),
-      containerWidth: new Animated.Value(0),
+      containerHeight: new Animated.Value(58),
+      containerWidth: new Animated.Value(10),
       opacity: new Animated.Value(0),
       zIndex: new Animated.Value(-10),
-      borderRadius: new Animated.Value(20),
+      borderRadius: new Animated.Value(10),
+      paddingHorizontal: new Animated.Value (0),
+      borderTopLeftRadius: new Animated.Value(0),
     }
   }
 
 
   modalAppear = () => {
-    const { containerHeight, containerWidth, opacity, zIndex, borderRadius, opacity2 } = this.state.animation
+    const { paddingHorizontal, containerHeight, containerWidth, opacity, zIndex, borderRadius, borderTopLeftRadius, opacity2 } = this.state.animation
 
     Animated.sequence([
       Animated.timing(zIndex, {
         toValue: 10,
         duration: 1,
       }),
-      Animated.stagger(400, [
-        Animated.timing(containerHeight, {
-          toValue: ScreenHeight * 83 / 100,
-          duration: 450,
-        }),
+      Animated.stagger(200, [
         Animated.parallel([
-          Animated.spring(containerWidth, {
+          Animated.timing(containerWidth, {
             toValue: ScreenWidth -30,
-            friction: 8,
-            tension: 70,
+            duration: 300,
+          }),
+          Animated.timing(paddingHorizontal, {
+            toValue: 15,
+            duration: 300,
           }),
           Animated.timing(borderRadius, {
             toValue: 0,
-            duration: 200,
+            duration: 300,
           }),
         ]),
+        Animated.timing(borderTopLeftRadius, {
+          toValue: 10,
+          duration: 250,
+        }),
+        Animated.spring(containerHeight, {
+          toValue: ScreenHeight * 83 / 100,
+          friction: 8,
+          tension: 70,
+        }),
         Animated.timing(opacity, {
           toValue: 1,
           duration: 1000,
@@ -114,29 +124,39 @@ class Settings extends React.Component {
   }
 
   modalDisappear = () => {
-    const { containerHeight, containerWidth, opacity, zIndex, borderRadius, opacity2 } = this.state.animation
+    const { containerHeight, containerWidth, opacity, zIndex, borderRadius, borderTopLeftRadius, opacity2, paddingHorizontal } = this.state.animation
 
     Animated.sequence([
       Animated.timing(opacity, {
         toValue: 0,
         duration: 250,
       }),
+      Animated.timing(paddingHorizontal, {
+        toValue: 0,
+        duration: 1,
+      }),
+      Animated.stagger(300, [
+        Animated.timing(containerHeight, {
+          toValue: 58,
+          duration: 300,
+        }),
+        Animated.parallel([
+          Animated.timing(borderTopLeftRadius, {
+            toValue: 0,
+            duration: 150,
+          }),
+          Animated.timing(containerWidth, {
+            toValue: 10,
+            duration: 300,
+          }),
 
-      Animated.stagger(150, [
-        Animated.timing(containerWidth, {
-          toValue: 0,
-          duration: 250,
-        }),
-        Animated.spring(containerHeight, {
-          toValue: 0,
-          friction: 20,
-          tension: 70,
-        }),
-        Animated.timing(borderRadius, {
-          toValue: 20,
-          duration: 450,
-        }),
+          Animated.timing(borderRadius, {
+            toValue: 10,
+            duration: 300,
+          }),
+        ]),
       ]),
+
       Animated.timing(zIndex, {
         toValue: -10,
         duration: 1,
@@ -190,7 +210,7 @@ class Settings extends React.Component {
 
     const { dectionLimit, nearbyRadius, category, nearbyLimit, categories } = this.state
     const { settings, themeColor } = this.props
-    const { containerHeight, containerWidth, opacity, opacity2, zIndex, borderRadius } = this.state.animation
+    const { containerHeight, containerWidth, opacity, opacity2, zIndex, borderRadius, borderTopLeftRadius, paddingHorizontal } = this.state.animation
 
 
     // console.log('settings', settings);
@@ -198,11 +218,12 @@ class Settings extends React.Component {
 
     // if (this.props.visible) {
       return (
-        <Animated.View style={[styles.container, {height: containerHeight, width: containerWidth, zIndex}]}>
+        <Animated.View style={[styles.container, {height: containerHeight, width: containerWidth, zIndex , borderRadius: borderTopLeftRadius}]}>
 
-          <Animated.View style={[styles.heading, {borderRadius, borderBottomColor: themeColor, backgroundColor: themeColor}]}>
+          <Animated.View style={[styles.heading, { borderRadius, borderTopLeftRadius, borderBottomColor: themeColor, backgroundColor: themeColor, paddingHorizontal}]}>
             <Animated.Text style={[styles.headingText, {opacity}]}>Settings</Animated.Text>
           </Animated.View>
+
 
           <Animated.ScrollView
             style={{flex: 1, opacity }}
@@ -398,19 +419,27 @@ const styles = StyleSheet.create({
     // height: ScreenHeight * 60 / 100,
     // width: ScreenWidth * 80 / 100,
     backgroundColor: '#eee',
-    borderRadius: 20,
+    // borderRadius: 10,
+
+    // borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+
   },
   heading: {
     height: 60,
+
     justifyContent: 'center',
     // alignItems: 'center',
     borderBottomWidth: 1,
-    padding: 15,
+
 
     // borderBottomColor: red,
     // backgroundColor: red,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    // borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 0,
+
 
   },
   headingText: {
@@ -422,8 +451,9 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     justifyContent: 'center',
-    alignItems: 'center',
+    // alignItems: 'center',
     paddingVertical: 10,
+    paddingHorizontal: 15,
     borderBottomWidth: 0.5,
   },
   item: {

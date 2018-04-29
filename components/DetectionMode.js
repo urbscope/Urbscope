@@ -257,7 +257,6 @@ class DetectionMode extends Component {
 
     const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
 
-    console.log(navigation);
 
     if (hasCameraPermission === null) {
      return <View style={{flex:1, backgroundColor: 'black'}}/>;
@@ -477,7 +476,7 @@ const styles = StyleSheet.create({
 
   buttonSettingsContainer: {
     position: 'absolute',
-    top: 8,
+    top: 5,
     zIndex: 11,
     right: 15,
   },
@@ -492,9 +491,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonLine: {
-    borderTopRightRadius: 20,
-    borderBottomRightRadius: 20,
-    flex: 0.2,
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    width: 10,
   },
   buttonLogoContainer: {
     flex: 1,

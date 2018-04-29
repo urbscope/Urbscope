@@ -92,5 +92,5 @@ export const DEFAULT_SETTINGS = {
   nearbyLimit: 10,
   nearbyRadius: 1000,
   category: CATEGORIES_NONE,
-  themeColor: yellow,
+  themeColor: red,
 }
