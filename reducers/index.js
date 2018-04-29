@@ -5,6 +5,7 @@ import {
   CHANGE_SETTINGS,
   LOAD_SETTINGS,
   CHANGE_COLOR,
+  SET_USERID,
 } from '../actions'
 
 
@@ -35,8 +36,20 @@ themeColor = (state={}, action) => {
   }
 }
 
+userID = (state={}, action) => {
+  const { type, userID } = action
+
+  switch (type) {
+    case SET_USERID:
+      return userID
+
+    default:
+      return state
+  }
+}
 
 export default combineReducers({
   themeColor,
   settings,
+  userID,
 })
