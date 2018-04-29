@@ -27,12 +27,12 @@ export function changeColor (color) {
   }
 }
 
-export function setUserIDSuccess (id) {
-  return{
-    type: SET_USERID,
-    id
-  }
-}
+// export function setUserIDSuccess (id) {
+//   return{
+//     type: SET_USERID,
+//     id
+//   }
+// }
 
 // ============================================================================
 // THUNK MIDDLEWARE
@@ -63,41 +63,41 @@ export function setSettings (settings, callback) {
   }
 }
 
-export function getUserID ( callback ) {
-  callback = callback || function () {};
-
-  console.log("GET USER ID FUNCTION CALL: ");
-
-
-
-
-  return (dispatch) => {
-    console.log("IN RETURN");
-    // LocalStorage.getUID().then(id=>{
-    //   console.log("id is ", id);
-    // })
-
-    //
-    LocalStorage.getUID().then(id => {
-      console.log("GOT USER ID: ", id);
-      if (!id){
-        console.log("IT IS NULL");
-
-        let uid = Constants.deviceId;
-        console.log("UNIQUE ID GENERATED: ", uid);
-
-        fetch(`https://urbserver.herokuapp.com/register/${uid}`).then(res => {
-          console.log("RESPONSE FROM SERVER: ", res);
-          if (res.status == 200){
-            LocalStorage.setUserID(uid);
-            dispatch(setUserIDSuccess(uid))
-            callback(uid);
-          }
-        })
-      } else {
-        dispatch(setUserIDSuccess(id))
-        callback(id);
-      }
-    })
-  }
-}
+// export function getUserID ( callback ) {
+//   callback = callback || function () {};
+//
+//   console.log("GET USER ID FUNCTION CALL: ");
+//
+//
+//
+//
+//   return (dispatch) => {
+//     console.log("IN RETURN");
+//     // LocalStorage.getUID().then(id=>{
+//     //   console.log("id is ", id);
+//     // })
+//
+//     //
+//     LocalStorage.getUserID().then(id => {
+//       console.log("GOT USER ID: ", id);
+//       if (!id){
+//         console.log("IT IS NULL");
+//
+//         let uid = Constants.deviceId;
+//         console.log("UNIQUE ID GENERATED: ", uid);
+//
+//         fetch(`https://urbserver.herokuapp.com/register/${uid}`).then(res => {
+//           if (res.status == 200){
+//             LocalStorage.setUserID(uid);
+//             dispatch(setUserIDSuccess(uid))
+//             callback(uid);
+//           }
+//         })
+//       } else {
+//         console.log(id);
+//         dispatch(setUserIDSuccess(id))
+//         callback(id);
+//       }
+//     })
+//   }
+// }

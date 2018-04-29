@@ -33,12 +33,13 @@ export function updateVisitedLocations(entry) {
 }
 
 
-export function getUID(){
-    return AsyncStorage.getItem(UID_STORAGE_KEY).then( entry =>
-        JSON.parse(entry)
+export function getUserID(){
+    return AsyncStorage.getItem(UID_STORAGE_KEY).then( entry => {
+            return JSON.parse(entry)
+        }
     )
 }
 
 export function setUserID(id){
-    return AsyncStorage.setItem(UID_STORAGE_KEY, id);
+    return AsyncStorage.setItem(UID_STORAGE_KEY, JSON.stringify(id));
 }

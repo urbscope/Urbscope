@@ -11,6 +11,8 @@ import { View,
 
 import { connect } from 'react-redux'
 import { setSettings, changeColor } from '../actions'
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+
 
 import { red, white, teal, black, purple, yellow, } from '../utils/colors'
 
@@ -36,6 +38,8 @@ import {
     CATEGORIES_TRAIN_STATIONS,
 } from '../utils/helpers';
 
+
+
 import { DEFAULT_SETTINGS } from '../utils/helpers'
 
 var ScreenWidth = Dimensions.get('window').width
@@ -48,25 +52,25 @@ class Settings extends React.Component {
     nearbyLimit: this.props.settings.nearbyLimit,
     nearbyRadius: this.props.settings.nearbyRadius,
     categories: {
-      [CATEGORIES_TOURISTIC_SITES]: true,
-      [CATEGORIES_AMPHITHEATERS]: false,
-      [CATEGORIES_AQUARIUMS]: false,
-      [CATEGORIES_ART_GALLERIES]: false,
-      [CATEGORIES_CONCERT_HALLS]: false,
-      [CATEGORIES_EXHIBITS]: false,
-      [CATEGORIES_HISTORIC_SITES]: false,
-      [CATEGORIES_MUSEUMS]: false,
-      [CATEGORIES_PUBLIC_ART]: false,
-      [CATEGORIES_STADIUMS]: false,
-      [CATEGORIES_ZOOS]: false,
-      [CATEGORIES_RESTAURANTS]: false,
-      [CATEGORIES_NIGHTLIFE_SPOTS]: false,
-      [CATEGORIES_OUTDOORS_AND_RECREATION]: false,
-      [CATEGORIES_TRAVEL_AND_TRANSPORT]: false,
-      [CATEGORIES_AIRPORTS]: false,
-      [CATEGORIES_BUS_STATIONS]: false,
-      [CATEGORIES_TOURIST_INFORMATION_CENTERS]: false,
-      [CATEGORIES_TRAIN_STATIONS]: false,
+      [CATEGORIES_TOURISTIC_SITES]: this.props.settings.categories[CATEGORIES_TOURISTIC_SITES],
+      [CATEGORIES_AMPHITHEATERS]: this.props.settings.categories[CATEGORIES_AMPHITHEATERS],
+      [CATEGORIES_AQUARIUMS]: this.props.settings.categories[CATEGORIES_AQUARIUMS],
+      [CATEGORIES_ART_GALLERIES]: this.props.settings.categories[CATEGORIES_ART_GALLERIES],
+      [CATEGORIES_CONCERT_HALLS]: this.props.settings.categories[CATEGORIES_CONCERT_HALLS],
+      [CATEGORIES_EXHIBITS]: this.props.settings.categories[CATEGORIES_EXHIBITS],
+      [CATEGORIES_HISTORIC_SITES]: this.props.settings.categories[CATEGORIES_HISTORIC_SITES],
+      [CATEGORIES_MUSEUMS]: this.props.settings.categories[CATEGORIES_MUSEUMS],
+      [CATEGORIES_PUBLIC_ART]: this.props.settings.categories[CATEGORIES_PUBLIC_ART],
+      [CATEGORIES_STADIUMS]: this.props.settings.categories[CATEGORIES_STADIUMS],
+      [CATEGORIES_ZOOS]: this.props.settings.categories[CATEGORIES_ZOOS],
+      [CATEGORIES_RESTAURANTS]: this.props.settings.categories[CATEGORIES_RESTAURANTS],
+      [CATEGORIES_NIGHTLIFE_SPOTS]: this.props.settings.categories[CATEGORIES_NIGHTLIFE_SPOTS],
+      [CATEGORIES_OUTDOORS_AND_RECREATION]: this.props.settings.categories[CATEGORIES_OUTDOORS_AND_RECREATION],
+      [CATEGORIES_TRAVEL_AND_TRANSPORT]: this.props.settings.categories[CATEGORIES_TRAVEL_AND_TRANSPORT],
+      [CATEGORIES_AIRPORTS]: this.props.settings.categories[CATEGORIES_AIRPORTS],
+      [CATEGORIES_BUS_STATIONS]: this.props.settings.categories[CATEGORIES_BUS_STATIONS],
+      [CATEGORIES_TOURIST_INFORMATION_CENTERS]: this.props.settings.categories[CATEGORIES_TOURIST_INFORMATION_CENTERS],
+      [CATEGORIES_TRAIN_STATIONS]: this.props.settings.categories[CATEGORIES_TRAIN_STATIONS],
     },
     category: this.props.settings.category,
     themeColor: this.props.settings.themeColor,
@@ -172,7 +176,7 @@ class Settings extends React.Component {
       dectionLimit: this.state.dectionLimit,
       nearbyLimit: this.state.nearbyLimit,
       nearbyRadius: this.state.nearbyRadius,
-      category: this.state.category,
+      categories: this.state.categories,
       themeColor: this.props.themeColor,
     }
 
@@ -181,7 +185,7 @@ class Settings extends React.Component {
         dectionLimit: this.props.settings.dectionLimit,
         nearbyLimit: this.props.settings.nearbyLimit,
         nearbyRadius: nextProps.settings.nearbyRadius,
-        category: nextProps.settings.category,
+        categories: nextProps.settings.categories,
         themeColor: this.props.settings.themeColor,
       }, () => {
         this.modalAppear()
@@ -199,7 +203,28 @@ class Settings extends React.Component {
       dectionLimit: DEFAULT_SETTINGS.dectionLimit,
       nearbyLimit: DEFAULT_SETTINGS.nearbyLimit,
       nearbyRadius: DEFAULT_SETTINGS.nearbyLimit,
-      category: DEFAULT_SETTINGS.category,
+      categories: {
+        [CATEGORIES_TOURISTIC_SITES]: DEFAULT_SETTINGS.categories[CATEGORIES_TOURISTIC_SITES],
+        [CATEGORIES_AMPHITHEATERS]: DEFAULT_SETTINGS.categories[CATEGORIES_AMPHITHEATERS],
+        [CATEGORIES_AQUARIUMS]: DEFAULT_SETTINGS.categories[CATEGORIES_AQUARIUMS],
+        [CATEGORIES_ART_GALLERIES]: DEFAULT_SETTINGS.categories[CATEGORIES_ART_GALLERIES],
+        [CATEGORIES_CONCERT_HALLS]: DEFAULT_SETTINGS.categories[CATEGORIES_CONCERT_HALLS],
+        [CATEGORIES_EXHIBITS]: DEFAULT_SETTINGS.categories[CATEGORIES_EXHIBITS],
+        [CATEGORIES_HISTORIC_SITES]: DEFAULT_SETTINGS.categories[CATEGORIES_HISTORIC_SITES],
+        [CATEGORIES_MUSEUMS]: DEFAULT_SETTINGS.categories[CATEGORIES_MUSEUMS],
+        [CATEGORIES_PUBLIC_ART]: DEFAULT_SETTINGS.categories[CATEGORIES_PUBLIC_ART],
+        [CATEGORIES_STADIUMS]: DEFAULT_SETTINGS.categories[CATEGORIES_STADIUMS],
+        [CATEGORIES_ZOOS]: DEFAULT_SETTINGS.categories[CATEGORIES_ZOOS],
+        [CATEGORIES_RESTAURANTS]: DEFAULT_SETTINGS.categories[CATEGORIES_RESTAURANTS],
+        [CATEGORIES_NIGHTLIFE_SPOTS]: DEFAULT_SETTINGS.categories[CATEGORIES_NIGHTLIFE_SPOTS],
+        [CATEGORIES_OUTDOORS_AND_RECREATION]: DEFAULT_SETTINGS.categories[CATEGORIES_OUTDOORS_AND_RECREATION],
+        [CATEGORIES_TRAVEL_AND_TRANSPORT]: DEFAULT_SETTINGS.categories[CATEGORIES_TRAVEL_AND_TRANSPORT],
+        [CATEGORIES_AIRPORTS]: DEFAULT_SETTINGS.categories[CATEGORIES_AIRPORTS],
+        [CATEGORIES_BUS_STATIONS]: DEFAULT_SETTINGS.categories[CATEGORIES_BUS_STATIONS],
+        [CATEGORIES_TOURIST_INFORMATION_CENTERS]: DEFAULT_SETTINGS.categories[CATEGORIES_TOURIST_INFORMATION_CENTERS],
+        [CATEGORIES_TRAIN_STATIONS]: DEFAULT_SETTINGS.categories[CATEGORIES_TRAIN_STATIONS],
+      },
+
       themeColor:DEFAULT_SETTINGS.themeColor,
     }, () => this.props.changeSettings(DEFAULT_SETTINGS))
 
@@ -214,7 +239,7 @@ class Settings extends React.Component {
 
 
     // console.log('settings', settings);
-    // console.log('state', this.state);
+    console.log('state category', this.state.categories);
 
     // if (this.props.visible) {
       return (
@@ -315,6 +340,328 @@ class Settings extends React.Component {
               </View>
 
 
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_TOURISTIC_SITES]: !this.state.categories[CATEGORIES_TOURISTIC_SITES],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_TOURISTIC_SITES]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+                <Text style={{fontSize: 15}}>Touristic Sites </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_AMPHITHEATERS]: !this.state.categories[CATEGORIES_AMPHITHEATERS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_AMPHITHEATERS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Amphitheaters </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_AQUARIUMS]: !this.state.categories[CATEGORIES_AQUARIUMS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_AQUARIUMS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Aquariums</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_ART_GALLERIES]: !this.state.categories[CATEGORIES_ART_GALLERIES],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_ART_GALLERIES]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Art Galleries</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_CONCERT_HALLS]: !this.state.categories[CATEGORIES_CONCERT_HALLS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_CONCERT_HALLS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Concert Halls </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_EXHIBITS]: !this.state.categories[CATEGORIES_EXHIBITS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_EXHIBITS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Exhibits</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_HISTORIC_SITES]: !this.state.categories[CATEGORIES_HISTORIC_SITES],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_HISTORIC_SITES]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Historic Sites </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_MUSEUMS]: !this.state.categories[CATEGORIES_MUSEUMS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_MUSEUMS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Museums </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_PUBLIC_ART]: !this.state.categories[CATEGORIES_PUBLIC_ART],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_PUBLIC_ART]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Public Arts</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_STADIUMS]: !this.state.categories[CATEGORIES_STADIUMS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_STADIUMS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Stadiums</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_ZOOS]: !this.state.categories[CATEGORIES_ZOOS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_ZOOS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Zoos</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_RESTAURANTS]: !this.state.categories[CATEGORIES_RESTAURANTS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_RESTAURANTS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Restaurants</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_NIGHTLIFE_SPOTS]: !this.state.categories[CATEGORIES_NIGHTLIFE_SPOTS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_NIGHTLIFE_SPOTS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Nightlife</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_OUTDOORS_AND_RECREATION]: !this.state.categories[CATEGORIES_OUTDOORS_AND_RECREATION],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_OUTDOORS_AND_RECREATION]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Outdoors and Recreations</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_TRAVEL_AND_TRANSPORT]: !this.state.categories[CATEGORIES_TRAVEL_AND_TRANSPORT],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_TRAVEL_AND_TRANSPORT]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Travel and Transport </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_AIRPORTS]: !this.state.categories[CATEGORIES_AIRPORTS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_AIRPORTS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Airports</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_BUS_STATIONS]: !this.state.categories[CATEGORIES_BUS_STATIONS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_BUS_STATIONS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Bus Stations</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_TOURIST_INFORMATION_CENTERS]: !this.state.categories[CATEGORIES_TOURIST_INFORMATION_CENTERS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_TOURIST_INFORMATION_CENTERS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Tourist Information Centers</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.checkbox}
+                onPress={() => this.setState({categories: {
+                    ...this.state.categories,
+                    [CATEGORIES_TRAIN_STATIONS]: !this.state.categories[CATEGORIES_TRAIN_STATIONS],
+                  }})
+                }
+              >
+                <MaterialIcons
+                  name={categories[CATEGORIES_TRAIN_STATIONS]
+                    ? 'check-box'
+                    : 'check-box-outline-blank' }
+                  size={25} style={{marginRight: 5}}
+                  color={themeColor}
+                />
+              <Text style={{fontSize: 15}}>Train Stations</Text>
+              </TouchableOpacity>
 
               {/*
                 <Picker
@@ -491,6 +838,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingTop: 10,
     borderColor: '#444',
+  },
+  checkbox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: '#ddd',
+    borderRadius: 5,
+    marginTop: 5,
   }
 
 })
