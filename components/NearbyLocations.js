@@ -47,8 +47,7 @@ class NearbyLocations extends Component {
       markers: {},
       selectedMarker: null,
       destination: null,
-      heading: 240,
-      north: 0,
+      arrowRotation: null,
       distanceToDestinationText: null,
       distanceToDestinationMeters: null,
       settingVisible: false,
@@ -57,7 +56,6 @@ class NearbyLocations extends Component {
 
     this.heading = null;
     this.targetBearing = null; //Angle between current location and targetDestination
-    this.arrowRotation = null;
 
 
     this._panResponder = PanResponder.create({
@@ -107,6 +105,7 @@ class NearbyLocations extends Component {
     + "&inCat=" + settings.category
     + "&inRadius=" + settings.nearbyRadius;
 
+    console.log(url);
 
     fetch(url).then(response => {
       if (response.status === 200) {
@@ -177,9 +176,10 @@ async componentDidMount() {
 
       //If Navigate is on, calculate arrowRotation angle
       if (this.targetBearing) {
-        this.arrowRotation = 360 - this.heading + this.targetBearing;
-        if (this.arrowRotation > 360)
-        this.arrowRotation -= 360;
+        let arrowRotation = 360 - this.heading + this.targetBearing;
+        if (arrowRotation > 360)
+          arrowRotation -= 360;
+        this.setState({arrowRotation});
         // console.log(this.arrowRotation);
       }
     });
@@ -327,11 +327,11 @@ async componentDidMount() {
                 changeScreen={navigation.navigate}
                 dispatch={navigation.dispatch}
                 />
-
-              <DirectionMeter
-                bearing={this.state.north}
-                north={this.heading}
-              />
+                {this.state.arrowRotation &&
+                    <DirectionMeter
+                        bearing={this.state.arrowRotation}
+                    />
+                }
 
 
               <Animated.View
@@ -351,7 +351,13 @@ async componentDidMount() {
                   followsUserLocation={true}
                   onPress={() => {
                     this.targetBearing = null;
-                    this.setState({destination: null, selectedMarker: null, distanceToDestinationMeters: null, distanceToDestinationText: null});
+                    this.setState({
+                        destination: null,
+                        selectedMarker: null,
+                        distanceToDestinationMeters: null,
+                        distanceToDestinationText: null,
+                        arrowRotation:null
+                    });
                   }}
 
                    onMapReady={()=>this.mapRef.animateToRegion({

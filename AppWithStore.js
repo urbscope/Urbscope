@@ -15,6 +15,7 @@ import SplashLoading from './components/SplashLoading'
 import { connect } from 'react-redux'
 import { loadSettings, setSettings } from './actions'
 import {getUserID, setUserID} from "./utils/localStorageAPI";
+console.disableYellowBox = true;
 
 const MainNavigtor = StackNavigator({
   DetectionMode: { screen: DetectionMode },
@@ -44,7 +45,6 @@ class AppWithStore extends React.Component {
 
 
       getUserID().then(id=>{
-      console.log(id);
       if (!id)
         this.createUserID();
         }
