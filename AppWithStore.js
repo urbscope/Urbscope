@@ -169,11 +169,11 @@ class AppWithStore extends React.Component {
     // this.props.loadUserID((id) => console.log(id))
     this.props.loadUserID()
 
-      getUserID().then(id=>{
-      if (!id)
-        this.createUserID();
-        }
-    );
+    //   getUserID().then(id=>{
+    //   if (!id)
+    //     this.createUserID();
+    //     }
+    // );
 
     // getUID().then(id => {
     //   console.log("WORKSSSSS");
