@@ -132,8 +132,8 @@ class DirectionMeter extends Component {
       // }
 
       // controls.update();
-
-      cube.rotation.z = this.props.bearing * Math.PI / 180;
+      //console.log("bearing: ", this.props.bearing);
+      cube.rotation.z = -this.props.bearing * Math.PI / 180;
 
       // rotate();
 

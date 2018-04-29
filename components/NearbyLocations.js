@@ -176,11 +176,13 @@ async componentDidMount() {
 
       //If Navigate is on, calculate arrowRotation angle
       if (this.targetBearing) {
+        console.log("targetBearing: ", this.targetBearing);
+        console.log("heading: ",  this.heading);
         let arrowRotation = 360 - this.heading + this.targetBearing;
         if (arrowRotation > 360)
           arrowRotation -= 360;
         this.setState({arrowRotation});
-        // console.log(this.arrowRotation);
+        console.log(arrowRotation);
       }
     });
   };
