@@ -40,6 +40,7 @@ const ScreenWidth  = Dimensions.get('window').width
 // ===========================================================================
 class DetectionMode extends Component {
   state = {
+    shouldRenderModalButton: false,
     hasCameraPermission: null,
     errorMessage: null,
     loading: false,
@@ -48,6 +49,7 @@ class DetectionMode extends Component {
     modalVisible: false,
     settingVisible: false,
     modalButtonAnimations: {
+      zIndex: new Animated.Value(-5),
       diameter: new Animated.Value(360),
       height: 200,
       radius: new Animated.Value(180),
@@ -158,91 +160,104 @@ class DetectionMode extends Component {
   // ========================================================================
 
   animateModalButtonAppear = () => {
-    const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
-
-    Animated.stagger(200, [
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 400,
-        }),
-        Animated.timing(diameter, {
-          toValue: 86,
-          duration: 600,
-        }),
-        Animated.timing(radius, {
-          toValue: 43,
-          duration: 600,
-        }),
-        Animated.timing(fontSize, {
-          toValue: 40,
-          duration: 600,
-        }),
-      ]),
-      Animated.spring(top, {
-        toValue: (50),
-        friction: 4,
-        tension: 50,
-      }),
-      Animated.sequence([
-        Animated.timing(fontOpacity, {
-          toValue: 1,
-          duration: 600,
-        }),
-        Animated.timing(fontSize, {
-          toValue: 80,
-          duration: 800,
-        }),
-        Animated.timing(fontSize, {
-          toValue: 40,
-          duration: 400,
-        }),
-      ])
-    ]).start();
+    const { diameter, radius, top, opacity, fontSize, fontOpacity, zIndex } = this.state.modalButtonAnimations
+      this.setState({shouldRenderModalButton:true},()=>{
+          Animated.sequence([
+              Animated.timing(zIndex, {
+                  toValue: 9,
+                  duration: 1,
+              }),
+              Animated.stagger(200, [
+                  Animated.parallel([
+                      Animated.timing(opacity, {
+                          toValue: 1,
+                          duration: 400,
+                      }),
+                      Animated.timing(diameter, {
+                          toValue: 86,
+                          duration: 600,
+                      }),
+                      Animated.timing(radius, {
+                          toValue: 43,
+                          duration: 600,
+                      }),
+                      Animated.timing(fontSize, {
+                          toValue: 40,
+                          duration: 600,
+                      }),
+                  ]),
+                  Animated.spring(top, {
+                      toValue: (50),
+                      friction: 4,
+                      tension: 50,
+                  }),
+                  Animated.sequence([
+                      Animated.timing(fontOpacity, {
+                          toValue: 1,
+                          duration: 600,
+                      }),
+                      Animated.timing(fontSize, {
+                          toValue: 80,
+                          duration: 800,
+                      }),
+                      Animated.timing(fontSize, {
+                          toValue: 40,
+                          duration: 400,
+                      }),
+                  ])
+              ])
+          ]).start();
+      })
 
   }
 
   animateModalButtonDisappear = () => {
-    const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
+    const { diameter, radius, top, opacity, fontSize, fontOpacity, zIndex } = this.state.modalButtonAnimations
 
-    Animated.stagger(500, [
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 200,
-        }),
-        Animated.timing(diameter, {
-          toValue: 0,
-          duration: 500,
-        }),
-        Animated.timing(radius, {
-          toValue: 0,
-          duration: 500,
-        }),
-        Animated.timing(fontSize, {
-          toValue: 0,
-          duration: 500,
-        }),
-        Animated.timing(fontOpacity, {
-          toValue: 0,
-          duration: 500,
-        }),
-      ]),
-      Animated.parallel([
-        Animated.timing(diameter, {
-          toValue: 360,
-          duration: 1,
-        }),
-        Animated.timing(radius, {
-          toValue: 180,
-          duration: 1,
-        }),
-        Animated.timing(top, {
-          toValue: ScreenHeight - (ScreenHeight/2) - 200,
-          duration: 1,
-        }),
-      ])
-    ]).start();
+      Animated.sequence([
+          Animated.stagger(500, [
+              Animated.parallel([
+                  Animated.timing(opacity, {
+                      toValue: 0,
+                      duration: 200,
+                  }),
+                  Animated.timing(diameter, {
+                      toValue: 0,
+                      duration: 500,
+                  }),
+                  Animated.timing(radius, {
+                      toValue: 0,
+                      duration: 500,
+                  }),
+                  Animated.timing(fontSize, {
+                      toValue: 0,
+                      duration: 500,
+                  }),
+                  Animated.timing(fontOpacity, {
+                      toValue: 0,
+                      duration: 500,
+                  }),
+              ]),
+              Animated.parallel([
+                  Animated.timing(diameter, {
+                      toValue: 360,
+                      duration: 1,
+                  }),
+                  Animated.timing(radius, {
+                      toValue: 180,
+                      duration: 1,
+                  }),
+                  Animated.timing(top, {
+                      toValue: ScreenHeight - (ScreenHeight/2) - 200,
+                      duration: 1,
+                  }),
+              ])
+          ]),
+          Animated.timing(zIndex,{
+            toValue: -5,
+            duration: 1
+          })
+    ]).start(()=>this.setState({shouldRenderModalButton:false}));
   }
 
   // ========================================================================
@@ -255,8 +270,8 @@ class DetectionMode extends Component {
 
     const { hasCameraPermission, locations, modalVisible, settingVisible } = this.state
 
-    const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
-
+    const { diameter, radius, top, opacity, fontSize, fontOpacity , zIndex} = this.state.modalButtonAnimations
+    console.log("modalshouldrender is " , this.state.shouldRenderModalButton);
 
     if (hasCameraPermission === null) {
      return <View style={{flex:1, backgroundColor: 'black'}}/>;
@@ -278,30 +293,33 @@ class DetectionMode extends Component {
             */}
               <View style={styles.container}>
                 <Loading loading={this.state.loading} />
+                  { (this.state.shouldRenderModalButton)
+                      ? (<Animated.View
 
-                <Animated.View
-
-                  style={/*this.state.detected
-                          ?*/ [styles.modalButton, {
-                              width: diameter,
-                              height: diameter,
-                              borderRadius: radius,
-                              top,
-                              opacity,
-                              backgroundColor: themeColor
-                            }]
+                          style={/*this.state.detected
+                              ?*/ [styles.modalButton, {
+                          width: diameter,
+                          height: diameter,
+                          zIndex,
+                          borderRadius: radius,
+                          top,
+                          opacity,
+                          backgroundColor: themeColor
+                      }]
                           /*: {}*/}
-                >
-                  <TouchableOpacity
-                    style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
-                    onPress={this.state.modalVisible ? this.closeModal : this.openModal}
-                  >
-                    <Animated.Text style={[styles.modalButtonText, { fontSize, opacity: fontOpacity }]}>
-                      {locations.length}
-                    </Animated.Text>
-                  </TouchableOpacity>
+                          >
+                          <TouchableOpacity
+                          style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
+                          onPress={this.state.modalVisible ? this.closeModal : this.openModal}
+                          >
+                          <Animated.Text style={[styles.modalButtonText, { fontSize, opacity: fontOpacity }]}>
+                          {locations.length}
+                          </Animated.Text>
+                          </TouchableOpacity>
 
-                </Animated.View>
+                        </Animated.View>)
+                      : <View/>}
+
 
                 <LandmarkDetailsModal
                   visible={modalVisible}
@@ -464,7 +482,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: white,
     // top: this.state.modalButtonAnimations.top,
-    zIndex: 9,
     // backgroundColor: red,
   },
   modalButtonText: {

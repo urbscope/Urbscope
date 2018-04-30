@@ -102,11 +102,18 @@ class NearbyLocations extends Component {
     let location = await this._getLocationAsync();
     // console.log(location);
 
+      let cats = [];
+      for (categ in settings.categories){
+        if (settings.categories[categ])
+          cats.push(categ);
+      }
+      cats = cats.join(',');
+
     //TODO: add relevant category + ALL category
     let url = "https://urbserver.herokuapp.com/landmark?"
     + "inLL=" + this.formatLocation(location, false)
     + "&inLimit=" + settings.nearbyLimit
-    + "&inCat=" + settings.category
+    + "&inCat=" + cats
     + "&inRadius=" + settings.nearbyRadius;
 
     console.log(url);
@@ -160,7 +167,6 @@ async componentDidMount() {
       console.log(this.props.navigation.state.params);
       setTimeout(() => {
         Animated.spring(this.state.mapViewPosition, { toValue: {x: ScreenWidth-20, y: 0}, friction: 7, tension: 20}).start();
-
       }, 1000)
     }
   }
@@ -348,7 +354,7 @@ async componentDidMount() {
 
               <DirectionMeter
                   bearing={this.state.arrowRotation}
-                  visible={showArrow}
+                  visible={this.state.arrowRotation!=null}
               />
 
 

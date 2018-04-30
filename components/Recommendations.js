@@ -32,7 +32,6 @@ const RatingImages = {
 class Recommendations extends Component {
 
   state = {
-    settingVisible: false,
     loading: false,
     recommendedPlaces: [
       {
@@ -95,15 +94,6 @@ class Recommendations extends Component {
 
   }
 
-
-  closeSettings = () => {
-    this.setState({settingVisible: false})
-  }
-
-
-  openSettings = () => {
-    this.setState({settingVisible: true})
-  }
 
 
   componentDidMount () {
@@ -276,25 +266,6 @@ render(){
           ))
         }
         </ScrollView>
-
-{/*
-        <TouchableOpacity
-          onPress={settingVisible
-            ? this.closeSettings
-            : this.openSettings}
-            style={[styles.buttonSettings, {backgroundColor: themeColor}]}
-            >
-            <Ionicons
-              name='ios-settings-outline'
-              size={50}
-              color={'#fff'}
-              />
-        </TouchableOpacity>
-
-        <Settings
-          visible={settingVisible}
-        />
-*/}
 
 
           <View style={{padding: 13, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.5)'}}>

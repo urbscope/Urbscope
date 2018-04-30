@@ -22,6 +22,7 @@ const ScreenWidth  = Dimensions.get('window').width
 class LandmarkDetailsModal extends Component {
 
   state = {
+    shouldRender: false,
     height: new Animated.Value(0),
     width: new Animated.Value(0),
     opacity: new Animated.Value(0),
@@ -29,38 +30,37 @@ class LandmarkDetailsModal extends Component {
 
   modalAppear = () => {
     const { height, width, opacity } = this.state
-
-    // Animated.sequence([
-      Animated.stagger(200, [
-        Animated.timing(width, {
-          toValue: 2,
-          duration: 300,
-        }),
-        Animated.timing(height, {
-          toValue: (ScreenHeight * 7)/10,
-          duration: 450,
-        }),
-        Animated.spring(width, {
-          toValue: (ScreenWidth * 9)/10,
-          friction: 4,
-          tension: 50,
-        }),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 400,
-        }),
-      ]).start()
+      // LayoutAnimation.linear();
+      this.setState({shouldRenderModalButton:true}, ()=>{
+        // Animated.sequence([
+        Animated.stagger(200, [
+            Animated.timing(width, {
+                toValue: 2,
+                duration: 300,
+            }),
+            Animated.timing(height, {
+                toValue: (ScreenHeight * 7)/10,
+                duration: 450,
+            }),
+            Animated.spring(width, {
+                toValue: (ScreenWidth * 9)/10,
+                friction: 4,
+                tension: 50,
+            }),
+            Animated.timing(opacity, {
+                toValue: 1,
+                duration: 400,
+            }),
+        ]).start()
+    })
     // ])
 
-    LayoutAnimation.linear();
-    this.setState({ displayComponents : true })
   }
 
   modalDisappear = () => {
     const { height, width, opacity } = this.state
 
     // LayoutAnimation.linear();
-    this.setState({ displayComponents : false })
 
     Animated.stagger(300, [
       Animated.timing(opacity, {
@@ -76,7 +76,7 @@ class LandmarkDetailsModal extends Component {
         friction: 20,
         tension: 60,
       }),
-    ]).start();
+    ]).start(()=>this.setState({shouldRenderModalButton:false}));
   }
   componentWillReceiveProps(nextProps) {
 
@@ -90,42 +90,47 @@ class LandmarkDetailsModal extends Component {
   componentDidMount () {
   }
 
-  render(){
-    let locations = this.props.locations
-    const { height, width, opacity } = this.state
+    render(){
+        let locations = this.props.locations
+        const { height, width, opacity } = this.state
 
-    if (locations.length === 0 ) {
-      locations = [{description: 'problem'}]
+        if (locations.length === 0 ) {
+            locations = [{description: 'problem'}]
+        }
+
+        // if (this.props.visible && locations.length !== 0 ) {
+        if (this.props.visible ) {
+            return(
+                <Animated.View style={[styles.container, {height, width}]}>
+
+                    <Animated.ScrollView
+                        ref={(scrollView) => { this.scrollView = scrollView}}
+                        horizontal= {true}
+                        decelerationRate={0}
+                        showsHorizontalScrollIndicator={false}
+                        style={[styles.scroll, {opacity}]}
+                    >
+
+                        {locations.map(item => (
+                            <LandmarkDetails
+                                key={item.description}
+                                location={item}
+                                multiple={locations.length === 1 ? false : true}
+                            />
+                        ))}
+
+                        <View style={{width: 20}} />
+
+                    </Animated.ScrollView>
+
+                </Animated.View>
+            )
+        } else {
+            return (
+                <View/>
+            )
+        }
     }
-
-    // if (this.props.visible && locations.length !== 0 ) {
-    // if (this.props.visible ) {
-      return(
-        <Animated.View style={[styles.container, {height, width}]}>
-
-          <Animated.ScrollView
-              ref={(scrollView) => { this.scrollView = scrollView}}
-              horizontal= {true}
-              decelerationRate={0}
-              showsHorizontalScrollIndicator={false}
-              style={[styles.scroll, {opacity}]}
-            >
-
-              {locations.map(item => (
-                <LandmarkDetails
-                  key={item.description}
-                  location={item}
-                  multiple={locations.length === 1 ? false : true}
-                  />
-              ))}
-
-              <View style={{width: 20}} />
-
-            </Animated.ScrollView>
-
-        </Animated.View>
-      )
-  }
 }
 
 export default LandmarkDetailsModal

@@ -64,8 +64,6 @@ class NearbyLocationsList extends React.Component {
       const { locations, themeColor } = this.props
 
 
-
-
         let [translateX, translateY] = [listViewPosition.x, listViewPosition.y];
         let imageStyle = {transform: [{translateX}, {translateY}]};
 
@@ -85,8 +83,8 @@ class NearbyLocationsList extends React.Component {
                 let picture=  defaultPicture;
                 if (val.picture)
                 picture = val.picture;
-                return
-                <TouchableOpacity
+                return (
+                    <TouchableOpacity
                   key={val.key}
                   onPress={()=>this.props.handlePress(val.key)}
                 >
@@ -103,7 +101,7 @@ class NearbyLocationsList extends React.Component {
                       </Text>
                     </View>
                   </View>
-                </TouchableOpacity>
+                </TouchableOpacity>)
               })
             }
           </ScrollView>

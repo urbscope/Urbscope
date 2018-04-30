@@ -19,20 +19,24 @@ class DirectionMeter extends Component {
     super(props)
     this.state = {
       verticalPosition: new Animated.Value(-ScreenHeight*0.2),
+        shouldRender : false,
     }
 
     this.hasColorChanged = false
+      this.lastBearing = null;
+      this.shouldGoAway = false;
   }
 
 
   modalAppear = () => {
     const { verticalPosition } = this.state
-    console.log("appesar ");
-    Animated.spring(verticalPosition, {
-      toValue: ScreenHeight * 0.02,
-      friction: 4,
-      tension: 6,
-    }).start()
+      this.setState({shouldRenderModalButton:true}, ()=>{
+          Animated.spring(verticalPosition, {
+              toValue: ScreenHeight * 0.02,
+              friction: 4,
+              tension: 6,
+          }).start();
+      });
   }
 
   modalDisappear = () => {
@@ -42,18 +46,22 @@ class DirectionMeter extends Component {
       toValue: - ScreenHeight * 0.2,
       friction: 4,
       tension: 6,
-    }).start()
+    }).start(()=>this.setState({shouldRenderModalButton: false}));
+
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.visible) {
-      setTimeout(() => {
+      // setTimeout(() => {
+        this.shouldGoAway = false;
         this.modalAppear()
-      }, 1000)
+      // }, 1000)
     } else {
-      setTimeout(() => {
+      // setTimeout(() => {
+        this.lastBearing = this.props.bearing;
+        this.shouldGoAway = true;
         this.modalDisappear()
-      }, 1000)
+      // }, 1000)
     }
 
     if (nextProps.themeColor !== this.props.themeColor) {
@@ -152,9 +160,12 @@ class DirectionMeter extends Component {
         this.hasColorChanged = false
       }
 
-
-      cube.rotation.z = -this.props.bearing * Math.PI / 180;
-
+      if (this.shouldGoAway){
+          cube.rotation.z = -this.lastBearing * Math.PI / 180;
+      }
+      else {
+          cube.rotation.z = -this.props.bearing * Math.PI / 180;
+      }
       renderer.render(scene, camera);
 
       gl.endFrameEXP();
@@ -167,10 +178,11 @@ class DirectionMeter extends Component {
   render () {
     const { verticalPosition } = this.state
 
-    if (this.props.visible) {
+    if (this.state.shouldRender) {
 
       return(
         <Animated.View style={[styles.container, {top: verticalPosition}]}>
+
           <Expo.GLView
             style={styles.gl}
 

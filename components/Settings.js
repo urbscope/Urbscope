@@ -48,6 +48,7 @@ var ScreenHeight = Dimensions.get('window').height
 class Settings extends React.Component {
 
   state = {
+    shouldRender: false,
     dectionLimit: this.props.settings.dectionLimit,
     nearbyLimit: this.props.settings.nearbyLimit,
     nearbyRadius: this.props.settings.nearbyRadius,
@@ -88,42 +89,43 @@ class Settings extends React.Component {
 
   modalAppear = () => {
     const { paddingHorizontal, containerHeight, containerWidth, opacity, zIndex, borderRadius, borderTopLeftRadius, opacity2 } = this.state.animation
-
-    Animated.sequence([
-      Animated.timing(zIndex, {
-        toValue: 10,
-        duration: 1,
-      }),
-      Animated.stagger(200, [
-        Animated.parallel([
-          Animated.timing(containerWidth, {
-            toValue: ScreenWidth -30,
-            duration: 300,
-          }),
-          Animated.timing(paddingHorizontal, {
-            toValue: 15,
-            duration: 300,
-          }),
-          Animated.timing(borderRadius, {
-            toValue: 0,
-            duration: 300,
-          }),
-        ]),
-        Animated.timing(borderTopLeftRadius, {
-          toValue: 10,
-          duration: 250,
-        }),
-        Animated.spring(containerHeight, {
-          toValue: ScreenHeight * 83 / 100,
-          friction: 8,
-          tension: 70,
-        }),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 1000,
-        }),
-      ])
-    ]).start()
+    this.setState({shouldRenderModalButton:true}, ()=>{
+        Animated.sequence([
+            Animated.timing(zIndex, {
+                toValue: 10,
+                duration: 1,
+            }),
+            Animated.stagger(200, [
+                Animated.parallel([
+                    Animated.timing(containerWidth, {
+                        toValue: ScreenWidth -30,
+                        duration: 300,
+                    }),
+                    Animated.timing(paddingHorizontal, {
+                        toValue: 15,
+                        duration: 300,
+                    }),
+                    Animated.timing(borderRadius, {
+                        toValue: 0,
+                        duration: 300,
+                    }),
+                ]),
+                Animated.timing(borderTopLeftRadius, {
+                    toValue: 10,
+                    duration: 250,
+                }),
+                Animated.spring(containerHeight, {
+                    toValue: ScreenHeight * 83 / 100,
+                    friction: 8,
+                    tension: 70,
+                }),
+                Animated.timing(opacity, {
+                    toValue: 1,
+                    duration: 1000,
+                }),
+            ])
+        ]).start()
+    });
 
   }
 
@@ -165,7 +167,7 @@ class Settings extends React.Component {
         toValue: -10,
         duration: 1,
       }),
-    ]).start();
+    ]).start(()=>this.setState({shouldRenderModalButton:false}));
 
 
   }
@@ -237,16 +239,15 @@ class Settings extends React.Component {
     const { settings, themeColor } = this.props
     const { containerHeight, containerWidth, opacity, opacity2, zIndex, borderRadius, borderTopLeftRadius, paddingHorizontal } = this.state.animation
 
-
     // console.log('settings', settings);
     // console.log('state category', this.state.categories);
 
-    // if (this.props.visible) {
+    if (this.state.shouldRender) {
       return (
         <Animated.View style={[styles.container, {height: containerHeight, width: containerWidth, zIndex , borderRadius: borderTopLeftRadius}]}>
 
           <Animated.View style={[styles.heading, { borderRadius, borderTopLeftRadius, borderBottomColor: themeColor, backgroundColor: themeColor, paddingHorizontal}]}>
-            <Animated.Text style={[styles.headingText, {opacity}]}> Ann</Animated.Text>
+            <Animated.Text style={[styles.headingText, {opacity}]}> Settings</Animated.Text>
           </Animated.View>
 
 
@@ -748,11 +749,11 @@ class Settings extends React.Component {
           </Animated.ScrollView>
         </Animated.View>
       )
-    // } else {
-    //   return (
-    //     <View />
-    //   )
-    // }
+    } else {
+      return (
+        <View />
+      )
+    }
   }
 }
 
