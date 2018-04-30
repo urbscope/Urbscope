@@ -13,6 +13,8 @@ import { View,
 import { cardBackground, cardButtonText } from '../utils/colors'
 import { fixLandmarkDetail } from '../utils/helpers'
 
+import { connect } from 'react-redux'
+
 
 import { GOOGLE_API } from '../utils/keysAPI'
 
@@ -55,7 +57,7 @@ class LandmarkDetails extends Component {
 
   render(){
 
-    const { location, multiple } = this.props
+    const { location, multiple, themeColor } = this.props
     const { loading } = this.state
     const { name, image, detailedDescription, url } = this.state.details
 
@@ -109,7 +111,7 @@ class LandmarkDetails extends Component {
                 }}
 
             >
-              <Text style={styles.wikipediaLinkText}>Read more on Wikipedia</Text>
+              <Text style={[styles.wikipediaLinkText, {color: themeColor}]}>Read more on Wikipedia</Text>
             </TouchableOpacity>
           }
 
@@ -123,7 +125,7 @@ class LandmarkDetails extends Component {
                   Linking.openURL(url)
                 }}
               >
-                <Text style={styles.website}>Go to website</Text>
+                <Text style={[styles.website, {color: themeColor}]}>Go to website</Text>
               </TouchableOpacity>
           }
 
@@ -148,7 +150,7 @@ class LandmarkDetails extends Component {
   }
 }
 
-export default LandmarkDetails
+
 
 const styles = StyleSheet.create({
 
@@ -243,7 +245,6 @@ const styles = StyleSheet.create({
   },
   wikipediaLinkText: {
     fontSize: 16,
-    color: cardButtonText
   },
   footer: {
     // flex: 0.2,
@@ -263,8 +264,15 @@ const styles = StyleSheet.create({
   },
   website: {
     fontSize: 16,
-    color: cardButtonText
+
   }
 
-
 })
+
+mapStateToProps = (state) => {
+  return {
+    themeColor: state.themeColor
+  }
+}
+
+export default connect(mapStateToProps)(LandmarkDetails)

@@ -348,7 +348,7 @@ class DetectionMode extends Component {
                   <View style={styles.buttonSettings}>
                     <View style={styles.buttonLogoContainer}>
                       <MaterialIcons
-                        name='explore'
+                        name='menu'
                         size={30}
                         color={'#eee'}
 

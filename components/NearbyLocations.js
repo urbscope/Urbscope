@@ -8,6 +8,7 @@ import { Dimensions,
          TouchableOpacity,
          Animated,
          PanResponder } from 'react-native'
+
 import ChangeModeSwitch from './ChangeModeSwitch'
 import ExplorationModeSwitch from './ExplorationModeSwitch'
 import { Constants, Location, Camera, Permissions, MapView } from 'expo'
@@ -49,6 +50,7 @@ class NearbyLocations extends Component {
       selectedMarker: null,
       destination: null,
       arrowRotation: null,
+      showArrow: true,
       distanceToDestinationText: null,
       distanceToDestinationMeters: null,
       settingVisible: false,
@@ -76,12 +78,13 @@ class NearbyLocations extends Component {
 
       onPanResponderRelease: (e, {moveX, vx}) => {
         this.state.mapViewPosition.flattenOffset();
-        if (moveX < ScreenWidth/3 || vx < -2) {
+        if (moveX < ScreenWidth*0.4 || vx < -1.5) {
           Animated.spring(this.state.mapViewPosition, { toValue: {x: 0, y: 0}, friction: 7, tension: 20}).start();
         }
-        if (moveX > ScreenWidth/3 || vx > 2) {
+        if (moveX > ScreenWidth*0.4 || vx > 2) {
           Animated.spring(this.state.mapViewPosition, { toValue: {x: ScreenWidth-20, y: 0}, friction: 7, tension: 20}).start();
         }
+
       }
 
     })
@@ -143,15 +146,22 @@ class NearbyLocations extends Component {
 async componentDidMount() {
     LayoutAnimation.linear();
 
-
     const {status} = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({hasCameraPermission: status === 'granted'});
-
     this._watchHeadingAsync();
     this._watchTargetBearingAsync();
     let location = await this._getLocationAsync();
     if (this.props.settings) {
         this.fetchMarkers(this.props.settings);
+    }
+
+    if (this.props.navigation.state.params) {
+      this.setState({showArrow: true})
+      console.log(this.props.navigation.state.params);
+      setTimeout(() => {
+        Animated.spring(this.state.mapViewPosition, { toValue: {x: ScreenWidth-20, y: 0}, friction: 7, tension: 20}).start();
+
+      }, 1000)
     }
   }
 
@@ -286,10 +296,10 @@ async componentDidMount() {
 
     const { navigation, settings, themeColor } = this.props
 
-    const { hasCameraPermission, location, settingVisible, mapViewPosition } = this.state
+    const { hasCameraPermission, location, settingVisible, mapViewPosition, showArrow } = this.state
 
 
-
+    // console.log(this.props.navigation);
 
     let [translateX, translateY] = [mapViewPosition.x, mapViewPosition.y];
     let imageStyle = {transform: [{translateX}, {translateY}]};
@@ -335,23 +345,21 @@ async componentDidMount() {
                 dispatch={navigation.dispatch}
                 changeScreennn={this.props.changeScreennn}
                 />
-                {this.state.arrowRotation &&
-                    <DirectionMeter
-                        bearing={this.state.arrowRotation}
-                    />
-                }
 
-                {/*
-                    <View>
-                        <NearbyLocationsList locations={Object.values(this.state.markers)} handlePress={(key) => {
-                            let loc = this.state.markers[key].location;
-                            this.setState({
-                                destination: loc,
-                                selectedMarker: key
-                            }, this.getTargetBearingAndDistance);
-                        }}/>
-                    </View>
-                */}
+              <DirectionMeter
+                  bearing={this.state.arrowRotation}
+                  visible={showArrow}
+              />
+
+
+
+                <NearbyLocationsList locations={Object.values(this.state.markers)} handlePress={(key) => {
+                    let loc = this.state.markers[key].location;
+                    this.setState({
+                        destination: loc,
+                        selectedMarker: key
+                    }, this.getTargetBearingAndDistance);
+                }}/>
 
 
               <Animated.View
@@ -427,7 +435,7 @@ async componentDidMount() {
                 <View style={styles.buttonSettings}>
                   <View style={styles.buttonLogoContainer}>
                     <MaterialIcons
-                      name='explore'
+                      name='menu'
                       size={30}
                       color={'#eee'}
 
@@ -482,17 +490,24 @@ async componentDidMount() {
       flex: 1
     },
     mapWindow: {
-
       position: 'absolute',
       borderTopRightRadius: 20,
       borderBottomRightRadius: 20,
       // borderWidth: 1,
       left: - ScreenWidth + 20,
       borderColor: '#eee',
-      bottom: '3%',
+      // bottom: 25,
       width: '100%',
-      height: '50%',
-      zIndex: 1,
+      height: 0.41 * ScreenHeight ,
+      zIndex: 15,
+      top: 0.43 * ScreenHeight ,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 1,
+        height: 1
+      },
+      shadowRadius: 3,
+      shadowOpacity: 0.2,
     },
     mapWindowDrag: {
       // borderLeftWidth: 3,

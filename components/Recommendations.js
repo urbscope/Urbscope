@@ -11,6 +11,8 @@ import { View,
 
 import Rating from 'react-native-rating'
 
+import { NavigationActions } from 'react-navigation';
+
 
 import ChangeModeSwitch from './ChangeModeSwitch'
 import ExplorationModeSwitch from './ExplorationModeSwitch'
@@ -23,90 +25,91 @@ import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 
 const RatingImages = {
-starFilled: require('../assets/starFilled.png'),
-starEmpty: require('../assets/starEmpty.png')
+  starFilled: require('../assets/starFilled.png'),
+  starEmpty: require('../assets/starEmpty.png')
 }
 
 class Recommendations extends Component {
-state = {
-  settingVisible: false,
-  loading: false,
-  recommendedPlaces: [
-    {
-      name: 'Taj Mahal',
-      id: '1',
-      thumbnail: 'https://www.telegraph.co.uk/content/dam/Travel/leadAssets/24/92/taj-pinl_2492833a.jpg?imwidth=1400',
-      description: 'The best mahal made by Shah Jahan',
-      rating: 4.5
-    },
-    {
-      name: 'Eiffel Tower',
-      id: '231',
-      thumbnail: 'https://amp.thisisinsider.com/images/58d919eaf2d0331b008b4bbd-750-562.jpg',
-      description: 'The best tower made by French',
-      rating: 4.8
-    },
-    {
-      name: 'Pyramids',
-      id: '2321',
-      thumbnail: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
-      description: 'The best triangles. made by Egyptians',
-      rating: 3.9
-    },
-    {
-      name: 'Pyramids',
-      id: '2321',
-      thumbnail: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
-      description: 'The best triangles. made by Egyptians',
-      rating: 3.9
-    },
-    {
-      name: 'Pyramids',
-      id: '2321',
-      thumbnail: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
-      description: 'The best triangles. made by Egyptians',
-      rating: 3.9
-    },
-  ],
-  visitedPlaces: [
-    {
-      name: 'Badshahi Mosque',
-      id: '2231',
-      thumbnail: 'http://www.discoveryair.pk/wp-content/uploads/2017/06/Badshahi-Mosque-Front-1024x472.jpg',
-      description: 'The King-y mosque',
-      rating: 5.0
-    },
-    {
-      name: 'Baap',
-      id: '23sdx1',
-      thumbnail: 'https://res.cloudinary.com/teepublic/image/private/s--32LFf8OQ--/t_Resized%20Artwork/c_fit,g_north_west,h_954,w_954/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_bbbbbb,e_outline:3:1000/c_mpad,g_center,h_1260,w_1260/b_rgb:eeeeee/c_limit,f_jpg,h_630,q_90,w_630/v1489962884/production/designs/1335911_1.jpg',
-      description: 'The best baap: Daddy',
-      rating: 0.9
-    },
-  ]
-}
 
-ratingEntered = (rating, index) => {
-  console.log('rating', rating);
-  console.log('index', index);
+  state = {
+    settingVisible: false,
+    loading: false,
+    recommendedPlaces: [
+      {
+        name: 'Taj Mahal',
+        id: '1',
+        thumbnail: 'https://www.telegraph.co.uk/content/dam/Travel/leadAssets/24/92/taj-pinl_2492833a.jpg?imwidth=1400',
+        description: 'The best mahal made by Shah Jahan',
+        rating: 4.5
+      },
+      {
+        name: 'Eiffel Tower',
+        id: '231',
+        thumbnail: 'https://amp.thisisinsider.com/images/58d919eaf2d0331b008b4bbd-750-562.jpg',
+        description: 'The best tower made by French',
+        rating: 4.8
+      },
+      {
+        name: 'Pyramids',
+        id: '2321',
+        thumbnail: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
+        description: 'The best triangles. made by Egyptians',
+        rating: 3.9
+      },
+      {
+        name: 'Pyramids',
+        id: '2321',
+        thumbnail: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
+        description: 'The best triangles. made by Egyptians',
+        rating: 3.9
+      },
+      {
+        name: 'Pyramids',
+        id: '2321',
+        thumbnail: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
+        description: 'The best triangles. made by Egyptians',
+        rating: 3.9
+      },
+    ],
+    visitedPlaces: [
+      {
+        name: 'Badshahi Mosque',
+        id: '2231',
+        thumbnail: 'http://www.discoveryair.pk/wp-content/uploads/2017/06/Badshahi-Mosque-Front-1024x472.jpg',
+        description: 'The King-y mosque',
+        rating: 5.0
+      },
+      {
+        name: 'Baap',
+        id: '23sdx1',
+        thumbnail: 'https://res.cloudinary.com/teepublic/image/private/s--32LFf8OQ--/t_Resized%20Artwork/c_fit,g_north_west,h_954,w_954/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_bbbbbb,e_outline:3:1000/c_mpad,g_center,h_1260,w_1260/b_rgb:eeeeee/c_limit,f_jpg,h_630,q_90,w_630/v1489962884/production/designs/1335911_1.jpg',
+        description: 'The best baap: Daddy',
+        rating: 0.9
+      },
+    ]
+  }
 
-}
+  ratingEntered = (rating, index) => {
+    console.log('rating', rating);
+    console.log('index', index);
 
-
-closeSettings = () => {
-  this.setState({settingVisible: false})
-}
+  }
 
 
-openSettings = () => {
-  this.setState({settingVisible: true})
-}
+  closeSettings = () => {
+    this.setState({settingVisible: false})
+  }
 
 
-componentDidMount () {
-  LayoutAnimation.linear();
-  this.setState({})
-}
+  openSettings = () => {
+    this.setState({settingVisible: true})
+  }
+
+
+  componentDidMount () {
+    LayoutAnimation.linear();
+    this.setState({})
+  }
 
 render(){
   const { navigation, themeColor } = this.props
@@ -227,29 +230,48 @@ render(){
                 <Text style={styles.recommendedPlacesListItemDescription}>{item.description}</Text>
 
                 <View style={styles.recommendedPlacesListItemRating}>
-                  <Rating
-                    onChange={rating => {
-                      this.ratingEntered(rating, index)
-                    }}
-                    selectedStar={RatingImages.starFilled}
-                    unselectedStar={RatingImages.starEmpty}
-                    initial={item.rating}
-                    editable={true}
-                    config={{
-                      easing: Easing.inOut(Easing.ease),
-                      duration: 350
-                    }}
-                    stagger={50}
-                    maxScale={1.4}
-                    starStyle={{
-                      width: 25,
-                      height: 25,
-                      opacity: 0.8
-                    }}
-                    />
+                <Rating
+                  onChange={rating => {
+                    this.ratingEntered(rating, index)
+                  }}
+                  selectedStar={RatingImages.starFilled}
+                  unselectedStar={RatingImages.starEmpty}
+                  initial={item.rating}
+                  editable={false}
+                  config={{
+                    easing: Easing.inOut(Easing.ease),
+                    duration: 350
+                  }}
+                  stagger={50}
+                  maxScale={1.4}
+                  starStyle={{
+                    width: 25,
+                    height: 25,
+                    opacity: 0.8
+                  }}
+                  />
                 </View>
 
               </View>
+
+              <TouchableOpacity style={[styles.navigateButton, {backgroundColor: themeColor}]}
+                onPress={() => {
+                  this.props.navigation.dispatch(NavigationActions.reset({
+                    index: 0,
+                    actions: [NavigationActions.navigate({
+                      routeName: 'ExplorationMode',
+                      params: {location: 'sdasda'}
+                    })],
+                  }))
+
+                }}
+              >
+                <MaterialIcons
+                  name='navigation'
+                  size={25}
+                  color={'#eee'}
+                  />
+              </TouchableOpacity>
             </View>
           ))
         }
@@ -275,7 +297,7 @@ render(){
 */}
 
 
-          <View style={{padding: 11, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.5)'}}>
+          <View style={{padding: 13, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.5)'}}>
             <Text style={{}}>
 
             </Text>
@@ -371,6 +393,17 @@ const styles = StyleSheet.create({
     width: 100,
     borderRightWidth: 0.5,
   },
+  navigateButton: {
+    height: 45,
+    width: 35,
+    // paddingRight: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    borderTopLeftRadius: 30,
+    borderBottomLeftRadius: 30,
+
+  }
 })
 
 

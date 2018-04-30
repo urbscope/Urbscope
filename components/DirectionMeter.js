@@ -1,5 +1,9 @@
 import React, { Component } from 'react'
-import { Dimensions, View, Text, StyleSheet } from 'react-native'
+import { Dimensions,
+         View,
+         Text,
+         Animated,
+         StyleSheet } from 'react-native'
 import * as THREE from 'three'
 import ExpoTHREE from 'expo-three'
 import Expo from 'expo'
@@ -13,21 +17,49 @@ class DirectionMeter extends Component {
 
   constructor(props) {
     super(props)
+    this.state = {
+      verticalPosition: new Animated.Value(ScreenHeight*0.2),
+    }
 
-    this.hasColorChanged = false;
-    this.hasDirectionChanged = false;
-    this.currentBearing = 0;
+    this.hasColorChanged = false
+  }
+
+
+  modalAppear = () => {
+    const { verticalPosition } = this.state
+
+    Animated.spring(verticalPosition, {
+      toValue: ScreenHeight * 0.02,
+      friction: 4,
+      tension: 6,
+    }).start()
+  }
+
+  modalDisappear = () => {
+    const { verticalPosition } = this.state
+
+    Animated.spring(verticalPosition, {
+      toValue: - ScreenHeight * 0.1,
+      friction: 4,
+      tension: 6,
+    }).start()
   }
 
   componentWillReceiveProps(nextProps) {
+    if (nextProps.visible) {
+      setTimeout(() => {
+        this.modalAppear()
+      }, 1000)
+    } else {
+      setTimeout(() => {
+        this.modalDisappear()
+      }, 1000)
+    }
+
     if (nextProps.themeColor !== this.props.themeColor) {
       this.hasColorChanged = true
-    }
-    if (Math.abs( nextProps.bearing - this.currentBearing ) <  0.05) {
-      this.shouldDirectionChanged = false
-    }
-    else{
-      this.shouldDirectionChanged = true
+    } else {
+      this.hasColorChanged = false
     }
   }
 
@@ -48,11 +80,11 @@ class DirectionMeter extends Component {
     renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
 
 
-    scene.add( new THREE.AmbientLight( 0xaaaaaa ) );
+    scene.add( new THREE.AmbientLight( 0xeeeeee ) );
 
 
 		var light = new THREE.PointLight( 0xeeeeee );
-    light.position.z = 70;
+    light.position.z = 80;
 		light.position.y = 30;
 		scene.add( light );
 
@@ -120,22 +152,8 @@ class DirectionMeter extends Component {
         this.hasColorChanged = false
       }
 
-      // cube.rotation.x += 0.02;
-      // cube.rotation.z += 0.02;
 
-      // if (cube.rotation.y > 45) {
-      //   cube.rotation.y -= 0.04;
-      // } else if (cube.rotation.y < -45) {
-      //   cube.rotation.y += 0.04;
-      // } else {
-      //   cube.rotation.y -= 0.04;
-      // }
-
-      // controls.update();
-      //console.log("bearing: ", this.props.bearing);
       cube.rotation.z = -this.props.bearing * Math.PI / 180;
-
-      // rotate();
 
       renderer.render(scene, camera);
 
@@ -147,17 +165,25 @@ class DirectionMeter extends Component {
   }
 
   render () {
+    const { verticalPosition } = this.state
 
-    return(
-      <View style={styles.container}>
-        <Expo.GLView
-          style={styles.gl}
+    if (this.props.visible) {
 
-          onContextCreate={this._onGLContextCreate}
-       />
+      return(
+        <Animated.View style={[styles.container, {top: verticalPosition}]}>
+          <Expo.GLView
+            style={styles.gl}
 
-      </View>
-    )
+            onContextCreate={this._onGLContextCreate}
+            />
+
+        </Animated.View>
+      )
+    } else {
+      return(
+        <Animated.View/>
+      )
+    }
   }
 }
 
@@ -165,9 +191,8 @@ class DirectionMeter extends Component {
 
 const styles = StyleSheet.create({
     container: {
-      top: ScreenHeight*0.02,
+      // top: ScreenHeight*0.02,
       // left: ScreenHeight*0.1,
-
 
       left: ScreenWidth*0.25,
       width: ScreenWidth*0.5,
@@ -180,7 +205,7 @@ const styles = StyleSheet.create({
     },
     gl: {
       flex: 1,
-      opacity: 0.8,
+      opacity: 1,
       // backgroundColor: 'rgba(200, 0, 200, 0.2)',
     },
     text: {

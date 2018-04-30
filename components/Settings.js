@@ -239,14 +239,14 @@ class Settings extends React.Component {
 
 
     // console.log('settings', settings);
-    console.log('state category', this.state.categories);
+    // console.log('state category', this.state.categories);
 
     // if (this.props.visible) {
       return (
         <Animated.View style={[styles.container, {height: containerHeight, width: containerWidth, zIndex , borderRadius: borderTopLeftRadius}]}>
 
           <Animated.View style={[styles.heading, { borderRadius, borderTopLeftRadius, borderBottomColor: themeColor, backgroundColor: themeColor, paddingHorizontal}]}>
-            <Animated.Text style={[styles.headingText, {opacity}]}>Settings</Animated.Text>
+            <Animated.Text style={[styles.headingText, {opacity}]}> Ann</Animated.Text>
           </Animated.View>
 
 

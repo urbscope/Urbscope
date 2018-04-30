@@ -87,7 +87,7 @@ const MainNavigtor = StackNavigator({
   DetectionMode: { screen: DetectionMode },
   ExplorationMode: { screen: Tabs },
 }, {
-  initialRouteName: 'DetectionMode',
+  initialRouteName: 'ExplorationMode',
   navigationOptions: ({ navigation }) => ({
     header: null,
   }),
@@ -179,7 +179,7 @@ class AppWithStore extends React.Component {
     // );
 
     getUserID().then(id=>{
-        console.log("user id: ", id);
+        // console.log("user id: ", id);
         if (!id)
           this.createUserID();
       }

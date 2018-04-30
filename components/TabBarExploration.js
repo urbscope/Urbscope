@@ -27,7 +27,7 @@ class TabBarExploration extends React.Component{
     let activeTintColor   = themeColor;
     let inactiveTintColor = '#eee';
 
-
+    // console.log(this.props);
     return (
       <View style={[styles.tabBar, {width: barWidth, left: ScreenWidth*0}]}>
 
