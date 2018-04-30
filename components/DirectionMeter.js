@@ -18,7 +18,7 @@ class DirectionMeter extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      verticalPosition: new Animated.Value(ScreenHeight*0.2),
+      verticalPosition: new Animated.Value(-ScreenHeight*0.2),
     }
 
     this.hasColorChanged = false
@@ -27,7 +27,7 @@ class DirectionMeter extends Component {
 
   modalAppear = () => {
     const { verticalPosition } = this.state
-
+    console.log("appesar ");
     Animated.spring(verticalPosition, {
       toValue: ScreenHeight * 0.02,
       friction: 4,
@@ -39,7 +39,7 @@ class DirectionMeter extends Component {
     const { verticalPosition } = this.state
 
     Animated.spring(verticalPosition, {
-      toValue: - ScreenHeight * 0.1,
+      toValue: - ScreenHeight * 0.2,
       friction: 4,
       tension: 6,
     }).start()

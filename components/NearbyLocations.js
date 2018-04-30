@@ -50,7 +50,7 @@ class NearbyLocations extends Component {
       selectedMarker: null,
       destination: null,
       arrowRotation: null,
-      showArrow: true,
+      showArrow: false,
       distanceToDestinationText: null,
       distanceToDestinationMeters: null,
       settingVisible: false,
