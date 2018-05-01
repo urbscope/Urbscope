@@ -66,6 +66,35 @@ export const fixLandmarkDetail = (res) => {
   return detail
 }
 
+export const fetchLandmarksFromServer= (url)=>{
+  return fetch(url).then(response => {
+        if (response.status === 200) {
+            return response.json();
+        } else {
+            throw new Error('Landmark search error!');
+        }
+    })
+        .then(responseJson => {
+            let landmarks = responseJson.landmarks;
+            let markers = {};
+            for (obj of landmarks){
+                coords = {lat: obj.latitude, lng: obj.longitude};
+                markers[obj.destinationID] =  {
+                    name: obj.name.toString(),
+                    category: obj.category,
+                    picture: obj.picture,
+                    location: {latitude: coords.lat, longitude: coords.lng},
+                    key: obj.destinationID.toString(),
+                    address: obj.address
+                }
+            }
+            return markers;
+        })
+        .catch(error => {
+            // console.error(error);
+        });
+}
+
 export const CATEGORIES_NONE = '';
 export const CATEGORIES_TOURISTIC_SITES = '56aa371be4b08b9a8d5734db,4fceea171983d5d06c3e9823,4bf58dd8d48988d1e2931735,5032792091d4c4b30a586d5c,56aa371be4b08b9a8d573532,4deefb944765f83613cdba6e,4bf58dd8d48988d181941735,507c8c4091d498d9fc8c67a9,4bf58dd8d48988d184941735,4bf58dd8d48988d17b941735';
 export const CATEGORIES_AMPHITHEATERS = '56aa371be4b08b9a8d5734db';

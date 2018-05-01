@@ -43,7 +43,7 @@ class DirectionMeter extends Component {
     const { verticalPosition } = this.state
 
     Animated.spring(verticalPosition, {
-      toValue: - ScreenHeight * 0.2,
+      toValue: - ScreenHeight * 0.3,
       friction: 4,
       tension: 6,
     }).start(()=>this.setState({shouldRender: false}));

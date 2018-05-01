@@ -20,6 +20,7 @@ import Settings from './Settings'
 import Loading from './Loading'
 
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import {getUserID} from "../utils/localStorageAPI";
 
 
 import { connect } from 'react-redux';
@@ -32,7 +33,7 @@ const RatingImages = {
 class Recommendations extends Component {
 
   state = {
-    loading: false,
+    loading: true,
     userID: null,
     recommendedPlaces: [
       {
@@ -96,10 +97,10 @@ class Recommendations extends Component {
   }
 
 
-
   componentDidMount () {
     LayoutAnimation.linear();
-    this.setState({})
+    getUserID().then(id=>this.setState({userID}));
+    this.setState({loading: false});
   }
 
 render(){

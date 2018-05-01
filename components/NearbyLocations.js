@@ -25,6 +25,7 @@ import Settings from './Settings'
 import { purple, white, red } from '../utils/colors'
 import {updateVisitedLocations} from "../utils/localStorageAPI";
 import NearbyLocationsList from "./NearbyLocationsList";
+import {fetchLandmarksFromServer} from "../utils/helpers";
 
 var foursquare = require('react-foursquare')({
   clientID: 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH',
@@ -117,35 +118,8 @@ class NearbyLocations extends Component {
     + "&inRadius=" + settings.nearbyRadius;
 
     console.log(url);
-
-    fetch(url).then(response => {
-      if (response.status === 200) {
-        return response.json();
-      } else {
-        throw new Error('Landmark search error!');
-      }
-    })
-    .then(responseJson => {
-
-      let landmarks = responseJson.landmarks;
-      let markers = {};
-      for (obj of landmarks){
-          coords = {lat: obj.latitude, lng: obj.longitude};
-          markers[obj.destinationID] =  {
-              name: obj.name.toString(),
-              category: obj.category,
-              picture: obj.picture,
-              location: {latitude: coords.lat, longitude: coords.lng},
-              key: obj.destinationID.toString(),
-              address: obj.address
-          }
-      }
-      this.setState({
-        markers: markers
-      })
-    })
-    .catch(error => {
-      // console.error(error);
+    fetchLandmarksFromServer(url).then(markers=>{
+      this.setState({markers: markers});
     });
 
   }
