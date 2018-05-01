@@ -25,7 +25,7 @@ import Settings from './Settings'
 import { purple, white, red } from '../utils/colors'
 import {updateVisitedLocations} from "../utils/localStorageAPI";
 import NearbyLocationsList from "./NearbyLocationsList";
-import {fetchLandmarksFromServer} from "../utils/helpers";
+import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
 
 var foursquare = require('react-foursquare')({
   clientID: 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH',
@@ -112,7 +112,7 @@ class NearbyLocations extends Component {
 
     //TODO: add relevant category + ALL category
     let url = "https://urbserver.herokuapp.com/landmark?"
-    + "inLL=" + this.formatLocation(location, false)
+    + "inLL=" + formatLocation(location, false)
     + "&inLimit=" + settings.nearbyLimit
     + "&inCat=" + cats
     + "&inRadius=" + settings.nearbyRadius;
@@ -179,22 +179,6 @@ async componentDidMount() {
 
 
 
-  formatLocation(location, asObject = true) {
-    if (!location)
-    return null;
-    else if (asObject) {
-      if (location.coords)
-      return {latitude: location.coords.latitude, longitude: location.coords.longitude};
-      else
-      return {latitude: location.latitude, longitude: location.longitude};
-    }
-    else {
-      if (location.coords)
-      return "" + location.coords.latitude + "," + location.coords.longitude;
-      else
-      return "" + location.latitude + "," + location.longitude;
-    }
-  }
 
   componentWillUnmount() {
     this.headingWatch.remove();
@@ -204,8 +188,8 @@ async componentDidMount() {
 
   getTargetBearingAndDistance = async () => {
 
-    let startLoc = this.formatLocation(this.state.location, false);
-    let destinationLoc = this.formatLocation(this.state.destination, false);
+    let startLoc = formatLocation(this.state.location, false);
+    let destinationLoc = formatLocation(this.state.destination, false);
     if (!destinationLoc || !startLoc) {
       // console.log("location null. returning");
       return;
@@ -233,7 +217,7 @@ async componentDidMount() {
       return;
 
       let pointCoords = {latitude: points[0][0], longitude: points[0][1]};
-      this.targetBearing = geolib.getRhumbLineBearing(this.formatLocation(this.state.location), pointCoords);
+      this.targetBearing = geolib.getRhumbLineBearing(formatLocation(this.state.location), pointCoords);
 
       if (distanceToDestination.value <= 100)
         this.addVisitedLocation();

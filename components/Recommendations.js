@@ -24,6 +24,8 @@ import {getUserID} from "../utils/localStorageAPI";
 
 
 import { connect } from 'react-redux';
+import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
+import {Location, Permissions} from "expo";
 
 const RatingImages = {
   starFilled: require('../assets/starFilled.png'),
@@ -35,55 +37,55 @@ class Recommendations extends Component {
   state = {
     loading: true,
     userID: null,
-    recommendedPlaces: [
-      {
-        name: 'Taj Mahal',
-        id: '1',
-        thumbnail: 'https://www.telegraph.co.uk/content/dam/Travel/leadAssets/24/92/taj-pinl_2492833a.jpg?imwidth=1400',
-        description: 'The best mahal made by Shah Jahan',
-        rating: 4.5
-      },
-      {
-        name: 'Eiffel Tower',
-        id: '231',
-        thumbnail: 'https://amp.thisisinsider.com/images/58d919eaf2d0331b008b4bbd-750-562.jpg',
-        description: 'The best tower made by French',
-        rating: 4.8
-      },
-      {
-        name: 'Pyramids',
-        id: '2321',
-        thumbnail: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
-        description: 'The best triangles. made by Egyptians',
-        rating: 3.9
-      },
-      {
-        name: 'Pyramids',
-        id: '2321',
-        thumbnail: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
-        description: 'The best triangles. made by Egyptians',
-        rating: 3.9
-      },
-      {
-        name: 'Pyramids',
-        id: '2321',
-        thumbnail: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
-        description: 'The best triangles. made by Egyptians',
-        rating: 3.9
-      },
-    ],
+     recommendedPlaces: {},//[
+    //   {
+    //     name: 'Taj Mahal',
+    //     key: '1',
+    //     picture: 'https://www.telegraph.co.uk/content/dam/Travel/leadAssets/24/92/taj-pinl_2492833a.jpg?imwidth=1400',
+    //     description: 'The best mahal made by Shah Jahan',
+    //     rating: 4.5
+    //   },
+    //   {
+    //     name: 'Eiffel Tower',
+    //     key: '231',
+    //     picture: 'https://amp.thisisinsider.com/images/58d919eaf2d0331b008b4bbd-750-562.jpg',
+    //     description: 'The best tower made by French',
+    //     rating: 4.8
+    //   },
+    //   {
+    //     name: 'Pyramids',
+    //     key: '2321',
+    //     picture: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
+    //     description: 'The best triangles. made by Egyptians',
+    //     rating: 3.9
+    //   },
+    //   {
+    //     name: 'Pyramids',
+    //     key: '2321',
+    //     picture: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
+    //     description: 'The best triangles. made by Egyptians',
+    //     rating: 3.9
+    //   },
+    //   {
+    //     name: 'Pyramids',
+    //     key: '2321',
+    //     picture: 'https://i.kinja-img.com/gawker-media/image/upload/s--eq6ppCkp--/c_scale,fl_progressive,q_80,w_800/kmjs3kohtxp7eal972f2.jpg',
+    //     description: 'The best triangles. made by Egyptians',
+    //     rating: 3.9
+    //   },
+    // ],
     visitedPlaces: [
       {
         name: 'Badshahi Mosque',
         id: '2231',
-        thumbnail: 'http://www.discoveryair.pk/wp-content/uploads/2017/06/Badshahi-Mosque-Front-1024x472.jpg',
+        picture: 'http://www.discoveryair.pk/wp-content/uploads/2017/06/Badshahi-Mosque-Front-1024x472.jpg',
         description: 'The King-y mosque',
         rating: 5.0
       },
       {
         name: 'Baap',
         id: '23sdx1',
-        thumbnail: 'https://res.cloudinary.com/teepublic/image/private/s--32LFf8OQ--/t_Resized%20Artwork/c_fit,g_north_west,h_954,w_954/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_bbbbbb,e_outline:3:1000/c_mpad,g_center,h_1260,w_1260/b_rgb:eeeeee/c_limit,f_jpg,h_630,q_90,w_630/v1489962884/production/designs/1335911_1.jpg',
+        picture: 'https://res.cloudinary.com/teepublic/image/private/s--32LFf8OQ--/t_Resized%20Artwork/c_fit,g_north_west,h_954,w_954/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_bbbbbb,e_outline:3:1000/c_mpad,g_center,h_1260,w_1260/b_rgb:eeeeee/c_limit,f_jpg,h_630,q_90,w_630/v1489962884/production/designs/1335911_1.jpg',
         description: 'The best baap: Daddy',
         rating: 0.9
       },
@@ -97,16 +99,45 @@ class Recommendations extends Component {
   }
 
 
-  componentDidMount () {
+  async componentDidMount () {
     LayoutAnimation.linear();
-    getUserID().then(id=>this.setState({userID}));
-    this.setState({loading: false});
+    let userID = await getUserID();//.then(id=>this.setState({userID}));
+      // console.log("userID: ", userID);
+    this._getLocationAsync().then((location)=>{
+        let url = "https://urbserver.herokuapp.com/recommend/"
+            + userID
+          + "?inLL=" + "51.502279,-0.124437";//formatLocation(location, false);
+        console.log(url);
+        fetchLandmarksFromServer(url).then((landmarks)=>{
+          this.setState({recommendedPlaces: landmarks});
+        })
+    });
+
+      this.setState({
+          loading: false,
+          userID: userID,
+      });
   }
+
+  //THIS IS COPIED FROM NEARBY LOCATIONS. CONSIDER COMBINING
+    _getLocationAsync = async () => {
+        let {status} = await Permissions.askAsync(Permissions.LOCATION);
+        if (status !== 'granted') {
+            this.setState({
+                errorMessage: 'Permission to access location was denied',
+            });
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+        this.setState({location});
+        return location;
+    };
 
 render(){
   const { navigation, themeColor } = this.props
 
   const { settingVisible, loading, visitedPlaces, recommendedPlaces } = this.state
+  const recommendedPlacesValues = Object.values(recommendedPlaces);
 
   if (loading) {
     return(
@@ -160,7 +191,7 @@ render(){
                   visitedPlaces.map((item, index) => (
                     <View key = {item.id} style = {[styles.visitedPlacesListItem, {borderColor: themeColor}]}>
                       <Image
-                        source={{uri: item.thumbnail}}
+                        source={{uri: item.picture}}
                         style={[styles.visitedPlacesListItemImage, {borderColor: themeColor}]}
                       />
                     <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'space-around'}}>
@@ -211,15 +242,15 @@ render(){
           style={[styles.recommendedPlacesList, {borderColor: themeColor}]}
         >
         {
-          recommendedPlaces.map((item, index) => (
-            <View key = {item.id} style = {[styles.recommendedPlacesListItem, {borderColor: themeColor}]}>
+          recommendedPlacesValues.map((item, index) => (
+            <View key = {item.key} style = {[styles.recommendedPlacesListItem, {borderColor: themeColor}]}>
               <Image
-                source={{uri: item.thumbnail}}
+                source={{uri: item.picture}}
                 style={[styles.visitedPlacesListItemImage, {borderColor: themeColor}]}
               />
               <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'space-around'}}>
                 <Text style={[styles.recommendedPlacesListItemHeading, {color: themeColor}]}>{item.name}</Text>
-                <Text style={styles.recommendedPlacesListItemDescription}>{item.description}</Text>
+                <Text style={styles.recommendedPlacesListItemDescription}>{item.category}</Text>
 
                 <View style={styles.recommendedPlacesListItemRating}>
                 <Rating
@@ -228,7 +259,7 @@ render(){
                   }}
                   selectedStar={RatingImages.starFilled}
                   unselectedStar={RatingImages.starEmpty}
-                  initial={item.rating}
+                  initial={0}
                   editable={false}
                   config={{
                     easing: Easing.inOut(Easing.ease),

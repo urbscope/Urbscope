@@ -53,7 +53,22 @@ export const fixLandmarkDetailsFS = (res) => {
   }
 }
 
-
+export const formatLocation = (location, asObject = true)=> {
+    if (!location)
+        return null;
+    else if (asObject) {
+        if (location.coords)
+            return {latitude: location.coords.latitude, longitude: location.coords.longitude};
+        else
+            return {latitude: location.latitude, longitude: location.longitude};
+    }
+    else {
+        if (location.coords)
+            return "" + location.coords.latitude + "," + location.coords.longitude;
+        else
+            return "" + location.latitude + "," + location.longitude;
+    }
+}
 
 export const fixLandmarkDetail = (res) => {
 
@@ -85,7 +100,8 @@ export const fetchLandmarksFromServer= (url)=>{
                     picture: obj.picture,
                     location: {latitude: coords.lat, longitude: coords.lng},
                     key: obj.destinationID.toString(),
-                    address: obj.address
+                    address: obj.address,
+                    description: obj.description,
                 }
             }
             return markers;
