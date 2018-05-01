@@ -22,7 +22,7 @@ import { connect } from 'react-redux'
 import DirectionMeter from './DirectionMeter'
 import Settings from './Settings'
 
-import { purple, white, red } from '../utils/colors'
+import {purple, white, red, blue} from '../utils/colors'
 import {updateVisitedLocations} from "../utils/localStorageAPI";
 import NearbyLocationsList from "./NearbyLocationsList";
 import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
@@ -137,8 +137,11 @@ async componentDidMount() {
     }
 
     if (this.props.navigation.state.params) {
-      this.setState({showArrow: true})
-      console.log(this.props.navigation.state.params);
+      let recommendedLocation = this.props.navigation.state.params.recommendedLocation;
+      this.setState({
+          destination: recommendedLocation.location,
+          selectedMarker: recommendedLocation.key,
+      }, this.getTargetBearingAndDistance);
       setTimeout(() => {
         Animated.spring(this.state.mapViewPosition, { toValue: {x: ScreenWidth-20, y: 0}, friction: 7, tension: 20}).start();
       }, 1000)
@@ -258,12 +261,15 @@ async componentDidMount() {
 
   render() {
 
-    const { navigation, settings, themeColor } = this.props
+    let recommendedMarker = this.props.navigation.state.params
+        ? this.props.navigation.state.params.recommendedLocation
+        : null;
 
-    const { hasCameraPermission, location, settingVisible, mapViewPosition, showArrow } = this.state
+    const { navigation, settings, themeColor } = this.props;
+
+    const { hasCameraPermission, location, settingVisible, mapViewPosition } = this.state;
 
 
-    // console.log(this.props.navigation);
 
     let [translateX, translateY] = [mapViewPosition.x, mapViewPosition.y];
     let imageStyle = {transform: [{translateX}, {translateY}]};
@@ -384,6 +390,25 @@ async componentDidMount() {
                       }}
                       />
                   ))}
+
+                    {recommendedMarker
+                        ?<Marker
+                            key={recommendedMarker.key}
+                            id ={recommendedMarker.key}
+                            coordinate={recommendedMarker.location}
+                            title={recommendedMarker.name}
+                            pinColor={blue}
+                            onPress={e => {
+                                this.setState({
+                                    destination: e.location,
+                                    selectedMarker: e.id,
+                                }, this.getTargetBearingAndDistance);
+                            }}
+                        />
+                        :null}
+
+                    }
+
 
                 </MapView>
 

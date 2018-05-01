@@ -106,7 +106,7 @@ class Recommendations extends Component {
     this._getLocationAsync().then((location)=>{
         let url = "https://urbserver.herokuapp.com/recommend/"
             + userID
-          + "?inLL=" + "51.502279,-0.124437";//formatLocation(location, false);
+          + "?inLL=" + formatLocation(location, false);
         console.log(url);
         fetchLandmarksFromServer(url).then((landmarks)=>{
           this.setState({recommendedPlaces: landmarks});
@@ -283,7 +283,7 @@ render(){
                     index: 0,
                     actions: [NavigationActions.navigate({
                       routeName: 'ExplorationMode',
-                      params: {location: 'sdasda'}
+                      params: {recommendedLocation: item}
                     })],
                   }))
 
