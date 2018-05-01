@@ -31,7 +31,7 @@ class LandmarkDetailsModal extends Component {
   modalAppear = () => {
     const { height, width, opacity } = this.state
       // LayoutAnimation.linear();
-      this.setState({shouldRenderModalButton:true}, ()=>{
+      this.setState({shouldRender:true}, ()=>{
         // Animated.sequence([
         Animated.stagger(200, [
             Animated.timing(width, {
@@ -76,7 +76,7 @@ class LandmarkDetailsModal extends Component {
         friction: 20,
         tension: 60,
       }),
-    ]).start(()=>this.setState({shouldRenderModalButton:false}));
+    ]).start(()=>this.setState({shouldRender:false}));
   }
   componentWillReceiveProps(nextProps) {
 

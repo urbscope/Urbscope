@@ -89,7 +89,7 @@ class Settings extends React.Component {
 
   modalAppear = () => {
     const { paddingHorizontal, containerHeight, containerWidth, opacity, zIndex, borderRadius, borderTopLeftRadius, opacity2 } = this.state.animation
-    this.setState({shouldRenderModalButton:true}, ()=>{
+    this.setState({shouldRender:true}, ()=>{
         Animated.sequence([
             Animated.timing(zIndex, {
                 toValue: 10,
@@ -167,7 +167,7 @@ class Settings extends React.Component {
         toValue: -10,
         duration: 1,
       }),
-    ]).start(()=>this.setState({shouldRenderModalButton:false}));
+    ]).start(()=>this.setState({shouldRender:false}));
 
 
   }
@@ -238,7 +238,6 @@ class Settings extends React.Component {
     const { dectionLimit, nearbyRadius, category, nearbyLimit, categories } = this.state
     const { settings, themeColor } = this.props
     const { containerHeight, containerWidth, opacity, opacity2, zIndex, borderRadius, borderTopLeftRadius, paddingHorizontal } = this.state.animation
-
     // console.log('settings', settings);
     // console.log('state category', this.state.categories);
 

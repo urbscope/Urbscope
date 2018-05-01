@@ -30,7 +30,7 @@ class DirectionMeter extends Component {
 
   modalAppear = () => {
     const { verticalPosition } = this.state
-      this.setState({shouldRenderModalButton:true}, ()=>{
+      this.setState({shouldRender:true}, ()=>{
           Animated.spring(verticalPosition, {
               toValue: ScreenHeight * 0.02,
               friction: 4,
@@ -46,7 +46,7 @@ class DirectionMeter extends Component {
       toValue: - ScreenHeight * 0.2,
       friction: 4,
       tension: 6,
-    }).start(()=>this.setState({shouldRenderModalButton: false}));
+    }).start(()=>this.setState({shouldRender: false}));
 
   }
 

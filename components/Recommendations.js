@@ -33,6 +33,7 @@ class Recommendations extends Component {
 
   state = {
     loading: false,
+    userID: null,
     recommendedPlaces: [
       {
         name: 'Taj Mahal',

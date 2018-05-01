@@ -34,7 +34,6 @@ vision.init({ auth: GOOGLE_API })
 const ScreenHeight = Dimensions.get('window').height
 const ScreenWidth  = Dimensions.get('window').width
 
-
 // ===========================================================================
 //  BEGINNING OF THE CLASS
 // ===========================================================================
@@ -271,7 +270,6 @@ class DetectionMode extends Component {
     const { hasCameraPermission, locations, modalVisible, settingVisible } = this.state
 
     const { diameter, radius, top, opacity, fontSize, fontOpacity , zIndex} = this.state.modalButtonAnimations
-    console.log("modalshouldrender is " , this.state.shouldRenderModalButton);
 
     if (hasCameraPermission === null) {
      return <View style={{flex:1, backgroundColor: 'black'}}/>;

@@ -11,7 +11,6 @@ import { StyleSheet,
 
 import { connect } from 'react-redux'
 
-const defaultPicture = require('../assets/urbscope_loading.png');
 
 const ScreenHeight = Dimensions.get('window').height
 const ScreenWidth  = Dimensions.get('window').width
@@ -80,18 +79,19 @@ class NearbyLocationsList extends React.Component {
 
             <ScrollView style={styles.listContainer} >
               {locations.map(val => {
-                let picture=  defaultPicture;
-                if (val.picture)
-                picture = val.picture;
                 return (
                     <TouchableOpacity
                   key={val.key}
                   onPress={()=>this.props.handlePress(val.key)}
                 >
                   <View style={styles.listItem} >
-                    <Image style={styles.Image}
-                      source={{uri: picture}}
-                      />
+                      {val.picture
+                          ?(<Image style={styles.Image}
+                                   source={{uri: val.picture}}/>)
+                          :(<Image style={styles.Image}
+                                   source={require('../assets/urbscope_loading.png')}/>)
+                      }
+
                     <View>
                       <Text>
                         {val.name}
