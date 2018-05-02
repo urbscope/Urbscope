@@ -337,7 +337,7 @@ async componentDidMount() {
                                           let loc;
                                           if (this.state.markers[key])
                                             loc = this.state.markers[key].location;
-                                          else if (this.state.sponsoredLocation['key'] == key)
+                                          else if (this.state.sponsoredLocation['key'] === key)
                                             loc = this.state.sponsoredLocation.location;
                                           else
                                             return;

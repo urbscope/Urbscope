@@ -74,7 +74,7 @@ class Settings extends React.Component {
       [CATEGORIES_TRAIN_STATIONS]: this.props.settings.categories[CATEGORIES_TRAIN_STATIONS],
     },
     category: this.props.settings.category,
-    themeColor: this.props.settings.themeColor,
+    themeColor: this.props.themeColor,
     animation: {
       containerHeight: new Animated.Value(58),
       containerWidth: new Animated.Value(10),
@@ -188,7 +188,7 @@ class Settings extends React.Component {
         nearbyLimit: this.props.settings.nearbyLimit,
         nearbyRadius: nextProps.settings.nearbyRadius,
         categories: nextProps.settings.categories,
-        themeColor: this.props.settings.themeColor,
+        themeColor: nextProps.settings.themeColor,
       }, () => {
         this.modalAppear()
       })
@@ -235,8 +235,8 @@ class Settings extends React.Component {
 
   render () {
 
-    const { dectionLimit, nearbyRadius, category, nearbyLimit, categories } = this.state
-    const { settings, themeColor } = this.props
+    const { dectionLimit, nearbyRadius, category, nearbyLimit, categories } = this.state;
+    const { settings, themeColor } = this.props;
     const { containerHeight, containerWidth, opacity, opacity2, zIndex, borderRadius, borderTopLeftRadius, paddingHorizontal } = this.state.animation
     // console.log('settings', settings);
     // console.log('state category', this.state.categories);

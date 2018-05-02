@@ -14,7 +14,7 @@ import SplashLoading from './components/SplashLoading'
 import TabBarExploration from './components/TabBarExploration'
 
 import { connect } from 'react-redux'
-import { loadSettings, setSettings } from './actions'
+import {changeColor, loadSettings, setSettings} from './actions'
 import {getUserID, setUserID} from "./utils/localStorageAPI";
 console.disableYellowBox = true;
 
@@ -166,7 +166,7 @@ class AppWithStore extends React.Component {
   }
 
   componentDidMount () {
-    // AsyncStorage.clear()
+    // AsyncStorage.removeItem("settingsstorage");
 
 
     // this.props.loadUserID((id) =>console.log(this.props.userID));
@@ -186,19 +186,21 @@ class AppWithStore extends React.Component {
     );
 
     this.props.loadSettings(() => {
-      // console.log("load settings init");
-      // console.log(this.props);
+      //console.log("AppWithStore:load settings init");
+      //console.log("this.props.settings: ", this.props.settings);
 
       if (this.props.settings === null || this.props.settings === undefined) {
-        this.props.changeSettings(DEFAULT_SETTINGS, () => {
-          this.setState({ loading: false })
-          // console.log("load default when props null or undefined");
-        })
-      } else {
-        if (Object.keys(this.props.settings).length === 0 ) {
+          this.props.changeColor(DEFAULT_SETTINGS.themeColor);
           this.props.changeSettings(DEFAULT_SETTINGS, () => {
             this.setState({ loading: false })
-            // console.log("load default when props empty");
+          // console.log("load default when props null or undefined");
+          })
+      } else {
+        if (Object.keys(this.props.settings).length === 0 ) {
+            this.props.changeColor(DEFAULT_SETTINGS.themeColor);
+            this.props.changeSettings(DEFAULT_SETTINGS, () => {
+              this.setState({ loading: false })
+              // console.log("load default when props empty");
           })
         } else {
           // console.log("load settings success");
@@ -240,6 +242,7 @@ mapStateToProps = (state) => {
 mapDispatchToProps = (dispatch, { navigation }) => {
   return {
     loadSettings: (callback) => dispatch(loadSettings(callback)),
+    changeColor: (color) => dispatch(changeColor(color)),
     changeSettings: (settings, callback) => dispatch(setSettings(settings, callback)),
     loadUserID: (callback) => dispatch(getUserID(callback)),
   }
