@@ -22,7 +22,7 @@ import { connect } from 'react-redux'
 import DirectionMeter from './DirectionMeter'
 import Settings from './Settings'
 import {loadSettings, setHasVisitedFalse, setHasVisitedTrue, setSettings} from "../actions";
-import {purple, white, red, blue, black} from '../utils/colors'
+import {purple, white, red, blue, black, yellow} from '../utils/colors'
 import {getUserID, updateVisitedLocations} from "../utils/localStorageAPI";
 import NearbyLocationsList from "./NearbyLocationsList";
 import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
@@ -48,6 +48,7 @@ class NearbyLocations extends Component {
       hasCameraPermission: null,
       location: null,
       markers: {},
+      sponsoredLocation: null,
       selectedMarker: null,
       destination: null,
       arrowRotation: null,
@@ -118,8 +119,8 @@ class NearbyLocations extends Component {
     + "&inRadius=" + settings.nearbyRadius;
 
     console.log(url);
-    fetchLandmarksFromServer(url).then(markers=>{
-      this.setState({markers: markers});
+    fetchLandmarksFromServer(url).then(res=>{
+      this.setState({markers: res[0], sponsoredLocation: res[1]});
     });
 
   }
@@ -267,8 +268,7 @@ async componentDidMount() {
 
     const { navigation, settings, themeColor } = this.props;
 
-    const { hasCameraPermission, location, settingVisible, mapViewPosition } = this.state;
-
+    const { hasCameraPermission, location, settingVisible, mapViewPosition, sponsoredLocation } = this.state;
 
     let [translateX, translateY] = [mapViewPosition.x, mapViewPosition.y];
     let imageStyle = {transform: [{translateX}, {translateY}]};
@@ -307,13 +307,15 @@ async componentDidMount() {
                 dispatch={navigation.dispatch}
                 />
 */}
+
+          {/*
             <TouchableOpacity style={{width: 200, height:200, backgroundColor: white}} onPress={()=>{
               console.log("has been pressed");
                 this.props.setHasVisitedTrue();
               }
             }
             />
-
+          */}
 
             <ChangeModeSwitch
                 replaceScreen={navigation.replace}
@@ -329,13 +331,22 @@ async componentDidMount() {
               />
 
 
-                <NearbyLocationsList locations={Object.values(this.state.markers)} handlePress={(key) => {
-                    let loc = this.state.markers[key].location;
-                    this.setState({
-                        destination: loc,
-                        selectedMarker: key
-                    }, this.getTargetBearingAndDistance);
-                }}/>
+                <NearbyLocationsList locations={Object.values(this.state.markers)}
+                                     sponsoredLocation = {this.state.sponsoredLocation}
+                                     handlePress={(key) => {
+                                          let loc;
+                                          if (this.state.markers[key])
+                                            loc = this.state.markers[key].location;
+                                          else if (this.state.sponsoredLocation['key'] == key)
+                                            loc = this.state.sponsoredLocation.location;
+                                          else
+                                            return;
+                                          this.setState({
+                                              destination: loc,
+                                              selectedMarker: key
+                                          }, this.getTargetBearingAndDistance);
+                                     }}
+                />
 
 
 
@@ -404,6 +415,22 @@ async componentDidMount() {
                             id ={recommendedMarker.key}
                             coordinate={recommendedMarker.location}
                             title={recommendedMarker.name}
+                            pinColor={blue}
+                            onPress={e => {
+                                this.setState({
+                                    destination: e.location,
+                                    selectedMarker: e.id,
+                                }, this.getTargetBearingAndDistance);
+                            }}
+                        />
+                        :null}
+
+                    {sponsoredLocation
+                        ?<Marker
+                            key={sponsoredLocation.key}
+                            id ={sponsoredLocation.key}
+                            coordinate={sponsoredLocation.location}
+                            title={sponsoredLocation.name}
                             pinColor={blue}
                             onPress={e => {
                                 this.setState({

@@ -38,6 +38,7 @@ class Recommendations extends Component {
     state = {
         loading: true,
         userID: null,
+        sponsoredLocation: null,
         recommendedPlaces: {},
          visitedPlaces: {},//[
         //     {
@@ -93,8 +94,8 @@ class Recommendations extends Component {
                 + userID
                 + "?inLL=" + formatLocation(location, false);
             console.log(url);
-            fetchLandmarksFromServer(url).then((landmarks)=>{
-                this.setState({recommendedPlaces: landmarks});
+            fetchLandmarksFromServer(url).then((res)=>{
+                this.setState({recommendedPlaces: res[0], sponsoredLocation: res[1]});
             })
         });
 

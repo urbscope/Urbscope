@@ -90,6 +90,11 @@ export const fetchLandmarksFromServer= (url)=>{
         }
     })
         .then(responseJson => {
+            let sponsored = responseJson.sponsoredItem;
+            let {latitude,longitude} =  sponsored;
+            sponsored['location'] = {latitude: latitude, longitude: longitude}
+            sponsored['key'] = sponsored['destinationID'];
+
             let landmarks = responseJson.landmarks;
             let markers = {};
             for (obj of landmarks){
@@ -104,7 +109,7 @@ export const fetchLandmarksFromServer= (url)=>{
                     description: obj.description,
                 }
             }
-            return markers;
+            return [markers, sponsored];
         })
         .catch(error => {
             // console.error(error);

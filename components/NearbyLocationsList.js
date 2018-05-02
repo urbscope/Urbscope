@@ -60,7 +60,7 @@ class NearbyLocationsList extends React.Component {
       const { listViewPosition } = this.state
 
 
-      const { locations, themeColor } = this.props
+      const { locations, themeColor, sponsoredLocation } = this.props
 
 
         let [translateX, translateY] = [listViewPosition.x, listViewPosition.y];
@@ -78,7 +78,32 @@ class NearbyLocationsList extends React.Component {
             </View>
 
             <ScrollView style={styles.listContainer} >
-              {locations.map(val => {
+                {sponsoredLocation
+                    ? (<TouchableOpacity
+                            key={sponsoredLocation.key}
+                            onPress={()=>this.props.handlePress(sponsoredLocation.key)}
+                        >
+                            <View style={styles.listItem} >
+                                {sponsoredLocation.picture
+                                    ?(<Image style={styles.Image}
+                                             source={{uri: sponsoredLocation.picture}}/>)
+                                    :(<Image style={styles.Image}
+                                             source={require('../assets/urbscope_loading.png')}/>)
+                                }
+
+                                <View>
+                                    <Text>
+                                        {sponsoredLocation.name}
+                                    </Text>
+                                    <Text>
+                                        {sponsoredLocation.category}
+                                    </Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>)
+                    : null}
+
+                {locations.map(val => {
                 return (
                     <TouchableOpacity
                   key={val.key}
