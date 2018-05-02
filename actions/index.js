@@ -5,6 +5,20 @@ export const CHANGE_SETTINGS  = "CHANGE_SETTINGS"
 export const LOAD_SETTINGS = "LOAD_SETTINGS"
 export const CHANGE_COLOR = "CHANGE_COLOR"
 export const SET_USERID = "SET_USERID"
+export const SET_HASVISITED_TRUE = "SET_HASVISITED_TRUE"
+export const SET_HASVISITED_FALSE = "SET_HASVISITED_FALSE"
+
+export function setHasVisitedTrue() {
+  return {
+    type: SET_HASVISITED_TRUE
+  }
+}
+
+export function setHasVisitedFalse() {
+    return {
+        type: SET_HASVISITED_FALSE
+    }
+}
 
 export function setSettingsSuccess (settings) {
   return {

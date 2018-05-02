@@ -6,6 +6,8 @@ import {
   LOAD_SETTINGS,
   CHANGE_COLOR,
   SET_USERID,
+  SET_HASVISITED_TRUE,
+  SET_HASVISITED_FALSE
 } from '../actions'
 
 
@@ -48,8 +50,22 @@ userID = (state={}, action) => {
   }
 }
 
+hasVisitedIsChanged = (state= false, action) => {
+    const { type} = action;
+
+    switch (type) {
+        case SET_HASVISITED_TRUE:
+            return true
+        case SET_HASVISITED_FALSE:
+            return false
+        default:
+            return state
+    }
+}
+
 export default combineReducers({
   themeColor,
   settings,
   userID,
+  hasVisitedIsChanged
 })

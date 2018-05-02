@@ -21,9 +21,9 @@ import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { connect } from 'react-redux'
 import DirectionMeter from './DirectionMeter'
 import Settings from './Settings'
-
-import {purple, white, red, blue} from '../utils/colors'
-import {updateVisitedLocations} from "../utils/localStorageAPI";
+import {loadSettings, setHasVisitedFalse, setHasVisitedTrue, setSettings} from "../actions";
+import {purple, white, red, blue, black} from '../utils/colors'
+import {getUserID, updateVisitedLocations} from "../utils/localStorageAPI";
 import NearbyLocationsList from "./NearbyLocationsList";
 import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
 
@@ -270,7 +270,6 @@ async componentDidMount() {
     const { hasCameraPermission, location, settingVisible, mapViewPosition } = this.state;
 
 
-
     let [translateX, translateY] = [mapViewPosition.x, mapViewPosition.y];
     let imageStyle = {transform: [{translateX}, {translateY}]};
 
@@ -308,6 +307,14 @@ async componentDidMount() {
                 dispatch={navigation.dispatch}
                 />
 */}
+            <TouchableOpacity style={{width: 200, height:200, backgroundColor: white}} onPress={()=>{
+              console.log("has been pressed");
+                this.props.setHasVisitedTrue();
+              }
+            }
+            />
+
+
             <ChangeModeSwitch
                 replaceScreen={navigation.replace}
                 currentScreen={navigation.state.routeName}
@@ -322,7 +329,6 @@ async componentDidMount() {
               />
 
 
-
                 <NearbyLocationsList locations={Object.values(this.state.markers)} handlePress={(key) => {
                     let loc = this.state.markers[key].location;
                     this.setState({
@@ -330,6 +336,7 @@ async componentDidMount() {
                         selectedMarker: key
                     }, this.getTargetBearingAndDistance);
                 }}/>
+
 
 
               <Animated.View
@@ -562,7 +569,13 @@ mapStateToProps = (state) => {
   }
 }
 
+mapDispatchToProps = (dispatch, { navigation }) => {
+    return {
+        setHasVisitedTrue: () => dispatch(setHasVisitedTrue()),
+        setHasVisitedFalse: ()=>dispatch(setHasVisitedFalse())
+    }
+}
 
 
-export default connect(mapStateToProps)(NearbyLocations)
+export default connect(mapStateToProps, mapDispatchToProps)(NearbyLocations)
 // export default connect(mapStateToProps)(NearbyLocations)
