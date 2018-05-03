@@ -153,7 +153,7 @@ async componentDidMount() {
   }
 
     _watchLocationAsync = async ()=>{
-        this.locationWatch = Location.watchPositionAsync({
+        this.locationWatch = await Location.watchPositionAsync({
             enableHighAccuracy: true,
             timeInterval: 3000,
             distanceInterval: 0.5,
