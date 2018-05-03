@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
       top: 0.01 * ScreenHeight,
       borderColor: '#eee',
       bottom: 25,
-      zIndex: 15,
+      zIndex: 5,
       shadowColor: '#000',
       shadowOffset: {
         width: 1,
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
       width: 20,
       borderTopRightRadius: 20,
       borderBottomRightRadius: 20,
-      zIndex: 15,
+      zIndex: 1,
     },
     listWindowDragLine: {
       height: '40%',

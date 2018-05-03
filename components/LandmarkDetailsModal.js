@@ -9,7 +9,7 @@ import { View,
          Dimensions,
          Modal } from 'react-native'
 
-import { purple, white, modalBackground } from '../utils/colors'
+// import { purple, white, modalBackground } from '../utils/colors'
 
 import LandmarkDetails from './LandmarkDetails'
 
@@ -31,7 +31,7 @@ class LandmarkDetailsModal extends Component {
   modalAppear = () => {
     const { height, width, opacity } = this.state
       // LayoutAnimation.linear();
-      this.setState({shouldRender:true}, ()=>{
+      this.setState( {shouldRender: true}, ()=>{
         // Animated.sequence([
         Animated.stagger(200, [
             Animated.timing(width, {
@@ -76,14 +76,19 @@ class LandmarkDetailsModal extends Component {
         friction: 20,
         tension: 60,
       }),
-    ]).start(()=>this.setState({shouldRender:false}));
-  }
-  componentWillReceiveProps(nextProps) {
+    ]).start(() => this.setState( {shouldRender:false} ));
 
-    if (nextProps.visible === true){
-      this.modalAppear()
-    } else {
-      this.modalDisappear()
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.visible !== nextProps.visible) {
+      if (nextProps.visible === true){
+        this.modalAppear()
+        console.log("modal appesr");
+      } else {
+        this.modalDisappear()
+        console.log("disappear");
+      }
     }
   }
 
@@ -99,7 +104,8 @@ class LandmarkDetailsModal extends Component {
         }
 
         // if (this.props.visible && locations.length !== 0 ) {
-        if (this.props.visible ) {
+
+        // if (this.state.shouldRender ) {
             return(
                 <Animated.View style={[styles.container, {height, width}]}>
 
@@ -125,11 +131,11 @@ class LandmarkDetailsModal extends Component {
 
                 </Animated.View>
             )
-        } else {
-            return (
-                <View/>
-            )
-        }
+        // } else {
+        //   return (
+        //   <View/>
+        // )
+        // }
     }
 }
 
@@ -146,7 +152,7 @@ const styles = StyleSheet.create({
     // borderColor: white,
     // borderWidth: 2,
     borderRadius: 10,
-    backgroundColor: modalBackground,
+    backgroundColor: '#eee',
   },
   scroll: {
     backgroundColor: 'transparent',
