@@ -14,7 +14,7 @@ import { setSettings, changeColor } from '../actions'
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 
 
-import { red, white, teal, black, purple, yellow, } from '../utils/colors'
+import { red, green, black, blue, yellow, } from '../utils/colors'
 
 import {
     CATEGORIES_TOURISTIC_SITES,
@@ -44,6 +44,13 @@ import { DEFAULT_SETTINGS } from '../utils/helpers'
 
 var ScreenWidth = Dimensions.get('window').width
 var ScreenHeight = Dimensions.get('window').height
+
+const FONT_SIZE_SMALLER = ScreenHeight * 0.015
+const FONT_SIZE_SMALL   = ScreenHeight * 0.0175
+const FONT_SIZE_MEDIUM  = ScreenHeight * 0.02
+const FONT_SIZE_LARGE   = ScreenHeight * 0.025
+const FONT_SIZE_LARGER  = ScreenHeight * 0.027
+const FONT_SIZE_LARGEST = ScreenHeight * 0.034
 
 class Settings extends React.Component {
 
@@ -83,46 +90,57 @@ class Settings extends React.Component {
       borderRadius: new Animated.Value(10),
       paddingHorizontal: new Animated.Value (0),
       borderTopLeftRadius: new Animated.Value(0),
+      backdropOpacity: new Animated.Value(0),
+      backdropZ: new Animated.Value(-10)
     }
   }
 
 
   modalAppear = () => {
-    const { paddingHorizontal, containerHeight, containerWidth, opacity, zIndex, borderRadius, borderTopLeftRadius, opacity2 } = this.state.animation
+    const { paddingHorizontal, containerHeight, containerWidth, opacity, zIndex, borderRadius, borderTopLeftRadius, opacity2, backdropOpacity, backdropZ } = this.state.animation
     this.setState({shouldRender:true}, ()=>{
         Animated.sequence([
             Animated.timing(zIndex, {
-                toValue: 10,
+                toValue: 15,
+                duration: 1,
+            }),
+            Animated.timing(backdropZ, {
+                toValue: 14,
                 duration: 1,
             }),
             Animated.stagger(200, [
-                Animated.parallel([
-                    Animated.timing(containerWidth, {
-                        toValue: ScreenWidth -30,
-                        duration: 300,
-                    }),
-                    Animated.timing(paddingHorizontal, {
-                        toValue: 15,
-                        duration: 300,
-                    }),
-                    Animated.timing(borderRadius, {
-                        toValue: 0,
-                        duration: 300,
-                    }),
-                ]),
-                Animated.timing(borderTopLeftRadius, {
-                    toValue: 10,
-                    duration: 250,
+              Animated.timing(backdropOpacity, {
+                  toValue: 0.5,
+                  duration: 1000,
+              }),
+              Animated.parallel([
+                Animated.timing(containerWidth, {
+                    toValue: ScreenWidth -30,
+                    duration: 300,
                 }),
-                Animated.spring(containerHeight, {
-                    toValue: ScreenHeight * 83 / 100,
-                    friction: 8,
-                    tension: 70,
+                Animated.timing(paddingHorizontal, {
+                    toValue: 15,
+                    duration: 300,
                 }),
-                Animated.timing(opacity, {
-                    toValue: 1,
-                    duration: 1000,
+                Animated.timing(borderRadius, {
+                    toValue: 0,
+                    duration: 300,
                 }),
+              ]),
+              Animated.timing(borderTopLeftRadius, {
+                  toValue: 10,
+                  duration: 250,
+              }),
+              Animated.spring(containerHeight, {
+                  toValue: ScreenHeight * 83 / 100,
+                  friction: 8,
+                  tension: 70,
+              }),
+              Animated.timing(opacity, {
+                  toValue: 1,
+                  duration: 1000,
+              }),
+
             ])
         ]).start()
     });
@@ -130,44 +148,52 @@ class Settings extends React.Component {
   }
 
   modalDisappear = () => {
-    const { containerHeight, containerWidth, opacity, zIndex, borderRadius, borderTopLeftRadius, opacity2, paddingHorizontal } = this.state.animation
-
-    Animated.sequence([
-      Animated.timing(opacity, {
+    const { containerHeight, containerWidth, opacity, zIndex, borderRadius, borderTopLeftRadius, opacity2, paddingHorizontal, backdropZ, backdropOpacity } = this.state.animation
+    Animated.stagger(100, [
+      Animated.timing(backdropOpacity, {
         toValue: 0,
-        duration: 250,
+        duration: 1000,
       }),
-      Animated.timing(paddingHorizontal, {
-        toValue: 0,
-        duration: 1,
-      }),
-      Animated.stagger(300, [
-        Animated.timing(containerHeight, {
-          toValue: 58,
-          duration: 300,
+      Animated.sequence([
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 250,
         }),
-        Animated.parallel([
-          Animated.timing(borderTopLeftRadius, {
-            toValue: 0,
-            duration: 150,
-          }),
-          Animated.timing(containerWidth, {
-            toValue: 10,
+        Animated.timing(paddingHorizontal, {
+          toValue: 0,
+          duration: 1,
+        }),
+        Animated.stagger(300, [
+          Animated.timing(containerHeight, {
+            toValue: 58,
             duration: 300,
           }),
-
-          Animated.timing(borderRadius, {
-            toValue: 10,
-            duration: 300,
-          }),
+          Animated.parallel([
+            Animated.timing(borderTopLeftRadius, {
+              toValue: 0,
+              duration: 150,
+            }),
+            Animated.timing(containerWidth, {
+              toValue: 10,
+              duration: 300,
+            }),
+            Animated.timing(borderRadius, {
+              toValue: 10,
+              duration: 300,
+            }),
+          ]),
         ]),
-      ]),
-
-      Animated.timing(zIndex, {
-        toValue: -10,
-        duration: 1,
-      }),
-    ]).start(()=>this.setState({shouldRender:false}));
+        Animated.timing(zIndex, {
+          toValue: -10,
+          duration: 1,
+        }),
+        Animated.timing(backdropZ, {
+          toValue: -10,
+          duration: 1,
+        }),
+      ])
+    ])
+    .start(()=>this.setState({shouldRender:false}));
 
 
   }
@@ -237,12 +263,17 @@ class Settings extends React.Component {
 
     const { dectionLimit, nearbyRadius, category, nearbyLimit, categories } = this.state;
     const { settings, themeColor } = this.props;
-    const { containerHeight, containerWidth, opacity, opacity2, zIndex, borderRadius, borderTopLeftRadius, paddingHorizontal } = this.state.animation
+    const { containerHeight, containerWidth, opacity, opacity2, zIndex, borderRadius, borderTopLeftRadius, paddingHorizontal, backdropZ, backdropOpacity } = this.state.animation
     // console.log('settings', settings);
     // console.log('state category', this.state.categories);
 
     if (this.state.shouldRender) {
       return (
+//
+
+        <Animated.View style={{position: 'absolute', height: '100%', width: '100%', zIndex: backdropZ}}>
+          <Animated.View style={[styles.backdrop, {opacity: backdropOpacity}]}></Animated.View>
+
         <Animated.View style={[styles.container, {height: containerHeight, width: containerWidth, zIndex , borderRadius: borderTopLeftRadius}]}>
 
           <Animated.View style={[styles.heading, { borderRadius, borderTopLeftRadius, borderBottomColor: themeColor, backgroundColor: themeColor, paddingHorizontal}]}>
@@ -255,16 +286,16 @@ class Settings extends React.Component {
             contentContainerStyle={styles.scroll}
           >
             <View style={[styles.sectionHeader, {borderBottomColor: themeColor}]}>
-              <Text style={{fontSize: 19, color: themeColor}}>Detection Settings</Text>
+              <Text style={{fontSize: FONT_SIZE_LARGER, color: themeColor}}>Detection Settings</Text>
             </View>
 
             {/*Detection Location Radius */}
             <View style={[styles.itemLast, { borderBottomWidth: 0.5, borderBottomColor: themeColor }]}>
               <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                <Text style={{fontSize: 15}}>Maximum Detected Landmarks: </Text>
+                <Text style={{fontSize: FONT_SIZE_MEDIUM}}>Maximum Detected Landmarks: </Text>
                 { (dectionLimit === null || dectionLimit === 0 || dectionLimit === undefined)
-                    ? <Text style={{fontSize: 16}}>{settings.dectionLimit}</Text>
-                    : <Text style={{fontSize: 16}}>{dectionLimit}</Text>
+                    ? <Text style={{fontSize: FONT_SIZE_LARGE, color: themeColor}}>{settings.dectionLimit}</Text>
+                    : <Text style={{fontSize: FONT_SIZE_LARGE, color: themeColor}}>{dectionLimit}</Text>
                 }
               </View>
               <Slider
@@ -275,34 +306,34 @@ class Settings extends React.Component {
                 minimumTrackTintColor={themeColor}
                 onValueChange={(dectionLimit) => this.setState({dectionLimit})}
               />
-              <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
+              <Animated.Text style={{fontSize: FONT_SIZE_SMALLER,  opacity: opacity2 }}>
                 Maximum number of landmark that can be detected in Detection Mode.
               </Animated.Text>
 
             </View>
 
             <View style={[styles.sectionHeader, {borderBottomColor: themeColor}]}>
-              <Text style={{fontSize: 19, color: themeColor}}>Exploration Settings</Text>
+              <Text style={{fontSize: FONT_SIZE_LARGER, color: themeColor}}>Exploration Settings</Text>
             </View>
 
             {/*Nearby Location Radius */}
             <View style={styles.item}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text style={{fontSize: 15}}>Radius of Nearby Landmarks: </Text>
+                <Text style={{fontSize: FONT_SIZE_MEDIUM}}>Radius of Nearby Landmarks: </Text>
                 { (nearbyRadius === null || nearbyRadius === 0 || nearbyRadius === undefined)
-                    ? <Text style={{fontSize: 16}}>{settings.nearbyRadius/1000} km</Text>
-                    : <Text style={{fontSize: 16}}>{nearbyRadius/1000} km</Text>
+                    ? <Text style={{fontSize: FONT_SIZE_LARGE, color: themeColor}}>{settings.nearbyRadius/1000} km</Text>
+                    : <Text style={{fontSize: FONT_SIZE_LARGE, color: themeColor}}>{nearbyRadius/1000} km</Text>
                 }
               </View>
               <Slider
-                step={500}
+                step={1000}
                 value={nearbyRadius === null ? settings.nearbyRadius : nearbyRadius}
-                minimumValue={500}
-                maximumValue={5000}
+                minimumValue={1000}
+                maximumValue={25000}
                 minimumTrackTintColor={themeColor}
                 onValueChange={(nearbyRadius) => this.setState({nearbyRadius})}
               />
-            <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
+            <Animated.Text style={{fontSize: FONT_SIZE_SMALLER,  opacity: opacity2 }}>
               Maximum number of landmark that are displayed in Nearby Location mode.
             </Animated.Text>
 
@@ -311,10 +342,10 @@ class Settings extends React.Component {
             {/*Nearby Location Limit */}
             <View style={styles.item}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text style={{fontSize: 15}}>Maximum Nearby Landmarks: </Text>
+                <Text style={{fontSize: FONT_SIZE_MEDIUM}}>Maximum Nearby Landmarks: </Text>
                 { (nearbyLimit === null || nearbyLimit === 0 || nearbyLimit === undefined)
-                    ? <Text style={{fontSize: 16}}>{settings.nearbyLimit}</Text>
-                    : <Text style={{fontSize: 16}}>{nearbyLimit}</Text>
+                    ? <Text style={{fontSize: FONT_SIZE_LARGE, color: themeColor}}>{settings.nearbyLimit}</Text>
+                    : <Text style={{fontSize: FONT_SIZE_LARGE, color: themeColor}}>{nearbyLimit}</Text>
                 }
               </View>
               <Slider
@@ -326,7 +357,7 @@ class Settings extends React.Component {
                 onValueChange={(nearbyLimit) => this.setState({nearbyLimit})}
               />
 
-              <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
+              <Animated.Text style={{fontSize: FONT_SIZE_SMALLER,  opacity: opacity2 }}>
                 Maximum number of landmark that are displayed in Nearby Location mode.
               </Animated.Text>
 
@@ -334,18 +365,46 @@ class Settings extends React.Component {
 
 
             {/* Category */}
-            <View style={styles.item}>
+            <View style={[styles.item, {borderColor: themeColor}]}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text style={{fontSize: 15}}>Select Category: </Text>
+                <Text style={{fontSize: FONT_SIZE_MEDIUM}}>Select categories: </Text>
               </View>
 
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_TOURISTIC_SITES]: !this.state.categories[CATEGORIES_TOURISTIC_SITES],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxMainCat, {borderBottomWidth:2, borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_TOURISTIC_SITES]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TOURISTIC_SITES]: false,
+                      [CATEGORIES_AMPHITHEATERS]: false,
+                      [CATEGORIES_AQUARIUMS]: false,
+                      [CATEGORIES_ART_GALLERIES]: false,
+                      [CATEGORIES_CONCERT_HALLS]: false,
+                      [CATEGORIES_EXHIBITS]: false,
+                      [CATEGORIES_HISTORIC_SITES]: false,
+                      [CATEGORIES_MUSEUMS]: false,
+                      [CATEGORIES_PUBLIC_ART]: false,
+                      [CATEGORIES_STADIUMS]: false,
+                      [CATEGORIES_ZOOS]: false,
+                    }})
+                  } else {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TOURISTIC_SITES]: true,
+                      [CATEGORIES_AMPHITHEATERS]: true,
+                      [CATEGORIES_AQUARIUMS]: true,
+                      [CATEGORIES_ART_GALLERIES]: true,
+                      [CATEGORIES_CONCERT_HALLS]: true,
+                      [CATEGORIES_EXHIBITS]: true,
+                      [CATEGORIES_HISTORIC_SITES]: true,
+                      [CATEGORIES_MUSEUMS]: true,
+                      [CATEGORIES_PUBLIC_ART]: true,
+                      [CATEGORIES_STADIUMS]: true,
+                      [CATEGORIES_ZOOS]: true,
+                    }})
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_TOURISTIC_SITES]
@@ -354,15 +413,42 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-                <Text style={{fontSize: 15}}>Touristic Sites </Text>
+              <Text style={{fontSize: FONT_SIZE_MEDIUM, fontWeight: '600'}}>Touristic Sites </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_AMPHITHEATERS]: !this.state.categories[CATEGORIES_AMPHITHEATERS],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor, paddingTop: 10}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_AMPHITHEATERS]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TOURISTIC_SITES]: false,
+                      [CATEGORIES_AMPHITHEATERS]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AQUARIUMS] &&
+                      categories[CATEGORIES_ART_GALLERIES] &&
+                      categories[CATEGORIES_CONCERT_HALLS] &&
+                      categories[CATEGORIES_EXHIBITS] &&
+                      categories[CATEGORIES_HISTORIC_SITES] &&
+                      categories[CATEGORIES_MUSEUMS] &&
+                      categories[CATEGORIES_PUBLIC_ART] &&
+                      categories[CATEGORIES_STADIUMS] &&
+                      categories[CATEGORIES_ZOOS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TOURISTIC_SITES]: true,
+                          [CATEGORIES_AMPHITHEATERS]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_AMPHITHEATERS]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_AMPHITHEATERS]
@@ -371,15 +457,42 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Amphitheaters </Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Amphitheaters </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_AQUARIUMS]: !this.state.categories[CATEGORIES_AQUARIUMS],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_AQUARIUMS]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TOURISTIC_SITES]: false,
+                      [CATEGORIES_AQUARIUMS]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AMPHITHEATERS] &&
+                      categories[CATEGORIES_ART_GALLERIES] &&
+                      categories[CATEGORIES_CONCERT_HALLS] &&
+                      categories[CATEGORIES_EXHIBITS] &&
+                      categories[CATEGORIES_HISTORIC_SITES] &&
+                      categories[CATEGORIES_MUSEUMS] &&
+                      categories[CATEGORIES_PUBLIC_ART] &&
+                      categories[CATEGORIES_STADIUMS] &&
+                      categories[CATEGORIES_ZOOS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TOURISTIC_SITES]: true,
+                          [CATEGORIES_AQUARIUMS]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_AQUARIUMS]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_AQUARIUMS]
@@ -388,15 +501,42 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Aquariums</Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Aquariums</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_ART_GALLERIES]: !this.state.categories[CATEGORIES_ART_GALLERIES],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_ART_GALLERIES]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TOURISTIC_SITES]: false,
+                      [CATEGORIES_ART_GALLERIES]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AMPHITHEATERS] &&
+                      categories[CATEGORIES_AQUARIUMS] &&
+                      categories[CATEGORIES_CONCERT_HALLS] &&
+                      categories[CATEGORIES_EXHIBITS] &&
+                      categories[CATEGORIES_HISTORIC_SITES] &&
+                      categories[CATEGORIES_MUSEUMS] &&
+                      categories[CATEGORIES_PUBLIC_ART] &&
+                      categories[CATEGORIES_STADIUMS] &&
+                      categories[CATEGORIES_ZOOS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TOURISTIC_SITES]: true,
+                          [CATEGORIES_ART_GALLERIES]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_ART_GALLERIES]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_ART_GALLERIES]
@@ -405,15 +545,42 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Art Galleries</Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Art Galleries</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_CONCERT_HALLS]: !this.state.categories[CATEGORIES_CONCERT_HALLS],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_CONCERT_HALLS]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TOURISTIC_SITES]: false,
+                      [CATEGORIES_CONCERT_HALLS]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AMPHITHEATERS] &&
+                      categories[CATEGORIES_AQUARIUMS] &&
+                      categories[CATEGORIES_ART_GALLERIES] &&
+                      categories[CATEGORIES_EXHIBITS] &&
+                      categories[CATEGORIES_HISTORIC_SITES] &&
+                      categories[CATEGORIES_MUSEUMS] &&
+                      categories[CATEGORIES_PUBLIC_ART] &&
+                      categories[CATEGORIES_STADIUMS] &&
+                      categories[CATEGORIES_ZOOS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TOURISTIC_SITES]: true,
+                          [CATEGORIES_CONCERT_HALLS]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_CONCERT_HALLS]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_CONCERT_HALLS]
@@ -422,15 +589,42 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Concert Halls </Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Concert Halls </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_EXHIBITS]: !this.state.categories[CATEGORIES_EXHIBITS],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_EXHIBITS]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TOURISTIC_SITES]: false,
+                      [CATEGORIES_EXHIBITS]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AMPHITHEATERS] &&
+                      categories[CATEGORIES_AQUARIUMS] &&
+                      categories[CATEGORIES_ART_GALLERIES] &&
+                      categories[CATEGORIES_CONCERT_HALLS] &&
+                      categories[CATEGORIES_HISTORIC_SITES] &&
+                      categories[CATEGORIES_MUSEUMS] &&
+                      categories[CATEGORIES_PUBLIC_ART] &&
+                      categories[CATEGORIES_STADIUMS] &&
+                      categories[CATEGORIES_ZOOS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TOURISTIC_SITES]: true,
+                          [CATEGORIES_EXHIBITS]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_EXHIBITS]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_EXHIBITS]
@@ -439,15 +633,42 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Exhibits</Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Exhibits</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_HISTORIC_SITES]: !this.state.categories[CATEGORIES_HISTORIC_SITES],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_HISTORIC_SITES]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TOURISTIC_SITES]: false,
+                      [CATEGORIES_HISTORIC_SITES]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AMPHITHEATERS] &&
+                      categories[CATEGORIES_AQUARIUMS] &&
+                      categories[CATEGORIES_ART_GALLERIES] &&
+                      categories[CATEGORIES_CONCERT_HALLS] &&
+                      categories[CATEGORIES_EXHIBITS] &&
+                      categories[CATEGORIES_MUSEUMS] &&
+                      categories[CATEGORIES_PUBLIC_ART] &&
+                      categories[CATEGORIES_STADIUMS] &&
+                      categories[CATEGORIES_ZOOS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TOURISTIC_SITES]: true,
+                          [CATEGORIES_HISTORIC_SITES]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_HISTORIC_SITES]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_HISTORIC_SITES]
@@ -456,15 +677,42 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Historic Sites </Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Historic Sites </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_MUSEUMS]: !this.state.categories[CATEGORIES_MUSEUMS],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_MUSEUMS]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TOURISTIC_SITES]: false,
+                      [CATEGORIES_MUSEUMS]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AMPHITHEATERS] &&
+                      categories[CATEGORIES_AQUARIUMS] &&
+                      categories[CATEGORIES_ART_GALLERIES] &&
+                      categories[CATEGORIES_CONCERT_HALLS] &&
+                      categories[CATEGORIES_EXHIBITS] &&
+                      categories[CATEGORIES_HISTORIC_SITES] &&
+                      categories[CATEGORIES_PUBLIC_ART] &&
+                      categories[CATEGORIES_STADIUMS] &&
+                      categories[CATEGORIES_ZOOS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TOURISTIC_SITES]: true,
+                          [CATEGORIES_MUSEUMS]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_MUSEUMS]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_MUSEUMS]
@@ -473,15 +721,42 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Museums </Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Museums </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_PUBLIC_ART]: !this.state.categories[CATEGORIES_PUBLIC_ART],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_PUBLIC_ART]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TOURISTIC_SITES]: false,
+                      [CATEGORIES_PUBLIC_ART]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AMPHITHEATERS] &&
+                      categories[CATEGORIES_AQUARIUMS] &&
+                      categories[CATEGORIES_ART_GALLERIES] &&
+                      categories[CATEGORIES_CONCERT_HALLS] &&
+                      categories[CATEGORIES_EXHIBITS] &&
+                      categories[CATEGORIES_HISTORIC_SITES] &&
+                      categories[CATEGORIES_MUSEUMS] &&
+                      categories[CATEGORIES_STADIUMS] &&
+                      categories[CATEGORIES_ZOOS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TOURISTIC_SITES]: true,
+                          [CATEGORIES_PUBLIC_ART]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_PUBLIC_ART]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_PUBLIC_ART]
@@ -490,15 +765,42 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Public Arts</Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Public Arts</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_STADIUMS]: !this.state.categories[CATEGORIES_STADIUMS],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_STADIUMS]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TOURISTIC_SITES]: false,
+                      [CATEGORIES_STADIUMS]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AMPHITHEATERS] &&
+                      categories[CATEGORIES_AQUARIUMS] &&
+                      categories[CATEGORIES_ART_GALLERIES] &&
+                      categories[CATEGORIES_CONCERT_HALLS] &&
+                      categories[CATEGORIES_EXHIBITS] &&
+                      categories[CATEGORIES_HISTORIC_SITES] &&
+                      categories[CATEGORIES_MUSEUMS] &&
+                      categories[CATEGORIES_PUBLIC_ART] &&
+                      categories[CATEGORIES_ZOOS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TOURISTIC_SITES]: true,
+                          [CATEGORIES_STADIUMS]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_STADIUMS]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_STADIUMS]
@@ -507,15 +809,42 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Stadiums</Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Stadiums</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_ZOOS]: !this.state.categories[CATEGORIES_ZOOS],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_ZOOS]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TOURISTIC_SITES]: false,
+                      [CATEGORIES_ZOOS]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AMPHITHEATERS] &&
+                      categories[CATEGORIES_AQUARIUMS] &&
+                      categories[CATEGORIES_ART_GALLERIES] &&
+                      categories[CATEGORIES_CONCERT_HALLS] &&
+                      categories[CATEGORIES_EXHIBITS] &&
+                      categories[CATEGORIES_HISTORIC_SITES] &&
+                      categories[CATEGORIES_MUSEUMS] &&
+                      categories[CATEGORIES_PUBLIC_ART] &&
+                      categories[CATEGORIES_STADIUMS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TOURISTIC_SITES]: true,
+                          [CATEGORIES_ZOOS]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_ZOOS]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_ZOOS]
@@ -524,10 +853,10 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Zoos</Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Zoos</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
+              <TouchableOpacity style={styles.checkboxMainCat}
                 onPress={() => this.setState({categories: {
                     ...this.state.categories,
                     [CATEGORIES_RESTAURANTS]: !this.state.categories[CATEGORIES_RESTAURANTS],
@@ -541,10 +870,10 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Restaurants</Text>
+              <Text style={{fontSize: FONT_SIZE_MEDIUM, fontWeight: '600'}}>Restaurants</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
+              <TouchableOpacity style={styles.checkboxMainCat}
                 onPress={() => this.setState({categories: {
                     ...this.state.categories,
                     [CATEGORIES_NIGHTLIFE_SPOTS]: !this.state.categories[CATEGORIES_NIGHTLIFE_SPOTS],
@@ -558,10 +887,10 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Nightlife</Text>
+              <Text style={{fontSize: FONT_SIZE_MEDIUM, fontWeight: '600'}}>Nightlife</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
+              <TouchableOpacity style={styles.checkboxMainCat}
                 onPress={() => this.setState({categories: {
                     ...this.state.categories,
                     [CATEGORIES_OUTDOORS_AND_RECREATION]: !this.state.categories[CATEGORIES_OUTDOORS_AND_RECREATION],
@@ -575,15 +904,31 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Outdoors and Recreations</Text>
+              <Text style={{fontSize: FONT_SIZE_MEDIUM, fontWeight: '600'}}>Outdoors and Recreations</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_TRAVEL_AND_TRANSPORT]: !this.state.categories[CATEGORIES_TRAVEL_AND_TRANSPORT],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxMainCat, {borderBottomWidth:2, borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_TRAVEL_AND_TRANSPORT]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TRAVEL_AND_TRANSPORT]: false,
+                      [CATEGORIES_AIRPORTS]: false,
+                      [CATEGORIES_BUS_STATIONS]: false,
+                      [CATEGORIES_TOURIST_INFORMATION_CENTERS]: false,
+                      [CATEGORIES_TRAIN_STATIONS]: false,
+                    }})
+                  } else {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TRAVEL_AND_TRANSPORT]: true,
+                      [CATEGORIES_AIRPORTS]: true,
+                      [CATEGORIES_BUS_STATIONS]: true,
+                      [CATEGORIES_TOURIST_INFORMATION_CENTERS]: true,
+                      [CATEGORIES_TRAIN_STATIONS]: true,
+                    }})
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_TRAVEL_AND_TRANSPORT]
@@ -592,15 +937,36 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Travel and Transport </Text>
+              <Text style={{fontSize: FONT_SIZE_MEDIUM, fontWeight: '600'}}>Travel and Transport </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_AIRPORTS]: !this.state.categories[CATEGORIES_AIRPORTS],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor, paddingTop: 10}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_AIRPORTS]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TRAVEL_AND_TRANSPORT]: false,
+                      [CATEGORIES_AIRPORTS]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_BUS_STATIONS] &&
+                      categories[CATEGORIES_TOURIST_INFORMATION_CENTERS] &&
+                      categories[CATEGORIES_TRAIN_STATIONS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TRAVEL_AND_TRANSPORT]: true,
+                          [CATEGORIES_AIRPORTS]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_AIRPORTS]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_AIRPORTS]
@@ -609,15 +975,36 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Airports</Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Airports</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_BUS_STATIONS]: !this.state.categories[CATEGORIES_BUS_STATIONS],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_BUS_STATIONS]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TRAVEL_AND_TRANSPORT]: false,
+                      [CATEGORIES_BUS_STATIONS]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AIRPORTS] &&
+                      categories[CATEGORIES_TOURIST_INFORMATION_CENTERS] &&
+                      categories[CATEGORIES_TRAIN_STATIONS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TRAVEL_AND_TRANSPORT]: true,
+                          [CATEGORIES_BUS_STATIONS]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_BUS_STATIONS]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_BUS_STATIONS]
@@ -626,15 +1013,36 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Bus Stations</Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Bus Stations</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_TOURIST_INFORMATION_CENTERS]: !this.state.categories[CATEGORIES_TOURIST_INFORMATION_CENTERS],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_TOURIST_INFORMATION_CENTERS]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TRAVEL_AND_TRANSPORT]: false,
+                      [CATEGORIES_TOURIST_INFORMATION_CENTERS]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AIRPORTS] &&
+                      categories[CATEGORIES_BUS_STATIONS] &&
+                      categories[CATEGORIES_TRAIN_STATIONS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TRAVEL_AND_TRANSPORT]: true,
+                          [CATEGORIES_TOURIST_INFORMATION_CENTERS]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_TOURIST_INFORMATION_CENTERS]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_TOURIST_INFORMATION_CENTERS]
@@ -643,15 +1051,36 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Tourist Information Centers</Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Tourist Information Centers</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.checkbox}
-                onPress={() => this.setState({categories: {
-                    ...this.state.categories,
-                    [CATEGORIES_TRAIN_STATIONS]: !this.state.categories[CATEGORIES_TRAIN_STATIONS],
-                  }})
-                }
+              <TouchableOpacity style={[styles.checkboxSubCat, {borderColor: themeColor}]}
+                onPress={() => {
+                  if (categories[CATEGORIES_TRAIN_STATIONS]) {
+                    this.setState({categories: {
+                      ...categories,
+                      [CATEGORIES_TRAVEL_AND_TRANSPORT]: false,
+                      [CATEGORIES_TRAIN_STATIONS]: false,
+                    }})
+                  } else {
+                    if (
+                      categories[CATEGORIES_AIRPORTS] &&
+                      categories[CATEGORIES_BUS_STATIONS] &&
+                      categories[CATEGORIES_TOURIST_INFORMATION_CENTERS]
+                    ) {
+                        this.setState({categories: {
+                          ...categories,
+                          [CATEGORIES_TRAVEL_AND_TRANSPORT]: true,
+                          [CATEGORIES_TRAIN_STATIONS]: true,
+                        }})
+                    } else {
+                      this.setState({categories: {
+                        ...categories,
+                        [CATEGORIES_TRAIN_STATIONS]: true,
+                      }})
+                    }
+                  }
+                }}
               >
                 <MaterialIcons
                   name={categories[CATEGORIES_TRAIN_STATIONS]
@@ -660,74 +1089,75 @@ class Settings extends React.Component {
                   size={25} style={{marginRight: 5}}
                   color={themeColor}
                 />
-              <Text style={{fontSize: 15}}>Train Stations</Text>
+              <Text style={{fontSize: FONT_SIZE_SMALL}}>Train Stations</Text>
               </TouchableOpacity>
 
-              {/*
-                <Picker
-                style={[styles.picker, {borderTopColor: themeColor, borderBottomColor: themeColor}]}
-                selectedValue={category}
-                onValueChange={category => this.setState({category})}
-                itemStyle={{color: themeColor}}
-              >
-                <Picker.Item label="Touristic Sites" value={CATEGORIES_TOURISTIC_SITES} />
-                <Picker.Item label="Amphitheaters" value={CATEGORIES_AMPHITHEATERS} />
-                <Picker.Item label="Aquariums" value={CATEGORIES_AQUARIUMS} />
-                <Picker.Item label="Art Galleries" value={CATEGORIES_ART_GALLERIES} />
-                <Picker.Item label="Concert Halls" value={CATEGORIES_CONCERT_HALLS} />
-                <Picker.Item label="Exhibits" value={CATEGORIES_EXHIBITS} />
-                <Picker.Item label="Historic Sites" value={CATEGORIES_HISTORIC_SITES} />
-                <Picker.Item label="Museums" value={CATEGORIES_MUSEUMS} />
-                <Picker.Item label="Public Art" value={CATEGORIES_PUBLIC_ART} />
-                <Picker.Item label="Stadiums" value={CATEGORIES_STADIUMS} />
-                <Picker.Item label="Zoos" value={CATEGORIES_ZOOS} />
-                <Picker.Item label="Restaurants" value={CATEGORIES_RESTAURANTS} />
-                <Picker.Item label="Nightlife Spots" value={CATEGORIES_NIGHTLIFE_SPOTS} />
-                <Picker.Item label="Outdoors & Recreation" value={CATEGORIES_OUTDOORS_AND_RECREATION} />
-                <Picker.Item label="Travel & Transport" value={CATEGORIES_TRAVEL_AND_TRANSPORT} />
-                <Picker.Item label="Airports" value={CATEGORIES_AIRPORTS} />
-                <Picker.Item label="Bus Stations" value={CATEGORIES_BUS_STATIONS} />
-                <Picker.Item label="Tourist Information Centers" value={CATEGORIES_TOURIST_INFORMATION_CENTERS} />
-                <Picker.Item label="Train Stations" value={CATEGORIES_TRAIN_STATIONS} />
-              </Picker>
-              */}
-              <Animated.Text style={{fontSize: 12, fontStyle: 'italic', textAlign: 'center', opacity: opacity2 }}>
+              <Animated.Text style={{fontSize: FONT_SIZE_SMALLER,  opacity: opacity2, marginTop: 10 }}>
                 The landmarks from selected category will be displayed in Nearby Location mode.
               </Animated.Text>
             </View>
 
+            <View style={[styles.sectionHeader, {borderBottomColor: themeColor}]}>
+              <Text style={{fontSize: FONT_SIZE_LARGER, color: themeColor}}>General Settings</Text>
+            </View>
+
             <View style={styles.itemLast}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text style={{fontSize: 15}}>Theme: </Text>
+                <Text style={{fontSize: FONT_SIZE_MEDIUM}}>Theme: </Text>
               </View>
               <View style={styles.themeList}>
                 <TouchableOpacity
                   style={(themeColor === red)
-                          ? [styles.themeButton, {backgroundColor: red, borderWidth: 2}]
+                          ? [styles.themeButton, {backgroundColor: red,
+                              shadowColor: '#000', shadowRadius: 3, shadowOpacity: 0.6,
+                              shadowOffset: {
+                                width: 1,
+                                height: 1
+                              }}]
                           : [styles.themeButton, {backgroundColor: red}]}
                   onPress={() => this.props.changeColor(red)}
                 />
                 <TouchableOpacity
-                  style={(themeColor === teal)
-                          ? [styles.themeButton, {backgroundColor: teal, borderWidth: 2}]
-                          : [styles.themeButton, {backgroundColor: teal}]}
-                  onPress={() => this.props.changeColor(teal)}
+                  style={(themeColor === green)
+                          ? [styles.themeButton, {backgroundColor: green,
+                              shadowColor: '#000', shadowRadius: 3, shadowOpacity: 0.6,
+                              shadowOffset: {
+                                width: 1,
+                                height: 1
+                              }}]
+                          : [styles.themeButton, {backgroundColor: green}]}
+                  onPress={() => this.props.changeColor(green)}
                 />
                 <TouchableOpacity
-                  style={(themeColor === purple)
-                          ? [styles.themeButton, {backgroundColor: purple, borderWidth: 2}]
-                          : [styles.themeButton, {backgroundColor: purple}]}
-                  onPress={() => this.props.changeColor(purple)}
+                  style={(themeColor === blue)
+                          ? [styles.themeButton, {backgroundColor: blue,
+                              shadowColor: '#000', shadowRadius: 3, shadowOpacity: 0.6,
+                              shadowOffset: {
+                                width: 1,
+                                height: 1
+                              }}]
+                          : [styles.themeButton, {backgroundColor: blue}]}
+                  onPress={() => this.props.changeColor(blue)}
                 />
                 <TouchableOpacity
                   style={(themeColor === yellow)
-                          ? [styles.themeButton, {backgroundColor: yellow, borderWidth: 2}]
+                          ? [styles.themeButton, {backgroundColor: yellow,
+                              shadowColor: '#000', shadowRadius: 3, shadowOpacity: 0.6,
+                              shadowOffset: {
+                                width: 1,
+                                height: 1
+                              }}]
                           : [styles.themeButton, {backgroundColor: yellow}]}
                   onPress={() => this.props.changeColor(yellow)}
                 />
                 <TouchableOpacity
                   style={(themeColor === black)
-                          ? [styles.themeButton, {backgroundColor: black, borderWidth: 2}]
+                          ? [styles.themeButton, {backgroundColor: black,
+                              shadowColor: '#000', shadowRadius: 3, shadowOpacity: 0.6,
+                              shadowOffset: {
+                                width: 1,
+                                height: 1
+                              }}]
                           : [styles.themeButton, {backgroundColor: black}]}
                   onPress={() => this.props.changeColor(black)}
                 />
@@ -747,6 +1177,10 @@ class Settings extends React.Component {
 
           </Animated.ScrollView>
         </Animated.View>
+      </Animated.View>
+
+
+
       )
     } else {
       return (
@@ -758,6 +1192,13 @@ class Settings extends React.Component {
 
 
 const styles = StyleSheet.create({
+  backdrop: {
+    opacity: 0.5,
+    position: 'absolute',
+    height: ScreenHeight,
+    width: ScreenWidth,
+    backgroundColor: '#000',
+  },
   container: {
     position: 'absolute',
     top: 15,
@@ -787,11 +1228,10 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
     borderBottomLeftRadius: 0,
 
-
   },
   headingText: {
-    fontSize: 25,
-    color: white,
+    fontSize: FONT_SIZE_LARGEST,
+    color: '#fff',
   },
   scroll: {
     // padding: 15,xsitemLast
@@ -824,7 +1264,7 @@ const styles = StyleSheet.create({
   },
   resetButtonText: {
     color: red,
-    fontSize: 16,
+    fontSize: FONT_SIZE_LARGE,
     textAlign: 'center'
   },
   themeList: {
@@ -833,19 +1273,32 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   themeButton: {
-    width: 35,
+    width: '15%',
     height: 30,
     borderRadius: 5,
     paddingTop: 10,
     borderColor: '#444',
   },
-  checkbox: {
+  checkboxSubCat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+
+    marginLeft: ScreenWidth*0.04,
+    // backgroundColor: '#ddd',
+    borderLeftWidth: 1,
+    // borderRadius: 5,
+    // borderBottomWidth: 0.25,
+    // marginTop: 5,
+  },
+  checkboxMainCat: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: '#ddd',
+    // backgroundColor: '#e8e8e8',
     borderRadius: 5,
-    marginTop: 5,
+    // marginTop: 5,
   }
 
 })

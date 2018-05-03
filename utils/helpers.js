@@ -1,4 +1,4 @@
-import { red, white, teal, black, purple, yellow, lightRed, darkRed } from './colors'
+import { red, green, black, blue, orange } from './colors'
 
 
 export const fixDetectedLandmarks = (res) => {
@@ -140,7 +140,7 @@ export const CATEGORIES_TRAIN_STATIONS = '4bf58dd8d48988d129951735';
 export const DEFAULT_SETTINGS = {
   dectionLimit: 5,
   nearbyLimit: 10,
-  nearbyRadius: 1000,
+  nearbyRadius: 2000,
   categories: {
     [CATEGORIES_TOURISTIC_SITES]: true,
     [CATEGORIES_AMPHITHEATERS]: false,

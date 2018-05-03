@@ -22,7 +22,7 @@ import { connect } from 'react-redux'
 import DirectionMeter from './DirectionMeter'
 import Settings from './Settings'
 import {loadSettings, setHasVisitedFalse, setHasVisitedTrue, setSettings} from "../actions";
-import {purple, white, red, blue, black, yellow} from '../utils/colors'
+import { pinRed, pinBlue, pinGold } from '../utils/colors'
 import {getUserID, updateVisitedLocations} from "../utils/localStorageAPI";
 import NearbyLocationsList from "./NearbyLocationsList";
 import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
@@ -57,6 +57,7 @@ class NearbyLocations extends Component {
       distanceToDestinationMeters: null,
       settingVisible: false,
       mapViewPosition: new Animated.ValueXY(),
+      settingsButtonZIndex: new Animated.Value(0),
     };
 
     this.heading = null;
@@ -252,11 +253,24 @@ async componentDidMount() {
 
 
   closeSettings = () => {
-    this.setState({settingVisible: false})
+    const { settingsButtonZIndex } = this.state
+
+    this.setState({settingVisible: false}, () => {
+      Animated.timing(settingsButtonZIndex, {
+        toValue: 0,
+        duration: 1,
+      }).start()
+    })
   }
 
 
   openSettings = () => {
+    const { settingsButtonZIndex } = this.state
+
+    Animated.timing(settingsButtonZIndex, {
+      toValue: 16,
+      duration: 1,
+    }).start()
     this.setState({settingVisible: true})
   }
 
@@ -268,7 +282,7 @@ async componentDidMount() {
 
     const { navigation, settings, themeColor } = this.props;
 
-    const { hasCameraPermission, location, settingVisible, mapViewPosition, sponsoredLocation } = this.state;
+    const { hasCameraPermission, location, settingVisible, mapViewPosition, sponsoredLocation, settingsButtonZIndex } = this.state;
 
     let [translateX, translateY] = [mapViewPosition.x, mapViewPosition.y];
     let imageStyle = {transform: [{translateX}, {translateY}]};
@@ -400,6 +414,7 @@ async componentDidMount() {
                       id ={marker.key}
                       coordinate={marker.location}
                       title={marker.name}
+                      pinColor={pinRed}
                       onPress={e => {
                         this.setState({
                           destination: e.location,
@@ -415,7 +430,7 @@ async componentDidMount() {
                             id ={recommendedMarker.key}
                             coordinate={recommendedMarker.location}
                             title={recommendedMarker.name}
-                            pinColor={blue}
+                            pinColor={pinBlue}
                             onPress={e => {
                                 this.setState({
                                     destination: e.location,
@@ -431,7 +446,7 @@ async componentDidMount() {
                             id ={sponsoredLocation.key}
                             coordinate={sponsoredLocation.location}
                             title={sponsoredLocation.name}
-                            pinColor={blue}
+                            pinColor={pinGold}
                             onPress={e => {
                                 this.setState({
                                     destination: e.location,
@@ -448,42 +463,28 @@ async componentDidMount() {
 
               </Animated.View>
 
+              <Animated.View style={[styles.buttonSettingsContainer, {zIndex: settingsButtonZIndex}]}>
+                <TouchableOpacity
+                  onPress={settingVisible
+                    ? this.closeSettings
+                    : this.openSettings}
+                    >
+                    <View style={styles.buttonSettings}>
+                      <View style={styles.buttonLogoContainer}>
+                        <MaterialIcons
+                          name='menu'
+                          size={30}
+                          color={'#eee'}
 
-              <TouchableOpacity
-                onPress={settingVisible
-                  ? this.closeSettings
-                  : this.openSettings}
-                style={styles.buttonSettingsContainer}
-              >
-                <View style={styles.buttonSettings}>
-                  <View style={styles.buttonLogoContainer}>
-                    <MaterialIcons
-                      name='menu'
-                      size={30}
-                      color={'#eee'}
+                          />
+                      </View>
 
-                      />
-                  </View>
+                      <View style={[styles.buttonLine, {backgroundColor: themeColor}]} />
 
-                  <View style={[styles.buttonLine, {backgroundColor: themeColor}]} />
+                    </View>
+                  </TouchableOpacity>
+              </Animated.View>
 
-                </View>
-              </TouchableOpacity>
-
-{
-              // <TouchableOpacity
-              //   onPress={settingVisible
-              //     ? this.closeSettings
-              //     : this.openSettings}
-              //     style={[styles.buttonSettings, {backgroundColor: themeColor}]}
-              //     >
-              //     <Ionicons
-              //       name='ios-settings-outline'
-              //       size={50}
-              //       color={white}
-              //       />
-              //   </TouchableOpacity>
-}
                 <Settings
                   visible={settingVisible}
                   />
@@ -522,7 +523,7 @@ async componentDidMount() {
       // bottom: 25,
       width: '100%',
       height: 0.41 * ScreenHeight ,
-      zIndex: 15,
+      zIndex: 14,
       top: 0.43 * ScreenHeight ,
       shadowColor: '#000',
       shadowOffset: {
@@ -563,7 +564,7 @@ async componentDidMount() {
     buttonSettingsContainer: {
       position: 'absolute',
       top: 5,
-      zIndex: 11,
+      // zIndex: 11,
       right: 15,
     },
     buttonSettings: {
