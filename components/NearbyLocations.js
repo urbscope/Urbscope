@@ -104,7 +104,7 @@ class NearbyLocations extends Component {
     // console.log(settings);
 
     let location = await this._getLocationAsync();
-    console.log(location);
+    //console.log(location);
 
       let cats = [];
       for (categ in settings.categories){
@@ -122,7 +122,6 @@ class NearbyLocations extends Component {
 
     console.log(url);
     fetchLandmarksFromServer(url).then(res=>{
-      console.log(res);
       this.setState({markers: res[0], sponsoredLocation: res[1]});
     });
 
@@ -223,7 +222,7 @@ async componentDidMount() {
     try {
       let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?mode=walking&origin=${ startLoc }&destination=${ destinationLoc }&key=${GOOGLE_MAPS_APIKEY}`);
       let respJson = await resp.json();
-      console.log(respJson);
+      //console.log(respJson);
 
       if (!respJson.routes || !respJson.routes[0] || !respJson.routes[0].legs || !respJson.routes[0].overview_polyline || !respJson.routes[0].overview_polyline.points) {
         return;
@@ -451,23 +450,6 @@ async componentDidMount() {
                     strokeColor={themeColor}
                     />
 
-                  {Object.values(this.state.markers).map(marker => (
-                    <Marker
-                      key={marker.key}
-                      id ={marker.key}
-                      coordinate={marker.location}
-                      title={marker.name}
-                      pinColor={pinRed}
-                      onPress={e => {
-                        this.setState({
-                          destination: e.location,
-                            showArrow: true,
-                          selectedMarker: e.id,
-                        }, this.getTargetBearingAndDistance);
-                      }}
-                      />
-                  ))}
-
                     {recommendedMarker
                         ?(<Marker
                             key={recommendedMarker.key}
@@ -501,6 +483,23 @@ async componentDidMount() {
                             }}
                         />)
                         :null}
+
+                        {Object.values(this.state.markers).map(marker => (
+                          <Marker
+                            key={marker.key}
+                            id ={marker.key}
+                            coordinate={marker.location}
+                            title={marker.name}
+                            pinColor={pinRed}
+                            onPress={e => {
+                              this.setState({
+                                destination: e.location,
+                                  showArrow: true,
+                                selectedMarker: e.id,
+                              }, this.getTargetBearingAndDistance);
+                            }}
+                            />
+                        ))}
 
                     }
 

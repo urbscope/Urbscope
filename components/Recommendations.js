@@ -217,7 +217,7 @@ class Recommendations extends Component {
       const recommendedPlacesValues = recommendedPlaces?Object.values(recommendedPlaces):[];
       const visitedPlacesValues = visitedPlaces?Object.values(visitedPlaces):[];
 
-      console.log(recommendedPlaces);
+      //console.log(recommendedPlaces);
 
       let starFilled
       let starEmpty

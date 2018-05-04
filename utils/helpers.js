@@ -92,7 +92,7 @@ export const fetchLandmarksFromServer= (url)=>{
         .then(responseJson => {
             let sponsored = responseJson.sponsoredItem;
             let {latitude,longitude} =  sponsored;
-            sponsored['location'] = {latitude: latitude, longitude: longitude}
+            sponsored['location'] = {latitude: parseFloat(latitude) , longitude: parseFloat(longitude) }
             sponsored['key'] = sponsored['destinationID'];
 
             let landmarks = responseJson.landmarks;
@@ -103,7 +103,7 @@ export const fetchLandmarksFromServer= (url)=>{
                     name: obj.name.toString(),
                     category: obj.category,
                     picture: obj.picture,
-                    location: {latitude: coords.lat, longitude: coords.lng},
+                    location: {latitude: parseFloat(coords.lat), longitude: parseFloat(coords.lng) },
                     key: obj.destinationID.toString(),
                     address: obj.address,
                     description: obj.description,
@@ -112,7 +112,7 @@ export const fetchLandmarksFromServer= (url)=>{
             return [markers, sponsored];
         })
         .catch(error => {
-            // console.error(error);
+            console.error(error);
         });
 }
 
