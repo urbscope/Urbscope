@@ -94,7 +94,12 @@ class NearbyLocationsList extends React.Component {
                         </View>
                         <TouchableOpacity
                           key={sponsoredLocation.key}
-                          onPress={()=>this.props.handlePress(sponsoredLocation.key)}
+                          onPress={()=> {
+                            this.props.handlePress(sponsoredLocation.key)
+                            setTimeout(() => {
+                              Animated.spring(this.state.listViewPosition, { toValue: {x: 0, y: 0}, friction: 7, tension: 20}).start();
+                            }, 500)
+                          }}
                           >
                           <View style={[styles.listItem, {borderBottomWidth: 0}]} >
                             {sponsoredLocation.picture
@@ -126,7 +131,13 @@ class NearbyLocationsList extends React.Component {
                 return (
                 <TouchableOpacity
                   key={val.key}
-                  onPress={()=>this.props.handlePress(val.key)}
+                  onPress={()=> {
+                    this.props.handlePress(val.key)
+                    setTimeout(() => {
+                      Animated.spring(this.state.listViewPosition, { toValue: {x: 0, y: 0}, friction: 7, tension: 20}).start();
+                    }, 500)
+
+                  }}
                 >
                   <View
                     style={(index === locations.length - 1 )

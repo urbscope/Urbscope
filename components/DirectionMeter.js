@@ -185,7 +185,6 @@ class DirectionMeter extends Component {
 
           <Expo.GLView
             style={styles.gl}
-
             onContextCreate={this._onGLContextCreate}
             />
 

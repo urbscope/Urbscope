@@ -302,6 +302,7 @@ async componentDidMount() {
   }
 
   render() {
+    // console.log(this.state.arrowRotation);
 
     let recommendedMarker = this.props.navigation.state.params
         ? this.props.navigation.state.params.recommendedLocation
@@ -380,12 +381,19 @@ async componentDidMount() {
                                      sponsoredLocation = {this.state.sponsoredLocation}
                                      handlePress={(key) => {
                                           let loc;
-                                          if (this.state.markers[key])
+                                          if (this.state.markers[key]){
                                             loc = this.state.markers[key].location;
-                                          else if (this.state.sponsoredLocation['key'] === key)
+                                            setTimeout(() => {
+                                              Animated.spring(this.state.mapViewPosition, { toValue: {x: ScreenWidth-20, y: 0}, friction: 7, tension: 20}).start();
+                                            }, 1000)
+                                          } else if (this.state.sponsoredLocation['key'] === key){
                                             loc = this.state.sponsoredLocation.location;
-                                          else
+                                            setTimeout(() => {
+                                              Animated.spring(this.state.mapViewPosition, { toValue: {x: ScreenWidth-20, y: 0}, friction: 7, tension: 20}).start();
+                                            }, 1000)
+                                          } else {
                                             return;
+                                          }
                                           this.setState({
                                               destination: loc,
                                               selectedMarker: key
@@ -436,7 +444,7 @@ async componentDidMount() {
                     apikey={GOOGLE_MAPS_APIKEY}
                     strokeWidth={3}
                     mode="walking"
-                    strokeColor="hotpink"
+                    strokeColor={themeColor}
                     />
 
                   {Object.values(this.state.markers).map(marker => (
@@ -456,7 +464,7 @@ async componentDidMount() {
                   ))}
 
                     {recommendedMarker
-                        ?<Marker
+                        ?(<Marker
                             key={recommendedMarker.key}
                             id ={recommendedMarker.key}
                             coordinate={recommendedMarker.location}
@@ -468,11 +476,11 @@ async componentDidMount() {
                                     selectedMarker: e.id,
                                 }, this.getTargetBearingAndDistance);
                             }}
-                        />
+                        />)
                         :null}
 
                     {sponsoredLocation
-                        ?<Marker
+                        ?(<Marker
                             key={sponsoredLocation.key}
                             id ={sponsoredLocation.key}
                             coordinate={sponsoredLocation.location}
@@ -484,7 +492,7 @@ async componentDidMount() {
                                     selectedMarker: e.id,
                                 }, this.getTargetBearingAndDistance);
                             }}
-                        />
+                        />)
                         :null}
 
                     }

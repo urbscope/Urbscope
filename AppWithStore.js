@@ -95,6 +95,8 @@ class AppWithStore extends React.Component {
 
   componentDidMount () {
     // AsyncStorage.removeItem("settingsstorage");
+    // AsyncStorage.clear()
+
 
 
     // this.props.loadUserID((id) =>console.log(this.props.userID));
