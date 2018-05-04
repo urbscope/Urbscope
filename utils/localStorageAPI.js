@@ -12,7 +12,7 @@ export function getSettings ( ) {
   )
 }
 
-export function getVisitedLocations(){
+export async function getVisitedLocations(){
   // AsyncStorage.removeItem(VISITED_STORAGE_KEY);
   return AsyncStorage.getItem(VISITED_STORAGE_KEY).then(entry=> {
           return JSON.parse(entry)

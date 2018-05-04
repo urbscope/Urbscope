@@ -25,23 +25,23 @@ import Loading from './Loading'
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import {getUserID, getVisitedLocations} from "../utils/localStorageAPI";
 
-
+import {red, blue, green, yellow, black} from '../utils/colors';
 import { connect } from 'react-redux';
 import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
 import {Location, Permissions} from "expo";
 import {setHasVisitedFalse } from "../actions";
 
 const RatingImages = {
-  starFilledred: require('../assets/starFilled.png'),
-  starEmptyred: require('../assets/starEmpty.png'),
-  starFilledgreen: require('../assets/starFilled.png'),
-  starEmptygreen: require('../assets/starEmpty.png'),
-  starFilledblue: require('../assets/starFilled.png'),
-  starEmptyblue: require('../assets/starEmpty.png'),
-  starFilledyellow: require('../assets/starFilled.png'),
-  starEmptyyellow: require('../assets/starEmpty.png'),
-  starFilledblack: require('../assets/starFilled.png'),
-  starEmptyblack: require('../assets/starEmpty.png'),
+  starFilledred: require('../assets/starFilledred.png'),
+  starEmptyred: require('../assets/starEmptyred.png'),
+  starFilledgreen: require('../assets/starFilledgreen.png'),
+  starEmptygreen: require('../assets/starEmptygreen.png'),
+  starFilledblue: require('../assets/starFilledblue.png'),
+  starEmptyblue: require('../assets/starEmptyblue.png'),
+  starFilledyellow: require('../assets/starFilledyellow.png'),
+  starEmptyyellow: require('../assets/starEmptyyellow.png'),
+  starFilledblack: require('../assets/starFilledblack.png'),
+  starEmptyblack: require('../assets/starEmptyblack.png'),
 
 }
 
@@ -50,7 +50,7 @@ const ScreenWidth  = Dimensions.get('window').width
 
 const FONT_SIZE_SMALLER = ScreenHeight * 0.015
 const FONT_SIZE_SMALL   = ScreenHeight * 0.0175
-const FONT_SIZE_MEDIUM  = ScreenHeight * 0.02
+const FONT_SIZE_MEDIUM  = ScreenHeight * 0.021
 const FONT_SIZE_LARGE   = ScreenHeight * 0.025
 const FONT_SIZE_LARGER  = ScreenHeight * 0.027
 const FONT_SIZE_LARGEST = ScreenHeight * 0.034
@@ -58,23 +58,74 @@ const FONT_SIZE_LARGEST = ScreenHeight * 0.034
 class Recommendations extends Component {
 
   state = {
-    loading: true,
+    loading: false,
     userID: null,
     sponsoredLocation: null,
-    recommendedPlaces: {},
-    visitedPlaces: {},//[
+    recommendedPlaces: [], //[
+    //   {
+    //       name: 'Badshahi Mosque',
+    //       id: '2231',
+    //       picture: 'http://www.discoveryair.pk/wp-content/uploads/2017/06/Badshahi-Mosque-Front-1024x472.jpg',
+    //       category: 'Mosques',
+    //       address: 'The King-y mosque',
+    //       rating: 5.0
+    //   },
+    //   {
+    //       name: 'Baap',
+    //       id: '23sdx1',
+    //       picture: 'https://res.cloudinary.com/teepublic/image/private/s--32LFf8OQ--/t_Resized%20Artwork/c_fit,g_north_west,h_954,w_954/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_bbbbbb,e_outline:3:1000/c_mpad,g_center,h_1260,w_1260/b_rgb:eeeeee/c_limit,f_jpg,h_630,q_90,w_630/v1489962884/production/designs/1335911_1.jpg',
+    //       category: 'bharwi',
+    //       address: 'The best baap: Daddy',
+    //       rating: 0.9
+    //   },
+    //   {
+    //       name: 'Badshahi Mosque',
+    //       id: '2231',
+    //       picture: 'http://www.discoveryair.pk/wp-content/uploads/2017/06/Badshahi-Mosque-Front-1024x472.jpg',
+    //       address: 'The King-y mosque',
+    //       category: 'Historic',
+    //       rating: 5.0
+    //   },
+    //   {
+    //       name: 'Baap',
+    //       id: '23sdx1',
+    //       picture: 'https://res.cloudinary.com/teepublic/image/private/s--32LFf8OQ--/t_Resized%20Artwork/c_fit,g_north_west,h_954,w_954/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_bbbbbb,e_outline:3:1000/c_mpad,g_center,h_1260,w_1260/b_rgb:eeeeee/c_limit,f_jpg,h_630,q_90,w_630/v1489962884/production/designs/1335911_1.jpg',
+    //       category: 'Concerts',
+    //       address: 'The best baap: Daddy',
+    //       rating: 0.9
+    //   },
+    //   {
+    //       name: 'Badshahi Mosque',
+    //       id: '2231',
+    //       picture: 'http://www.discoveryair.pk/wp-content/uploads/2017/06/Badshahi-Mosque-Front-1024x472.jpg',
+    //       category: 'Religious',
+    //       address: 'The King-y mosque',
+    //       rating: 5.0
+    //   },
+    //   {
+    //       name: 'Baap',
+    //       id: '23sdx1',
+    //       picture: 'https://res.cloudinary.com/teepublic/image/private/s--32LFf8OQ--/t_Resized%20Artwork/c_fit,g_north_west,h_954,w_954/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_bbbbbb,e_outline:3:1000/c_mpad,g_center,h_1260,w_1260/b_rgb:eeeeee/c_limit,f_jpg,h_630,q_90,w_630/v1489962884/production/designs/1335911_1.jpg',
+    //       address: 'The best baap: Daddy',
+    //       category: 'bharwi',
+    //       rating: 0.9
+    //   },
+    // ],
+    visitedPlaces: [] //[
       //     {
       //         name: 'Badshahi Mosque',
       //         id: '2231',
       //         picture: 'http://www.discoveryair.pk/wp-content/uploads/2017/06/Badshahi-Mosque-Front-1024x472.jpg',
-      //         description: 'The King-y mosque',
+      //         address: 'The King-y mosque',
+      //         category: 'Coffee and Stuff',
       //         rating: 5.0
       //     },
       //     {
       //         name: 'Baap',
       //         id: '23sdx1',
       //         picture: 'https://res.cloudinary.com/teepublic/image/private/s--32LFf8OQ--/t_Resized%20Artwork/c_fit,g_north_west,h_954,w_954/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_ffffff,e_outline:35/co_ffffff,e_outline:inner_fill:35/co_bbbbbb,e_outline:3:1000/c_mpad,g_center,h_1260,w_1260/b_rgb:eeeeee/c_limit,f_jpg,h_630,q_90,w_630/v1489962884/production/designs/1335911_1.jpg',
-      //         description: 'The best baap: Daddy',
+      //         address: 'The best baap: Daddy',
+      //         category: 'bharwi',
       //         rating: 0.9
       //     },
       // ]
@@ -111,32 +162,39 @@ class Recommendations extends Component {
       LayoutAnimation.linear();
       console.log("Recommendations:componentDidMount");
       let userID = await getUserID();
-      let prom1 = this._getLocationAsync().then((location)=>{
+
+      // THIS WAITS FOR THE VISITED PLACES
+      let visitedPlaces = await getVisitedLocations()
+      console.log('visited', visitedPlaces);
+
+
+      this._getLocationAsync().then((location) => {
         let url = "https://urbserver.herokuapp.com/recommend/"
         + userID
         + "?inLL=" + formatLocation(location, false);
         console.log(url);
-        fetchLandmarksFromServer(url).then((res)=>{
-          this.setState({recommendedPlaces: res[0], sponsoredLocation: res[1]});
+        fetchLandmarksFromServer(url).then( (res) => {
+          // THIS IS WHERE EVERYTHING IS SET IN THE STATE AT ONCE
+          this.setState({
+            recommendedPlaces: res[0],
+            sponsoredLocation: res[1],
+            loading: false,
+            visitedPlaces, // COMMENTED THIS FOR THE MOMENT.
+            userID,
+          });
         })
       });
 
-      let prom2 =  this.loadVisitedLocations();
-      await Promise.all([prom1,prom2]);
-
-      this.setState({
-        loading: false,
-        userID: userID,
-      });
     }
 
-    loadVisitedLocations = ()=>{
-      getVisitedLocations().then((visited)=>{
-        console.log("visited places", visited);
-        this.setState({visitedPlaces:visited});
-      })
+    // loadVisitedLocations = ()=>{
 
-    };
+      // getVisitedLocations().then((visited)=>{
+      //   console.log("visited places", visited);
+      //   this.setState({visitedPlaces:visited});
+      // })
+
+    // };
 
     //THIS IS COPIED FROM NEARBY LOCATIONS. CONSIDER COMBINING
     _getLocationAsync = async () => {
@@ -158,6 +216,40 @@ class Recommendations extends Component {
       const { settingVisible, loading, visitedPlaces, recommendedPlaces } = this.state;
       const recommendedPlacesValues = recommendedPlaces?Object.values(recommendedPlaces):[];
       const visitedPlacesValues = visitedPlaces?Object.values(visitedPlaces):[];
+
+      console.log(recommendedPlaces);
+
+      let starFilled
+      let starEmpty
+
+      switch (themeColor) {
+        case red:
+          starFilled = RatingImages.starFilledred
+          starEmpty = RatingImages.starEmptyred
+          break;
+
+        case green:
+          starFilled = RatingImages.starFilledgreen
+          starEmpty = RatingImages.starEmptygreen
+          break;
+
+        case blue:
+          starFilled = RatingImages.starFilledblue
+          starEmpty = RatingImages.starEmptyblue
+          break;
+
+        case yellow:
+          starFilled = RatingImages.starFilledyellow
+          starEmpty = RatingImages.starEmptyyellow
+          break;
+
+        case black:
+          starFilled = RatingImages.starFilledblack
+          starEmpty = RatingImages.starEmptyblack
+          break;
+
+        default:
+      }
 
 
       if (loading) {
@@ -185,8 +277,8 @@ class Recommendations extends Component {
                         Visited Placed
                       </Text>
                     </View>
-                    <View style={{padding: 5, justifyContent: 'center', alignItems: 'center'}}>
-                      <Text style={{color: '#eee', fontSize: FONT_SIZE_SMALL, fontWeight: '200'}}>
+                    <View style={[styles.header, {backgroundColor: themeColor}]}>
+                      <Text style={{color: '#eee', fontSize: FONT_SIZE_SMALLER, fontWeight: '200'}}>
                         For better recommendations, rate the palces you've visited.
                       </Text>
                     </View>
@@ -196,22 +288,29 @@ class Recommendations extends Component {
                       >
                       {
                         visitedPlacesValues.map((item, index) => (
-                          <View key = {item.key} style = {[styles.visitedPlacesListItem, {borderColor: themeColor}]}>
+                          <View key={item.key} style={(index === visitedPlacesValues.length - 1)
+                              ? [styles.visitedPlacesListItem, {borderBottomWidth: 0}]
+                              : [styles.visitedPlacesListItem, {borderColor: '#aaa'}]}
+                            >
                             <Image
                               source={{uri: item.picture}}
-                              style={[styles.visitedPlacesListItemImage, {borderColor: themeColor}]}
-                              />
-                            <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'space-around'}}>
-                              <Text style={[styles.visitedPlacesListItemHeading, {color: themeColor}]}>{item.name}</Text>
-                              <Text style={styles.visitedPlacesListItemDescription}>{item.category}</Text>
+                              style={styles.visitedPlacesListItemImage}
+                            />
+                            <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'space-around', paddingLeft: 10, paddingVertical: 5,}}>
+                              <Text style={{fontSize: FONT_SIZE_MEDIUM, fontWeight: '200'}}>
+                                {item.name}
+                              </Text>
+                              <Text style={{fontSize: FONT_SIZE_SMALL, color: themeColor, fontWeight: '200'}}>
+                                {item.category}
+                              </Text>
 
                               <View style={styles.visitedPlacesListItemRating}>
                                 <Rating
                                   onChange={rating => {
                                     this.ratingEntered(rating, index)
                                   }}
-                                  selectedStar={RatingImages.starFilled}
-                                  unselectedStar={RatingImages.starEmpty}
+                                  selectedStar={starFilled}
+                                  unselectedStar={starEmpty}
                                   initial={item.rating}
                                   editable={true}
                                   config={{
@@ -221,9 +320,9 @@ class Recommendations extends Component {
                                   stagger={50}
                                   maxScale={1.4}
                                   starStyle={{
-                                    width: 25,
-                                    height: 25,
-                                    opacity: 0.8
+                                    width: ScreenHeight * 0.03,
+                                    height: ScreenHeight * 0.03,
+                                    opacity: 0.7,
                                   }}
                                   />
                               </View>
@@ -239,7 +338,7 @@ class Recommendations extends Component {
 
 
 
-              <View style={{padding: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: themeColor}}>
+              <View style={[styles.header, {backgroundColor: themeColor}]}>
                 <Text style={{color: '#eee', fontSize: FONT_SIZE_LARGEST, fontWeight: '200'}}>
                   Recommendations
                 </Text>
@@ -250,22 +349,29 @@ class Recommendations extends Component {
                 >
                 {
                   recommendedPlacesValues.map((item, index) => (
-                    <View key = {item.key} style = {[styles.recommendedPlacesListItem, {borderColor: themeColor}]}>
+                    <View key={item.key} style={(index === recommendedPlacesValues.length - 1)
+                        ? [styles.recommendedPlacesListItem, {borderBottomWidth: 0}]
+                        : [styles.recommendedPlacesListItem, {borderColor: '#aaa'}]}
+                      >
                       <Image
                         source={{uri: item.picture}}
-                        style={[styles.visitedPlacesListItemImage, {borderColor: themeColor}]}
+                        style={styles.recommendedPlacesListItemImage}
                         />
-                      <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'space-around'}}>
-                        <Text style={[styles.recommendedPlacesListItemHeading, {color: themeColor}]}>{item.name}</Text>
-                        <Text style={styles.recommendedPlacesListItemDescription}>{item.category}</Text>
+                      <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'space-around', paddingLeft: 10, paddingVertical: 5,}}>
+                        <Text style={{fontSize: FONT_SIZE_MEDIUM, fontWeight: '200'}}>
+                          {item.name}
+                        </Text>
+                        <Text style={{fontSize: FONT_SIZE_SMALL, color: themeColor, fontWeight: '200'}}>
+                          {item.category}
+                        </Text>
 
                         <View style={styles.recommendedPlacesListItemRating}>
                           <Rating
                             onChange={rating => {
                               this.ratingEntered(rating, index)
                             }}
-                            selectedStar={RatingImages.starFilled}
-                            unselectedStar={RatingImages.starEmpty}
+                            selectedStar={starFilled}
+                            unselectedStar={starEmpty}
                             initial={0}
                             editable={false}
                             config={{
@@ -275,9 +381,9 @@ class Recommendations extends Component {
                             stagger={50}
                             maxScale={1.4}
                             starStyle={{
-                              width: 25,
-                              height: 25,
-                              opacity: 0.8
+                              width: ScreenHeight * 0.03,
+                              height: ScreenHeight * 0.03,
+                              opacity: 0.7
                             }}
                             />
                         </View>
@@ -298,7 +404,7 @@ class Recommendations extends Component {
                         >
                         <MaterialIcons
                           name='navigation'
-                          size={25}
+                          size={ScreenHeight * 0.028}
                           color={'#eee'}
                           />
                       </TouchableOpacity>
@@ -324,94 +430,43 @@ class Recommendations extends Component {
     container: {
       flex: 1,
     },
-    buttonSettings: {
-      position: 'absolute',
-      zIndex: 11,
-      top: 15,
-      right: 15,
-      height: 60,
-      width: 58,
-      borderRadius: 20,
+    header: {
+      padding: 5,
       justifyContent: 'center',
       alignItems: 'center',
-      paddingTop: 4,
-    },
-    visitedPlacesList: {
-      borderTopWidth: 0.5,
-      backgroundColor: '#eee'
+      shadowColor: '#000',
+      shadowOpacity: 0.2,
+      shadowRadius: 0.5,
+      shadowOffset: {
+        width: 0,
+        height: 1,
+      }
     },
     visitedPlacesListItem: {
       flexDirection: 'row',
-      alignItems: 'center',
       borderBottomWidth: 0.5,
-      height:  100,
-
-    },
-    visitedPlacesListItemHeading: {
-      fontSize: 20,
-      fontWeight: '600',
-      paddingLeft: 10,
-      paddingTop: 5,
-    },
-    visitedPlacesListItemDescription: {
-      fontSize: 12,
-      fontWeight: '200',
-      // alignSelf: 'center',
-      paddingLeft: 10,
-      paddingBottom: 10,
-    },
-    visitedPlacesListItemRating: {
-
-      paddingLeft: 10,
-      paddingBottom: 10,
+      height: ScreenHeight * 0.11,
     },
     visitedPlacesListItemImage: {
-      height: 99,
-      width: 100,
-      borderRightWidth: 0.5,
-      padding: 5,
-    },
-    recommendedPlacesList: {
-      borderTopWidth: 0.5,
+      width: ScreenHeight * 0.11,
     },
     recommendedPlacesListItem: {
       flexDirection: 'row',
       borderBottomWidth: 0.5,
-      height:  100,
-    },
-    recommendedPlacesListItemHeading: {
-      fontSize: 20,
-      fontWeight: '600',
-      paddingLeft: 10,
-      paddingTop: 5,
-    },
-    recommendedPlacesListItemDescription: {
-      fontSize: 12,
-      fontWeight: '200',
-      // alignSelf: 'center',
-      paddingLeft: 10,
-      paddingBottom: 10,
-    },
-    recommendedPlacesListItemRating: {
-
-      paddingLeft: 10,
-      paddingBottom: 10,
+      height: ScreenHeight * 0.11,
     },
     recommendedPlacesListItemImage: {
-      height: '100%',
-      width: 100,
-      borderRightWidth: 0.5,
+      width: ScreenHeight * 0.11,
+
     },
     navigateButton: {
-      height: 45,
-      width: 35,
-      // paddingRight: 2,
+      height: ScreenHeight * 0.05,
+      width: ScreenHeight * 0.043,
       justifyContent: 'center',
       alignItems: 'center',
       alignSelf: 'center',
-      borderTopLeftRadius: 30,
-      borderBottomLeftRadius: 30,
-
+      borderTopLeftRadius: ScreenHeight * 0.025,
+      borderBottomLeftRadius: ScreenHeight * 0.025,
     }
   })
 

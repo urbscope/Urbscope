@@ -18,6 +18,11 @@ class TabBarExploration extends React.Component{
         g: parseInt(result[2], 16),
         b: parseInt(result[3], 16)
     } : null;
+    // return {
+    //     r: parseInt(result[1], 16),
+    //     g: parseInt(result[2], 16),
+    //     b: parseInt(result[3], 16)
+    // }
   }
 
   render() {
@@ -27,8 +32,14 @@ class TabBarExploration extends React.Component{
     const { routes } = this.props.navigationState;
     let navState = this.props.navigationState;
 
+    let themeColorRGBA
     let color = this.hexToRgb(themeColor);
-    let themeColorRGBA = `rgba(${color.r},${color.g},${color.b},0.5)`
+
+    if (color) {
+      themeColorRGBA = `rgba(${color.r},${color.g},${color.b},0.5)`
+    } else {
+      themeColorRGBA = `rgba(0,0,0,0.5)`
+    }
 
     const barWidth = ScreenWidth;
     const tabWidth = barWidth / routes.length;
