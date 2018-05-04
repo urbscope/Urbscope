@@ -146,6 +146,7 @@ async componentDidMount() {
       let recommendedLocation = this.props.navigation.state.params.recommendedLocation;
       this.setState({
           destination: recommendedLocation.location,
+          showArrow: true,
           selectedMarker: recommendedLocation.key,
       }, this.getTargetBearingAndDistance);
       setTimeout(() => {
@@ -374,7 +375,7 @@ async componentDidMount() {
 
               <DirectionMeter
                   bearing={this.state.arrowRotation}
-                  visible={this.state.arrowRotation!=null}
+                  visible={this.state.showArrow}
               />
 
 
@@ -397,6 +398,7 @@ async componentDidMount() {
                                           }
                                           this.setState({
                                               destination: loc,
+                                              showArrow: true,
                                               selectedMarker: key
                                           }, this.getTargetBearingAndDistance);
                                      }}
@@ -422,6 +424,7 @@ async componentDidMount() {
                   onPress={() => {
                     this.targetBearing = null;
                     this.setState({
+                        showArrow: false,
                         destination: null,
                         selectedMarker: null,
                         distanceToDestinationMeters: null,
@@ -458,6 +461,7 @@ async componentDidMount() {
                       onPress={e => {
                         this.setState({
                           destination: e.location,
+                            showArrow: true,
                           selectedMarker: e.id,
                         }, this.getTargetBearingAndDistance);
                       }}
@@ -474,6 +478,7 @@ async componentDidMount() {
                             onPress={e => {
                                 this.setState({
                                     destination: e.location,
+                                    showArrow: true,
                                     selectedMarker: e.id,
                                 }, this.getTargetBearingAndDistance);
                             }}
@@ -490,6 +495,7 @@ async componentDidMount() {
                             onPress={e => {
                                 this.setState({
                                     destination: e.location,
+                                    showArrow: true,
                                     selectedMarker: e.id,
                                 }, this.getTargetBearingAndDistance);
                             }}
