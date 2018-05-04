@@ -104,7 +104,7 @@ class NearbyLocations extends Component {
     // console.log(settings);
 
     let location = await this._getLocationAsync();
-    // console.log(location);
+    console.log(location);
 
       let cats = [];
       for (categ in settings.categories){
@@ -134,11 +134,13 @@ async componentDidMount() {
     this.setState({hasCameraPermission: status === 'granted'});
     this._watchHeadingAsync();
     this._watchTargetBearingAsync();
-    let location = await this._getLocationAsync();
+    this._watchLocationAsync();
     if (this.props.settings) {
         this.fetchMarkers(this.props.settings);
     }
 
+
+    let location = await this._getLocationAsync();
     if (this.props.navigation.state.params) {
       let recommendedLocation = this.props.navigation.state.params.recommendedLocation;
       this.setState({
@@ -151,8 +153,22 @@ async componentDidMount() {
     }
   }
 
+    _watchLocationAsync = async ()=>{
+        this.locationWatch = await Location.watchPositionAsync({
+            enableHighAccuracy: true,
+            timeInterval: 3000,
+            distanceInterval: 0.5,
+        }, (location) => {
+            try {
+                this.setState({location})
+            } catch (e) {
+                console.error("No setState", e);
+            }
+        })
+    };
 
-  _getLocationAsync = async () => {
+
+    _getLocationAsync = async () => {
     let {status} = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
       this.setState({
@@ -188,6 +204,7 @@ async componentDidMount() {
 
   componentWillUnmount() {
     this.headingWatch.remove();
+    this.locationWatch.remove();
     clearInterval(this.targetBearingWatchId);
 
   }
@@ -202,14 +219,16 @@ async componentDidMount() {
     }
 
     try {
-      let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?mode=walking&origin=${ startLoc }&destination=${ destinationLoc }`);
+      let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?mode=walking&origin=${ startLoc }&destination=${ destinationLoc }&key=${GOOGLE_MAPS_APIKEY}`);
       let respJson = await resp.json();
+      //console.log(respJson);
 
       if (!respJson.routes || !respJson.routes[0] || !respJson.routes[0].legs || !respJson.routes[0].overview_polyline || !respJson.routes[0].overview_polyline.points) {
-        // console.log(respJson);
-        // console.log("respjson polylines null.returning");
         return;
       }
+
+      let routeStartPoint = {latitude: respJson.routes[0].legs[0].start_location.lat, longitude:respJson.routes[0].legs[0].start_location.lng} ;
+      let distanceToStartPoint =  geolib.getDistance(formatLocation(this.state.location), routeStartPoint, 1, 2 );
 
       let distanceToDestination = respJson.routes[0].legs[0].distance;
         this.setState({
@@ -219,10 +238,16 @@ async componentDidMount() {
 
       respJson = respJson.routes[0].overview_polyline.points;
       let points = polyline.decode(respJson);
+      //console.log(points);
       if (!points || !points[1])
       return;
 
-      let pointCoords = {latitude: points[0][0], longitude: points[0][1]};
+      //console.log("distance is ", distanceToStartPoint, (distanceToStartPoint< 7)?"navigating to next point":"navigating to start point");
+
+      let pointCoords = (distanceToStartPoint< 7)
+          ?{latitude: points[1][0], longitude: points[1][1]}  //navigate to next point
+          :{latitude: points[0][0], longitude: points[0][1]}; //navigate to start point
+
       this.targetBearing = geolib.getRhumbLineBearing(formatLocation(this.state.location), pointCoords);
 
       if (distanceToDestination.value <= 100)
@@ -249,8 +274,9 @@ async componentDidMount() {
     this.targetBearingWatchId = setInterval(async () => {
       // console.log("targetBearingWatchId firing now")
       this.getTargetBearingAndDistance();
-    }, 15000);
+    }, 3000);
   };
+
 
 
   closeSettings = () => {
