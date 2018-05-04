@@ -6,13 +6,17 @@ import { View,
          TouchableHighlight,
          TouchableWithoutFeedback,
          Alert,
+         Platform,
          Animated,
          LayoutAnimation,
          Dimensions,
          ActivityIndicator,
+         StatusBar,
          SafeAreaView } from 'react-native'
 import { Constants, Location, Camera, Permissions } from 'expo'
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+
+import { connect } from 'react-redux'
 
 import vision from "react-cloud-vision-api"
 
@@ -21,7 +25,7 @@ import LandmarkDetailsModal from './LandmarkDetailsModal'
 import Loading from './Loading'
 import Settings from './Settings'
 
-import { purple, white, red } from '../utils/colors'
+// import { purple, white, red } from '../utils/colors'
 import { fixDetectedLandmarks, fixLandmarkDetails } from '../utils/helpers'
 import { GOOGLE_API } from '../utils/keysAPI'
 
@@ -32,12 +36,14 @@ vision.init({ auth: GOOGLE_API })
 const ScreenHeight = Dimensions.get('window').height
 const ScreenWidth  = Dimensions.get('window').width
 
+const FONT_SIZE_LARGE = ScreenHeight * 0.05
 
 // ===========================================================================
 //  BEGINNING OF THE CLASS
 // ===========================================================================
 class DetectionMode extends Component {
   state = {
+    shouldRenderModalButton: false,
     hasCameraPermission: null,
     errorMessage: null,
     loading: false,
@@ -46,29 +52,32 @@ class DetectionMode extends Component {
     modalVisible: false,
     settingVisible: false,
     modalButtonAnimations: {
+      zIndex: new Animated.Value(-5),
       diameter: new Animated.Value(360),
       height: 200,
       radius: new Animated.Value(180),
       top: new Animated.Value( ScreenHeight - (ScreenHeight/2) - 200),
       opacity: new Animated.Value(0),
       fontOpacity: new Animated.Value(0),
-      fontSize: new Animated.Value(1),
+      fontScale: new Animated.Value(0),
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     // console.log(LayoutAnimation);
     LayoutAnimation.linear();
     this.setState({})
+
     // this.animateModalButtonAppear()
+      const { status } = await Permissions.askAsync(Permissions.CAMERA);
+      this.setState({ hasCameraPermission: status === 'granted' });
   }
 
   // ========================================================================
   //  ASK FOR CAMERA PERMISSIONS
   // ========================================================================
   async componentWillMount() {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA);
-    this.setState({ hasCameraPermission: status === 'granted' });
+
   }
 
   // ========================================================================
@@ -96,7 +105,7 @@ class DetectionMode extends Component {
         base64: photo.base64,
       }),
       features: [
-        new vision.Feature('LANDMARK_DETECTION', 5),
+        new vision.Feature('LANDMARK_DETECTION', this.props.settings.detectionLimit),
       ]
     })
 
@@ -154,91 +163,104 @@ class DetectionMode extends Component {
   // ========================================================================
 
   animateModalButtonAppear = () => {
-    const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
-
-    Animated.stagger(200, [
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 400,
-        }),
-        Animated.timing(diameter, {
-          toValue: 86,
-          duration: 600,
-        }),
-        Animated.timing(radius, {
-          toValue: 43,
-          duration: 600,
-        }),
-        Animated.timing(fontSize, {
-          toValue: 40,
-          duration: 600,
-        }),
-      ]),
-      Animated.spring(top, {
-        toValue: (50),
-        friction: 4,
-        tension: 50,
-      }),
-      Animated.sequence([
-        Animated.timing(fontOpacity, {
-          toValue: 1,
-          duration: 600,
-        }),
-        Animated.timing(fontSize, {
-          toValue: 80,
-          duration: 800,
-        }),
-        Animated.timing(fontSize, {
-          toValue: 40,
-          duration: 400,
-        }),
-      ])
-    ]).start();
+    const { diameter, radius, top, opacity, fontScale, fontOpacity, zIndex } = this.state.modalButtonAnimations
+      this.setState({shouldRenderModalButton:true},()=>{
+          Animated.sequence([
+              Animated.timing(zIndex, {
+                  toValue: 9,
+                  duration: 1,
+              }),
+              Animated.stagger(200, [
+                  Animated.parallel([
+                      Animated.timing(opacity, {
+                          toValue: 1,
+                          duration: 400,
+                      }),
+                      Animated.timing(diameter, {
+                          toValue: ScreenHeight * 0.11,
+                          duration: 600,
+                      }),
+                      Animated.timing(radius, {
+                          toValue: 43,
+                          duration: 600,
+                      }),
+                      Animated.timing(fontScale, {
+                          toValue: 1,
+                          duration: 600,
+                      }),
+                  ]),
+                  Animated.spring(top, {
+                      toValue: ScreenHeight * 0.08,
+                      friction: 4,
+                      tension: 50,
+                  }),
+                  Animated.sequence([
+                      Animated.timing(fontOpacity, {
+                          toValue: 1,
+                          duration: 600,
+                      }),
+                      Animated.timing(fontScale, {
+                          toValue: 1.8,
+                          duration: 800,
+                      }),
+                      Animated.timing(fontScale, {
+                          toValue: 1,
+                          duration: 400,
+                      }),
+                  ])
+              ])
+          ]).start();
+      })
 
   }
 
   animateModalButtonDisappear = () => {
-    const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
+    const { diameter, radius, top, opacity, fontScale, fontOpacity, zIndex } = this.state.modalButtonAnimations
 
-    Animated.stagger(500, [
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 200,
-        }),
-        Animated.timing(diameter, {
-          toValue: 0,
-          duration: 500,
-        }),
-        Animated.timing(radius, {
-          toValue: 0,
-          duration: 500,
-        }),
-        Animated.timing(fontSize, {
-          toValue: 0,
-          duration: 500,
-        }),
-        Animated.timing(fontOpacity, {
-          toValue: 0,
-          duration: 500,
-        }),
-      ]),
-      Animated.parallel([
-        Animated.timing(diameter, {
-          toValue: 360,
-          duration: 1,
-        }),
-        Animated.timing(radius, {
-          toValue: 180,
-          duration: 1,
-        }),
-        Animated.timing(top, {
-          toValue: ScreenHeight - (ScreenHeight/2) - 200,
-          duration: 1,
-        }),
-      ])
-    ]).start();
+      Animated.sequence([
+          Animated.stagger(500, [
+              Animated.parallel([
+                  Animated.timing(opacity, {
+                      toValue: 0,
+                      duration: 200,
+                  }),
+                  Animated.timing(diameter, {
+                      toValue: 0,
+                      duration: 500,
+                  }),
+                  Animated.timing(radius, {
+                      toValue: 0,
+                      duration: 500,
+                  }),
+                  Animated.timing(fontScale, {
+                      toValue: 0,
+                      duration: 500,
+                  }),
+                  Animated.timing(fontOpacity, {
+                      toValue: 0,
+                      duration: 500,
+                  }),
+              ]),
+              Animated.parallel([
+                  Animated.timing(diameter, {
+                      toValue: 360,
+                      duration: 1,
+                  }),
+                  Animated.timing(radius, {
+                      toValue: 180,
+                      duration: 1,
+                  }),
+                  Animated.timing(top, {
+                      toValue: ScreenHeight - (ScreenHeight/2) - 200,
+                      duration: 1,
+                  }),
+              ])
+          ]),
+          Animated.timing(zIndex,{
+            toValue: -5,
+            duration: 1
+          })
+    ]).start(()=>this.setState({shouldRenderModalButton:false}));
   }
 
   // ========================================================================
@@ -247,19 +269,25 @@ class DetectionMode extends Component {
 
   render(){
 
-    const { navigation } = this.props
+    const { navigation, themeColor } = this.props
 
     const { hasCameraPermission, locations, modalVisible, settingVisible } = this.state
 
-    const { diameter, radius, top, opacity, fontSize, fontOpacity } = this.state.modalButtonAnimations
+    const { diameter, radius, top, opacity, fontScale, fontOpacity , zIndex} = this.state.modalButtonAnimations
 
     if (hasCameraPermission === null) {
-     return <View />;
+     return <SafeAreaView style={{flex:1, backgroundColor: 'black'}}/>;
     } else if (hasCameraPermission === false) {
-      return <Text>No access to camera</Text>;
+      return (
+        <SafeAreaView style={{flex:1, backgroundColor: 'black'}}>
+          <StatusBar barStyle="light-content" translucent={true}/>
+          <Text>No access to camera</Text>
+        </SafeAreaView>
+      );
     } else {
       return (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: themeColor }}>
+          <StatusBar barStyle="light-content" translucent={true}/>
           <Camera
             style={styles.camera}
             ref={(ref) => { this.camera = ref }}
@@ -267,31 +295,38 @@ class DetectionMode extends Component {
           >
             {/*<TouchableWithoutFeedback onPress={this.closeModal}>
             */}
-              <View style={styles.container}>
+
+
+              <View style={{flex: 1, alignItems: 'center'}}
+              >
                 <Loading loading={this.state.loading} />
+                  { (this.state.shouldRenderModalButton)
+                      ? (<Animated.View
 
-                <Animated.View
-
-                  style={/*this.state.detected
-                          ?*/ [styles.modalButton, {
-                              width: diameter,
-                              height: diameter,
-                              borderRadius: radius,
-                              top,
-                              opacity,
-                            }]
+                          style={/*this.state.detected
+                              ?*/ [styles.modalButton, {
+                          width: diameter,
+                          height: diameter,
+                          zIndex,
+                          borderRadius: radius,
+                          top,
+                          opacity,
+                          backgroundColor: themeColor
+                      }]
                           /*: {}*/}
-                >
-                  <TouchableOpacity
-                    style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
-                    onPress={this.state.modalVisible ? this.closeModal : this.openModal}
-                  >
-                    <Animated.Text style={[styles.modalButtonText, { fontSize, opacity: fontOpacity }]}>
-                      {locations.length}
-                    </Animated.Text>
-                  </TouchableOpacity>
+                          >
+                          <TouchableOpacity
+                          style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
+                          onPress={this.state.modalVisible ? this.closeModal : this.openModal}
+                          >
+                          <Animated.Text style={[styles.modalButtonText, { transform: [{ scaleX: fontScale }, { scaleY: fontScale }] , opacity: fontOpacity }]}>
+                          {locations.length}
+                          </Animated.Text>
+                          </TouchableOpacity>
 
-                </Animated.View>
+                        </Animated.View>)
+                      : <View/>}
+
 
                 <LandmarkDetailsModal
                   visible={modalVisible}
@@ -309,12 +344,12 @@ class DetectionMode extends Component {
                   onPress={modalVisible
                             ? () => {}
                             : this.detectLandmark}
-                  style={styles.buttonDetect}
+                  style={[styles.buttonDetect, {backgroundColor: themeColor}]}
                 >
                   <View style={styles.buttonDetectView}>
-                    <Ionicons
-                      name='ios-compass-outline'
-                      size={80}
+                    <MaterialIcons
+                      name='camera'
+                      size={50}
                       style={styles.buttonDetectIcon}
                       />
                   </View>
@@ -322,36 +357,42 @@ class DetectionMode extends Component {
 
 
                 <ChangeModeSwitch
+                  replaceScreen={navigation.replace}
                   currentScreen={navigation.state.routeName}
                   changeScreen={navigation.navigate}
                   dispatch={navigation.dispatch}
-                  />
+                />
 
 
                 <TouchableOpacity
                   onPress={settingVisible
-                            ? this.closeSettings
-                            : this.openSettings}
-                    style={styles.buttonSettings}
-                  >
-                    <Ionicons
-                      name='ios-settings-outline'
-                      size={50}
-                      color={white}
-                    />
+                    ? this.closeSettings
+                    : this.openSettings}
+                  style={styles.buttonSettingsContainer}
+                >
+                  <View style={styles.buttonSettings}>
+                    <View style={styles.buttonLogoContainer}>
+                      <MaterialIcons
+                        name='menu'
+                        size={30}
+                        color={'#eee'}
+
+                        />
+                    </View>
+
+                    <View style={[styles.buttonLine, {backgroundColor: themeColor}]} />
+
+                  </View>
                 </TouchableOpacity>
 
-                {
 
-                }
+
                 <Settings
                   visible={settingVisible}
                 />
 
               </View>
 
-            {/*</TouchableWithoutFeedback>
-            */}
           </Camera>
         </View>
       )
@@ -359,7 +400,6 @@ class DetectionMode extends Component {
   }
 }
 
-export default DetectionMode
 
 const styles = StyleSheet.create({
   container: {
@@ -391,18 +431,20 @@ const styles = StyleSheet.create({
     height: 100,
     width: 100,
     borderRadius: 50,
-    borderColor: red,
-    borderWidth: 3,
+    borderColor: '#eee',
+    borderWidth: 1,
+    opacity: 0.5,
+
   },
   buttonDetectView: {
     flex: 1,
     borderRadius: 50,
-    backgroundColor: 'rgba(183, 24, 69, 0.2)',
+    // backgroundColor: 'rgba(183, 24, 69, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   buttonDetectIcon: {
-    color: red,
+    color: '#eee',
   },
   buttonText: {
     fontSize: 20,
@@ -433,32 +475,53 @@ const styles = StyleSheet.create({
     // width: this.state.modalButtonAnimations.height,
     // borderRadius: this.state.modalButtonAnimations.radius,
     borderWidth: 1,
-    borderColor: white,
+    borderColor: '#fff',
     // top: this.state.modalButtonAnimations.top,
-    zIndex: 9,
-    backgroundColor: red,
+    // backgroundColor: red,
   },
   modalButtonText: {
-    fontFamily: 'AppleSDGothicNeo-Thin',
-    // fontSize: 40,
+    // fontFamily: 'AppleSDGothicNeo-Thin',
+    fontWeight: '200',
+    fontSize: FONT_SIZE_LARGE,
     marginTop: 5,
-    color: white
+    color: '#fff'
   },
 
-  buttonSettings: {
+  buttonSettingsContainer: {
     position: 'absolute',
-    zIndex: 11,
-    top: 15,
+    top: ScreenHeight * 0.05 ,
+    zIndex: 16,
     right: 15,
+  },
+  buttonSettings: {
     height: 60,
-    width: 58,
-    borderRadius: 20,
-    backgroundColor: red,
+    width: 60,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'stretch',
+    // borderRadius: 20,
+    // borderWidth: 0.5,
+    marginTop: 10,
+  },
+  buttonLine: {
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    width: 10,
+  },
+  buttonLogoContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 4,
-  },
-  buttonSettingsIcon: {
-    color: red,
   }
 })
+
+
+
+mapStateToProps = (state) => {
+  return {
+    settings: state.settings,
+    themeColor: state.themeColor,
+  }
+}
+
+export default connect(mapStateToProps)(DetectionMode)
