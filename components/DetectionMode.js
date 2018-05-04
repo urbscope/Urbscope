@@ -6,10 +6,12 @@ import { View,
          TouchableHighlight,
          TouchableWithoutFeedback,
          Alert,
+         Platform,
          Animated,
          LayoutAnimation,
          Dimensions,
          ActivityIndicator,
+         StatusBar,
          SafeAreaView } from 'react-native'
 import { Constants, Location, Camera, Permissions } from 'expo'
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
@@ -33,6 +35,8 @@ vision.init({ auth: GOOGLE_API })
 // Get Screen Dimensions
 const ScreenHeight = Dimensions.get('window').height
 const ScreenWidth  = Dimensions.get('window').width
+
+const FONT_SIZE_LARGE = ScreenHeight * 0.05
 
 // ===========================================================================
 //  BEGINNING OF THE CLASS
@@ -101,7 +105,7 @@ class DetectionMode extends Component {
         base64: photo.base64,
       }),
       features: [
-        new vision.Feature('LANDMARK_DETECTION', 5),
+        new vision.Feature('LANDMARK_DETECTION', this.props.settings.detectionLimit),
       ]
     })
 
@@ -173,7 +177,7 @@ class DetectionMode extends Component {
                           duration: 400,
                       }),
                       Animated.timing(diameter, {
-                          toValue: 86,
+                          toValue: ScreenHeight * 0.11,
                           duration: 600,
                       }),
                       Animated.timing(radius, {
@@ -186,7 +190,7 @@ class DetectionMode extends Component {
                       }),
                   ]),
                   Animated.spring(top, {
-                      toValue: (50),
+                      toValue: ScreenHeight * 0.08,
                       friction: 4,
                       tension: 50,
                   }),
@@ -276,12 +280,14 @@ class DetectionMode extends Component {
     } else if (hasCameraPermission === false) {
       return (
         <SafeAreaView style={{flex:1, backgroundColor: 'black'}}>
+          <StatusBar barStyle="light-content" translucent={true}/>
           <Text>No access to camera</Text>
         </SafeAreaView>
       );
     } else {
       return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: themeColor }}>
+          <StatusBar barStyle="light-content" translucent={true}/>
           <Camera
             style={styles.camera}
             ref={(ref) => { this.camera = ref }}
@@ -289,7 +295,10 @@ class DetectionMode extends Component {
           >
             {/*<TouchableWithoutFeedback onPress={this.closeModal}>
             */}
-              <View style={styles.container}>
+
+
+              <View style={{flex: 1, alignItems: 'center'}}
+              >
                 <Loading loading={this.state.loading} />
                   { (this.state.shouldRenderModalButton)
                       ? (<Animated.View
@@ -385,7 +394,7 @@ class DetectionMode extends Component {
               </View>
 
           </Camera>
-        </SafeAreaView>
+        </View>
       )
     }
   }
@@ -425,6 +434,7 @@ const styles = StyleSheet.create({
     borderColor: '#eee',
     borderWidth: 1,
     opacity: 0.5,
+
   },
   buttonDetectView: {
     flex: 1,
@@ -472,14 +482,14 @@ const styles = StyleSheet.create({
   modalButtonText: {
     // fontFamily: 'AppleSDGothicNeo-Thin',
     fontWeight: '200',
-    fontSize: 40,
+    fontSize: FONT_SIZE_LARGE,
     marginTop: 5,
     color: '#fff'
   },
 
   buttonSettingsContainer: {
     position: 'absolute',
-    top: 5,
+    top: ScreenHeight * 0.05 ,
     zIndex: 16,
     right: 15,
   },

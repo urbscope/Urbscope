@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native'
 import { NavigationActions } from 'react-navigation'
 import { connect } from 'react-redux'
 
 import { buttonActive, buttonActiveOutline } from '../utils/colors'
 
-import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'
 
+const ScreenHeight = Dimensions.get('window').height
+const ScreenWidth  = Dimensions.get('window').width
 
 class ChangeModeSwitch extends Component {
 
@@ -129,7 +131,7 @@ class ChangeModeSwitch extends Component {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top:  75,
+    top: ScreenHeight * 0.05 + 70,
     right: 15,
   },
   button: {

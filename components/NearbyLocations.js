@@ -7,6 +7,8 @@ import { Dimensions,
          LayoutAnimation,
          TouchableOpacity,
          Animated,
+         Platform,
+         StatusBar,
          PanResponder } from 'react-native'
 
 import ChangeModeSwitch from './ChangeModeSwitch'
@@ -83,8 +85,7 @@ class NearbyLocations extends Component {
         this.state.mapViewPosition.flattenOffset();
         if (moveX < ScreenWidth*0.4 || vx < -1.5) {
           Animated.spring(this.state.mapViewPosition, { toValue: {x: 0, y: 0}, friction: 7, tension: 20}).start();
-        }
-        if (moveX > ScreenWidth*0.4 || vx > 2) {
+        } else if (moveX > ScreenWidth*0.4 || vx > 1.5) {
           Animated.spring(this.state.mapViewPosition, { toValue: {x: ScreenWidth-20, y: 0}, friction: 7, tension: 20}).start();
         }
 
@@ -309,10 +310,14 @@ async componentDidMount() {
       )
     } else {
       return (
-        <SafeAreaView style={{flex: 1}}>
+        <View style={{flex: 1, backgroundColor: themeColor}}>
+          <StatusBar barStyle="light-content" translucent={true}/>
+
           <Camera style={styles.camera} type={Camera.Constants.Type.back}>
-            <View
-              style={styles.container}>
+            <SafeAreaView style={(Platform.OS === 'ios' && (ScreenHeight >= 812 || ScreenWidth >= 812))
+              ? {}
+              : {}
+            } >
 
             {/*
               <ExplorationModeSwitch
@@ -489,9 +494,9 @@ async componentDidMount() {
                   visible={settingVisible}
                   />
 
-              </View>
+              </SafeAreaView>
             </Camera>
-          </SafeAreaView >
+          </View >
         )
       }
     }
@@ -522,9 +527,9 @@ async componentDidMount() {
       borderColor: '#eee',
       // bottom: 25,
       width: '100%',
-      height: 0.41 * ScreenHeight ,
+      height: 0.425 * ScreenHeight ,
       zIndex: 14,
-      top: 0.43 * ScreenHeight ,
+      top: 0.5 * ScreenHeight ,
       shadowColor: '#000',
       shadowOffset: {
         width: 1,
@@ -563,7 +568,7 @@ async componentDidMount() {
     },
     buttonSettingsContainer: {
       position: 'absolute',
-      top: 5,
+      top: ScreenHeight * 0.05 ,
       // zIndex: 11,
       right: 15,
     },

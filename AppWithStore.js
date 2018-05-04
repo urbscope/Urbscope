@@ -9,7 +9,7 @@ import { DEFAULT_SETTINGS } from './utils/helpers'
 import DetectionMode from './components/DetectionMode'
 import NearbyLocations from './components/NearbyLocations'
 import Recommendations from './components/Recommendations'
-import ExplorationMode from './components/ExplorationMode'
+// import ExplorationMode from './components/ExplorationMode'
 import SplashLoading from './components/SplashLoading'
 import TabBarExploration from './components/TabBarExploration'
 
@@ -67,7 +67,7 @@ const MainNavigtor = StackNavigator({
   DetectionMode: { screen: DetectionMode },
   ExplorationMode: { screen: Tabs },
 }, {
-  initialRouteName: 'DetectionMode',
+  initialRouteName: 'ExplorationMode',
   navigationOptions: ({ navigation }) => ({
     header: null,
   }),
@@ -149,9 +149,9 @@ class AppWithStore extends React.Component {
       )
     } else {
       return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
           <MainNavigtor/>
-        </SafeAreaView>
+        </View>
       )
     }
   }

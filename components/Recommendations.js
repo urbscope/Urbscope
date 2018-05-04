@@ -1,46 +1,48 @@
 import React, { Component } from 'react'
 import { View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-    Image,
-    Easing,
-    FlatList,
-    LayoutAnimation } from 'react-native'
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  Easing,
+  StatusBar,
+  FlatList,
+  SafeAreaView,
+  LayoutAnimation } from 'react-native'
 
-import Rating from 'react-native-rating'
+  import Rating from 'react-native-rating'
 
-import { NavigationActions } from 'react-navigation';
-
-
-import ChangeModeSwitch from './ChangeModeSwitch'
-import ExplorationModeSwitch from './ExplorationModeSwitch'
-import Settings from './Settings'
-import Loading from './Loading'
-
-import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
-import {getUserID, getVisitedLocations} from "../utils/localStorageAPI";
+  import { NavigationActions } from 'react-navigation';
 
 
-import { connect } from 'react-redux';
-import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
-import {Location, Permissions} from "expo";
-import {setHasVisitedFalse } from "../actions";
+  import ChangeModeSwitch from './ChangeModeSwitch'
+  import ExplorationModeSwitch from './ExplorationModeSwitch'
+  import Settings from './Settings'
+  import Loading from './Loading'
 
-const RatingImages = {
+  import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+  import {getUserID, getVisitedLocations} from "../utils/localStorageAPI";
+
+
+  import { connect } from 'react-redux';
+  import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
+  import {Location, Permissions} from "expo";
+  import {setHasVisitedFalse } from "../actions";
+
+  const RatingImages = {
     starFilled: require('../assets/starFilled.png'),
     starEmpty: require('../assets/starEmpty.png')
-}
+  }
 
-class Recommendations extends Component {
+  class Recommendations extends Component {
 
     state = {
-        loading: true,
-        userID: null,
-        sponsoredLocation: null,
-        recommendedPlaces: {},
-         visitedPlaces: {},//[
+      loading: true,
+      userID: null,
+      sponsoredLocation: null,
+      recommendedPlaces: {},
+      visitedPlaces: {},//[
         //     {
         //         name: 'Badshahi Mosque',
         //         id: '2231',
@@ -56,81 +58,81 @@ class Recommendations extends Component {
         //         rating: 0.9
         //     },
         // ]
-    }
+      }
 
-    ratingEntered = (rating, index) => {
+      ratingEntered = (rating, index) => {
         console.log('rating', rating);
         console.log('index', index);
 
-    }
+      }
 
-    // UNSAFE_componentWillReceiveProps(nextProps){
-    //     console.log("Recommendation:UNSAFE_componentWillReceiveProps");
-    //     if (nextProps.hasVisitedIsChanged){
-    //         this.loadVisitedLocations();
-    //         this.props.setHasVisitedFalse();
-    //
-    //
-    //
-    //     }
-    // }
+      // UNSAFE_componentWillReceiveProps(nextProps){
+      //     console.log("Recommendation:UNSAFE_componentWillReceiveProps");
+      //     if (nextProps.hasVisitedIsChanged){
+      //         this.loadVisitedLocations();
+      //         this.props.setHasVisitedFalse();
+      //
+      //
+      //
+      //     }
+      // }
 
 
-    componentDidUpdate(nextProps, prevState) {
+      componentDidUpdate(nextProps, prevState) {
         console.log("Recommendation:componentDidUpdate");
         if (nextProps.hasVisitedIsChanged) {
-            this.loadVisitedLocations();
+          this.loadVisitedLocations();
         }
         nextProps.setHasVisitedFalse();
-    }
+      }
 
 
-    async componentDidMount () {
+      async componentDidMount () {
         LayoutAnimation.linear();
         console.log("Recommendations:componentDidMount");
         let userID = await getUserID();
         let prom1 = this._getLocationAsync().then((location)=>{
-            let url = "https://urbserver.herokuapp.com/recommend/"
-                + userID
-                + "?inLL=" + formatLocation(location, false);
-            console.log(url);
-            fetchLandmarksFromServer(url).then((res)=>{
-                this.setState({recommendedPlaces: res[0], sponsoredLocation: res[1]});
-            })
+          let url = "https://urbserver.herokuapp.com/recommend/"
+          + userID
+          + "?inLL=" + formatLocation(location, false);
+          console.log(url);
+          fetchLandmarksFromServer(url).then((res)=>{
+            this.setState({recommendedPlaces: res[0], sponsoredLocation: res[1]});
+          })
         });
 
         let prom2 =  this.loadVisitedLocations();
         await Promise.all([prom1,prom2]);
 
         this.setState({
-            loading: false,
-            userID: userID,
+          loading: false,
+          userID: userID,
         });
-    }
+      }
 
-    loadVisitedLocations = ()=>{
+      loadVisitedLocations = ()=>{
         getVisitedLocations().then((visited)=>{
-            console.log("visited places", visited);
-            this.setState({visitedPlaces:visited});
+          console.log("visited places", visited);
+          this.setState({visitedPlaces:visited});
         })
 
-    };
+      };
 
-    //THIS IS COPIED FROM NEARBY LOCATIONS. CONSIDER COMBINING
-    _getLocationAsync = async () => {
+      //THIS IS COPIED FROM NEARBY LOCATIONS. CONSIDER COMBINING
+      _getLocationAsync = async () => {
         let {status} = await Permissions.askAsync(Permissions.LOCATION);
         if (status !== 'granted') {
-            this.setState({
-                errorMessage: 'Permission to access location was denied',
-            });
+          this.setState({
+            errorMessage: 'Permission to access location was denied',
+          });
         }
 
         let location = await Location.getCurrentPositionAsync({});
         this.setState({location});
         return location;
-    };
+      };
 
-    render(){
+      render(){
         const { navigation, themeColor } = this.props;
 
         const { settingVisible, loading, visitedPlaces, recommendedPlaces } = this.state;
@@ -139,289 +141,273 @@ class Recommendations extends Component {
 
 
         if (loading) {
-            return(
-                <View style={ {flex: 1, backgroundColor: '#444'} }>
-                    <Loading loading={this.state.loading} />
-                </View>
-            )
+          return(
+            <View style={ {flex: 1, backgroundColor: '#444'} }>
+              <Loading loading={this.state.loading} />
+            </View>
+          )
         } else {
 
-            return (
-                <View style={styles.container}>
+          return (
+            <SafeAreaView style={styles.container}>
 
-                    {/*
-        <ExplorationModeSwitch
-          currentScreen={navigation.state.routeName}
-          changeScreen={navigation.navigate}
-          dispatch={navigation.dispatch}
-        />
+              <StatusBar barStyle="light-content" translucent={true}/>
 
 
-         <ChangeModeSwitch
-          replaceScreen={navigation.replace}
-          currentScreen={navigation.state.routeName}
-          changeScreen={navigation.navigate}
-          dispatch={navigation.dispatch}
-        />
+              {(!visitedPlaces || visitedPlaces.length === 0)
+                ? <View></View>
+                : (<View>
 
-      */}
+                  <View style={{padding: 10, justifyContent: 'center', alignItems: 'center', borderColor: themeColor, borderBottomWidth: 0.5}}>
+                    <Text style={{color: themeColor, fontSize: 25, fontWeight: '200'}}>
+                      Visited Placed
+                    </Text>
+                  </View>
+                  <View style={{padding: 5, justifyContent: 'center', alignItems: 'center'}}>
+                    <Text style={{color: themeColor, fontSize: 12, fontWeight: '200'}}>
+                      For better recommendations, rate the palces you've visited.
+                    </Text>
+                  </View>
 
-
-
-                    {visitedPlaces.length === 0
-                        ? <View></View>
-                        : (<View>
-
-                                <View style={{padding: 10, justifyContent: 'center', alignItems: 'center', borderColor: themeColor, borderBottomWidth: 0.5}}>
-                                    <Text style={{color: themeColor, fontSize: 25, fontWeight: '200'}}>
-                                        Visited Placed
-                                    </Text>
-                                </View>
-                                <View style={{padding: 5, justifyContent: 'center', alignItems: 'center'}}>
-                                    <Text style={{color: themeColor, fontSize: 12, fontWeight: '200'}}>
-                                        For better recommendations, rate the palces you've visited.
-                                    </Text>
-                                </View>
-
-                                <ScrollView
-                                    style={[styles.visitedPlacesList, {borderColor: themeColor}]}
-                                >
-                                    {
-                                        visitedPlacesValues.map((item, index) => (
-                                            <View key = {item.key} style = {[styles.visitedPlacesListItem, {borderColor: themeColor}]}>
-                                                <Image
-                                                    source={{uri: item.picture}}
-                                                    style={[styles.visitedPlacesListItemImage, {borderColor: themeColor}]}
-                                                />
-                                                <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'space-around'}}>
-                                                    <Text style={[styles.visitedPlacesListItemHeading, {color: themeColor}]}>{item.name}</Text>
-                                                    <Text style={styles.visitedPlacesListItemDescription}>{item.category}</Text>
-
-                                                    <View style={styles.visitedPlacesListItemRating}>
-                                                        <Rating
-                                                            onChange={rating => {
-                                                                this.ratingEntered(rating, index)
-                                                            }}
-                                                            selectedStar={RatingImages.starFilled}
-                                                            unselectedStar={RatingImages.starEmpty}
-                                                            initial={item.rating}
-                                                            editable={true}
-                                                            config={{
-                                                                easing: Easing.inOut(Easing.ease),
-                                                                duration: 350
-                                                            }}
-                                                            stagger={50}
-                                                            maxScale={1.4}
-                                                            starStyle={{
-                                                                width: 25,
-                                                                height: 25,
-                                                                opacity: 0.8
-                                                            }}
-                                                        />
-                                                    </View>
-
-                                                </View>
-                                            </View>
-                                        ))
-                                    }
-                                </ScrollView>
-                            </View>
-                        )
-                    }
-
-
-
-                    <View style={{padding: 10, justifyContent: 'center', alignItems: 'center'}}>
-                        <Text style={{color: themeColor, fontSize: 25, fontWeight: '200'}}>
-                            Recommendations
-                        </Text>
-                    </View>
-
-                    <ScrollView
-                        style={[styles.recommendedPlacesList, {borderColor: themeColor}]}
+                  <ScrollView
+                    style={[styles.visitedPlacesList, {borderColor: themeColor}]}
                     >
-                        {
-                            recommendedPlacesValues.map((item, index) => (
-                                <View key = {item.key} style = {[styles.recommendedPlacesListItem, {borderColor: themeColor}]}>
-                                    <Image
-                                        source={{uri: item.picture}}
-                                        style={[styles.visitedPlacesListItemImage, {borderColor: themeColor}]}
-                                    />
-                                    <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'space-around'}}>
-                                        <Text style={[styles.recommendedPlacesListItemHeading, {color: themeColor}]}>{item.name}</Text>
-                                        <Text style={styles.recommendedPlacesListItemDescription}>{item.category}</Text>
+                    {
+                      visitedPlacesValues.map((item, index) => (
+                        <View key = {item.key} style = {[styles.visitedPlacesListItem, {borderColor: themeColor}]}>
+                          <Image
+                            source={{uri: item.picture}}
+                            style={[styles.visitedPlacesListItemImage, {borderColor: themeColor}]}
+                            />
+                          <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'space-around'}}>
+                            <Text style={[styles.visitedPlacesListItemHeading, {color: themeColor}]}>{item.name}</Text>
+                            <Text style={styles.visitedPlacesListItemDescription}>{item.category}</Text>
 
-                                        <View style={styles.recommendedPlacesListItemRating}>
-                                            <Rating
-                                                onChange={rating => {
-                                                    this.ratingEntered(rating, index)
-                                                }}
-                                                selectedStar={RatingImages.starFilled}
-                                                unselectedStar={RatingImages.starEmpty}
-                                                initial={0}
-                                                editable={false}
-                                                config={{
-                                                    easing: Easing.inOut(Easing.ease),
-                                                    duration: 350
-                                                }}
-                                                stagger={50}
-                                                maxScale={1.4}
-                                                starStyle={{
-                                                    width: 25,
-                                                    height: 25,
-                                                    opacity: 0.8
-                                                }}
-                                            />
-                                        </View>
+                            <View style={styles.visitedPlacesListItemRating}>
+                              <Rating
+                                onChange={rating => {
+                                  this.ratingEntered(rating, index)
+                                }}
+                                selectedStar={RatingImages.starFilled}
+                                unselectedStar={RatingImages.starEmpty}
+                                initial={item.rating}
+                                editable={true}
+                                config={{
+                                  easing: Easing.inOut(Easing.ease),
+                                  duration: 350
+                                }}
+                                stagger={50}
+                                maxScale={1.4}
+                                starStyle={{
+                                  width: 25,
+                                  height: 25,
+                                  opacity: 0.8
+                                }}
+                                />
+                            </View>
 
-                                    </View>
-
-                                    <TouchableOpacity style={[styles.navigateButton, {backgroundColor: themeColor}]}
-                                                      onPress={() => {
-                                                          this.props.navigation.dispatch(NavigationActions.reset({
-                                                              index: 0,
-                                                              actions: [NavigationActions.navigate({
-                                                                  routeName: 'ExplorationMode',
-                                                                  params: {recommendedLocation: item}
-                                                              })],
-                                                          }))
-
-                                                      }}
-                                    >
-                                        <MaterialIcons
-                                            name='navigation'
-                                            size={25}
-                                            color={'#eee'}
-                                        />
-                                    </TouchableOpacity>
-                                </View>
-                            ))
-                        }
-                    </ScrollView>
+                          </View>
+                        </View>
+                      ))
+                    }
+                  </ScrollView>
+                </View>
+              )
+            }
 
 
-                    <View style={{padding: 13, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.5)'}}>
-                        <Text style={{}}>
 
-                        </Text>
+            <View style={{padding: 10, justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={{color: themeColor, fontSize: 25, fontWeight: '200'}}>
+                Recommendations
+              </Text>
+            </View>
+
+            <ScrollView
+              style={[styles.recommendedPlacesList, {borderColor: themeColor}]}
+              >
+              {
+                recommendedPlacesValues.map((item, index) => (
+                  <View key = {item.key} style = {[styles.recommendedPlacesListItem, {borderColor: themeColor}]}>
+                    <Image
+                      source={{uri: item.picture}}
+                      style={[styles.visitedPlacesListItemImage, {borderColor: themeColor}]}
+                      />
+                    <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'space-around'}}>
+                      <Text style={[styles.recommendedPlacesListItemHeading, {color: themeColor}]}>{item.name}</Text>
+                      <Text style={styles.recommendedPlacesListItemDescription}>{item.category}</Text>
+
+                      <View style={styles.recommendedPlacesListItemRating}>
+                        <Rating
+                          onChange={rating => {
+                            this.ratingEntered(rating, index)
+                          }}
+                          selectedStar={RatingImages.starFilled}
+                          unselectedStar={RatingImages.starEmpty}
+                          initial={0}
+                          editable={false}
+                          config={{
+                            easing: Easing.inOut(Easing.ease),
+                            duration: 350
+                          }}
+                          stagger={50}
+                          maxScale={1.4}
+                          starStyle={{
+                            width: 25,
+                            height: 25,
+                            opacity: 0.8
+                          }}
+                          />
+                      </View>
+
                     </View>
 
-                </View>
-            )
-        }
+                    <TouchableOpacity style={[styles.navigateButton, {backgroundColor: themeColor}]}
+                      onPress={() => {
+                        this.props.navigation.dispatch(NavigationActions.reset({
+                          index: 0,
+                          actions: [NavigationActions.navigate({
+                            routeName: 'ExplorationMode',
+                            params: {recommendedLocation: item}
+                          })],
+                        }))
+
+                      }}
+                      >
+                      <MaterialIcons
+                        name='navigation'
+                        size={25}
+                        color={'#eee'}
+                        />
+                    </TouchableOpacity>
+                  </View>
+                ))
+              }
+            </ScrollView>
+
+
+            <View style={{padding: 13, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.5)'}}>
+              <Text style={{}}>
+
+              </Text>
+            </View>
+
+          </SafeAreaView>
+        )
+      }
     }
-}
+  }
 
 
 
-const styles = StyleSheet.create({
+  const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#ededed'
+      flex: 1,
+      backgroundColor: '#ededed'
     },
     buttonSettings: {
-        position: 'absolute',
-        zIndex: 11,
-        top: 15,
-        right: 15,
-        height: 60,
-        width: 58,
-        borderRadius: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingTop: 4,
+      position: 'absolute',
+      zIndex: 11,
+      top: 15,
+      right: 15,
+      height: 60,
+      width: 58,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingTop: 4,
     },
     visitedPlacesList: {
-        borderTopWidth: 0.5,
+      borderTopWidth: 0.5,
     },
     visitedPlacesListItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderBottomWidth: 0.5,
-        height:  100,
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderBottomWidth: 0.5,
+      height:  100,
 
     },
     visitedPlacesListItemHeading: {
-        fontSize: 20,
-        fontWeight: '600',
-        paddingLeft: 10,
-        paddingTop: 5,
+      fontSize: 20,
+      fontWeight: '600',
+      paddingLeft: 10,
+      paddingTop: 5,
     },
     visitedPlacesListItemDescription: {
-        fontSize: 12,
-        fontWeight: '200',
-        // alignSelf: 'center',
-        paddingLeft: 10,
-        paddingBottom: 10,
+      fontSize: 12,
+      fontWeight: '200',
+      // alignSelf: 'center',
+      paddingLeft: 10,
+      paddingBottom: 10,
     },
     visitedPlacesListItemRating: {
 
-        paddingLeft: 10,
-        paddingBottom: 10,
+      paddingLeft: 10,
+      paddingBottom: 10,
     },
     visitedPlacesListItemImage: {
-        height: 99,
-        width: 100,
-        borderRightWidth: 0.5,
-        padding: 5,
+      height: 99,
+      width: 100,
+      borderRightWidth: 0.5,
+      padding: 5,
     },
     recommendedPlacesList: {
-        borderTopWidth: 0.5,
+      borderTopWidth: 0.5,
     },
     recommendedPlacesListItem: {
-        flexDirection: 'row',
-        borderBottomWidth: 0.5,
-        height:  100,
+      flexDirection: 'row',
+      borderBottomWidth: 0.5,
+      height:  100,
     },
     recommendedPlacesListItemHeading: {
-        fontSize: 20,
-        fontWeight: '600',
-        paddingLeft: 10,
-        paddingTop: 5,
+      fontSize: 20,
+      fontWeight: '600',
+      paddingLeft: 10,
+      paddingTop: 5,
     },
     recommendedPlacesListItemDescription: {
-        fontSize: 12,
-        fontWeight: '200',
-        // alignSelf: 'center',
-        paddingLeft: 10,
-        paddingBottom: 10,
+      fontSize: 12,
+      fontWeight: '200',
+      // alignSelf: 'center',
+      paddingLeft: 10,
+      paddingBottom: 10,
     },
     recommendedPlacesListItemRating: {
 
-        paddingLeft: 10,
-        paddingBottom: 10,
+      paddingLeft: 10,
+      paddingBottom: 10,
     },
     recommendedPlacesListItemImage: {
-        height: '100%',
-        width: 100,
-        borderRightWidth: 0.5,
+      height: '100%',
+      width: 100,
+      borderRightWidth: 0.5,
     },
     navigateButton: {
-        height: 45,
-        width: 35,
-        // paddingRight: 2,
-        justifyContent: 'center',
-        alignItems: 'center',
-        alignSelf: 'center',
-        borderTopLeftRadius: 30,
-        borderBottomLeftRadius: 30,
+      height: 45,
+      width: 35,
+      // paddingRight: 2,
+      justifyContent: 'center',
+      alignItems: 'center',
+      alignSelf: 'center',
+      borderTopLeftRadius: 30,
+      borderBottomLeftRadius: 30,
 
     }
-})
+  })
 
 
-mapStateToProps = (state) => {
+  mapStateToProps = (state) => {
     return {
-        settings: state.settings,
-        themeColor: state.themeColor,
-        hasVisitedIsChanged: state.hasVisitedIsChanged
+      settings: state.settings,
+      themeColor: state.themeColor,
+      hasVisitedIsChanged: state.hasVisitedIsChanged
     }
-}
+  }
 
-mapDispatchToProps = (dispatch, { navigation }) => {
+  mapDispatchToProps = (dispatch, { navigation }) => {
     return {
-        setHasVisitedFalse: () => dispatch(setHasVisitedFalse()),
+      setHasVisitedFalse: () => dispatch(setHasVisitedFalse()),
     }
-}
+  }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Recommendations)
+  export default connect(mapStateToProps, mapDispatchToProps)(Recommendations)

@@ -11,9 +11,15 @@ import { StyleSheet,
 
 import { connect } from 'react-redux'
 
-
 const ScreenHeight = Dimensions.get('window').height
 const ScreenWidth  = Dimensions.get('window').width
+
+const FONT_SIZE_SMALLER = ScreenHeight * 0.014
+const FONT_SIZE_SMALL   = ScreenHeight * 0.0175
+const FONT_SIZE_MEDIUM  = ScreenHeight * 0.02
+const FONT_SIZE_LARGE   = ScreenHeight * 0.025
+const FONT_SIZE_LARGER  = ScreenHeight * 0.027
+const FONT_SIZE_LARGEST = ScreenHeight * 0.034
 
 class NearbyLocationsList extends React.Component {
 
@@ -44,10 +50,9 @@ class NearbyLocationsList extends React.Component {
         onPanResponderRelease: (e, {moveX, vx}) => {
           this.state.listViewPosition.flattenOffset();
 
-          if (moveX < ScreenWidth * 0.4 || vx < -2) {
+          if (moveX < ScreenWidth * 0.4 || vx < -1.5) {
             Animated.spring(this.state.listViewPosition, { toValue: {x: 0, y: 0}, friction: 7, tension: 20}).start();
-          }
-          if (moveX > ScreenWidth * 0.4 || vx > 2) {
+          } else if (moveX > ScreenWidth * 0.4 || vx > 1.5) {
             Animated.spring(this.state.listViewPosition, { toValue: {x: ScreenWidth-20, y: 0}, friction: 7, tension: 20}).start();
           }
         }
@@ -66,6 +71,7 @@ class NearbyLocationsList extends React.Component {
         let [translateX, translateY] = [listViewPosition.x, listViewPosition.y];
         let imageStyle = {transform: [{translateX}, {translateY}]};
 
+        // console.log(locations);
         // let locations = this.props.locations;
 
         return (
@@ -79,52 +85,73 @@ class NearbyLocationsList extends React.Component {
 
             <ScrollView style={styles.listContainer} >
                 {sponsoredLocation
-                    ? (<TouchableOpacity
-                            key={sponsoredLocation.key}
-                            onPress={()=>this.props.handlePress(sponsoredLocation.key)}
-                        >
-                            <View style={styles.listItem} >
-                                {sponsoredLocation.picture
-                                    ?(<Image style={styles.Image}
-                                             source={{uri: sponsoredLocation.picture}}/>)
-                                    :(<Image style={styles.Image}
-                                             source={require('../assets/urbscope_loading.png')}/>)
+                    ? (
+                      <View>
+                        <View style={[styles.sponsorHeader, {backgroundColor: themeColor}]}>
+                          <Text style={{color: '#fff', fontSize: FONT_SIZE_MEDIUM, fontWeight: '200'}}>
+                            We recommend
+                          </Text>
+                        </View>
+                        <TouchableOpacity
+                          key={sponsoredLocation.key}
+                          onPress={()=>this.props.handlePress(sponsoredLocation.key)}
+                          >
+                          <View style={[styles.listItem, {borderBottomWidth: 0}]} >
+                            {sponsoredLocation.picture
+                              ?(<Image style={styles.Image}
+                                source={{uri: sponsoredLocation.picture}}/>)
+                                :(<Image style={styles.Image}
+                                  source={require('../assets/urbscope_loading.png')}/>)
                                 }
 
-                                <View>
-                                    <Text>
-                                        {sponsoredLocation.name}
-                                    </Text>
-                                    <Text>
-                                        {sponsoredLocation.category}
-                                    </Text>
+                                <View style={styles.listItemDetails}>
+                                  <Text style={{fontSize: FONT_SIZE_MEDIUM, fontWeight: '600'}}>
+                                    {sponsoredLocation.name}
+                                  </Text>
+                                  <Text style={{fontSize: FONT_SIZE_SMALL, color: themeColor, fontWeight: '200'}}>
+                                    {sponsoredLocation.category}
+                                  </Text>
                                 </View>
-                            </View>
-                        </TouchableOpacity>)
+                              </View>
+                            </TouchableOpacity>
+                      </View>)
                     : null}
 
-                {locations.map(val => {
+              <View style={[styles.sponsorHeader, {backgroundColor: themeColor}]}>
+                <Text style={{color: '#fff', fontSize: FONT_SIZE_MEDIUM, fontWeight: '200'}}>
+                  Nearby locations
+                </Text>
+              </View>
+              {locations.map( (val, index) => {
                 return (
-                    <TouchableOpacity
+                <TouchableOpacity
                   key={val.key}
                   onPress={()=>this.props.handlePress(val.key)}
                 >
-                  <View style={styles.listItem} >
-                      {val.picture
-                          ?(<Image style={styles.Image}
-                                   source={{uri: val.picture}}/>)
-                          :(<Image style={styles.Image}
-                                   source={require('../assets/urbscope_loading.png')}/>)
-                      }
+                  <View
+                    style={(index === locations.length - 1 )
+                      ? [styles.listItem, {borderBottomWidth: 0}]
+                      : styles.listItem }
+                  >
+                    {val.picture
+                        ?(<Image style={styles.Image}
+                                 source={{uri: val.picture}}/>)
+                        :(<Image style={styles.Image}
+                                 source={require('../assets/urbscope_loading.png')}/>)
+                    }
 
-                    <View>
-                      <Text>
+                    <View style={styles.listItemDetails}>
+                      <Text style={{fontSize: FONT_SIZE_MEDIUM, fontWeight: '600'}}>
                         {val.name}
                       </Text>
-                      <Text>
+                      <Text style={{fontSize: FONT_SIZE_SMALLER, fontWeight: '200'}}>
+                        {val.address[0]}
+                      </Text>
+                      <Text style={{color: themeColor, fontSize: FONT_SIZE_SMALL, fontWeight: '200'}}>
                         {val.category}
                       </Text>
                     </View>
+
                   </View>
                 </TouchableOpacity>)
               })
@@ -156,12 +183,22 @@ const styles = StyleSheet.create({
     listItem: {
         flexDirection: 'row',
         borderBottomWidth: 0.5,
-        height:  60,
+        borderColor: '#aaa',
+        height: ScreenHeight * 0.09,
+        justifyContent: 'flex-start',
+        alignItems: 'stretch',
     },
     Image: {
         height: '100%',
-        width: 60,
+        width: ScreenHeight * 0.09,
         borderRightWidth: 0.5,
+    },
+    listItemDetails: {
+      // paddingHorizontal: 10,
+      marginHorizontal: 10,
+      paddingVertical: 5,
+      justifyContent: 'space-around',
+      alignItems: 'flex-start'
     },
     listWindow: {
       backgroundColor: '#eee',
@@ -169,9 +206,9 @@ const styles = StyleSheet.create({
       borderTopRightRadius: 20,
       borderBottomRightRadius: 20,
       width: '100%',
-      height: 0.41 * ScreenHeight ,
+      height: 0.425 * ScreenHeight ,
       left: - ScreenWidth + 20,
-      top: 0.01 * ScreenHeight,
+      top: 0.05 * ScreenHeight,
       borderColor: '#eee',
       bottom: 25,
       zIndex: 5,
@@ -192,6 +229,13 @@ const styles = StyleSheet.create({
       borderTopRightRadius: 20,
       borderBottomRightRadius: 20,
       zIndex: 1,
+      shadowColor: '#000',
+      shadowRadius: 3,
+      shadowOpacity: 0.4,
+      shadowOffset: {
+        width: -1,
+        height: 0,
+      },
     },
     listWindowDragLine: {
       height: '40%',
@@ -201,6 +245,19 @@ const styles = StyleSheet.create({
       left: 9,
       top: '30%',
 
+    },
+    sponsorHeader: {
+      height: ScreenHeight * 0.04,
+      justifyContent: 'center',
+      alignItems: 'center',
+      opacity: 0.8,
+      shadowColor: '#000',
+      shadowRadius: 3,
+      shadowOpacity: 0.3,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
     },
 });
 

@@ -56,7 +56,7 @@ class Settings extends React.Component {
 
   state = {
     shouldRender: false,
-    dectionLimit: this.props.settings.dectionLimit,
+    detectionLimit: this.props.settings.detectionLimit,
     nearbyLimit: this.props.settings.nearbyLimit,
     nearbyRadius: this.props.settings.nearbyRadius,
     categories: {
@@ -201,7 +201,7 @@ class Settings extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     let newSettings = {
-      dectionLimit: this.state.dectionLimit,
+      detectionLimit: this.state.detectionLimit,
       nearbyLimit: this.state.nearbyLimit,
       nearbyRadius: this.state.nearbyRadius,
       categories: this.state.categories,
@@ -210,7 +210,7 @@ class Settings extends React.Component {
 
     if (nextProps.visible === true && this.props.visible === false ){
       this.setState({
-        dectionLimit: this.props.settings.dectionLimit,
+        detectionLimit: this.props.settings.detectionLimit,
         nearbyLimit: this.props.settings.nearbyLimit,
         nearbyRadius: nextProps.settings.nearbyRadius,
         categories: nextProps.settings.categories,
@@ -227,41 +227,45 @@ class Settings extends React.Component {
   }
 
   defaultSettings = () => {
-    this.setState({
-      dectionLimit: DEFAULT_SETTINGS.dectionLimit,
-      nearbyLimit: DEFAULT_SETTINGS.nearbyLimit,
-      nearbyRadius: DEFAULT_SETTINGS.nearbyLimit,
-      categories: {
-        [CATEGORIES_TOURISTIC_SITES]: DEFAULT_SETTINGS.categories[CATEGORIES_TOURISTIC_SITES],
-        [CATEGORIES_AMPHITHEATERS]: DEFAULT_SETTINGS.categories[CATEGORIES_AMPHITHEATERS],
-        [CATEGORIES_AQUARIUMS]: DEFAULT_SETTINGS.categories[CATEGORIES_AQUARIUMS],
-        [CATEGORIES_ART_GALLERIES]: DEFAULT_SETTINGS.categories[CATEGORIES_ART_GALLERIES],
-        [CATEGORIES_CONCERT_HALLS]: DEFAULT_SETTINGS.categories[CATEGORIES_CONCERT_HALLS],
-        [CATEGORIES_EXHIBITS]: DEFAULT_SETTINGS.categories[CATEGORIES_EXHIBITS],
-        [CATEGORIES_HISTORIC_SITES]: DEFAULT_SETTINGS.categories[CATEGORIES_HISTORIC_SITES],
-        [CATEGORIES_MUSEUMS]: DEFAULT_SETTINGS.categories[CATEGORIES_MUSEUMS],
-        [CATEGORIES_PUBLIC_ART]: DEFAULT_SETTINGS.categories[CATEGORIES_PUBLIC_ART],
-        [CATEGORIES_STADIUMS]: DEFAULT_SETTINGS.categories[CATEGORIES_STADIUMS],
-        [CATEGORIES_ZOOS]: DEFAULT_SETTINGS.categories[CATEGORIES_ZOOS],
-        [CATEGORIES_RESTAURANTS]: DEFAULT_SETTINGS.categories[CATEGORIES_RESTAURANTS],
-        [CATEGORIES_NIGHTLIFE_SPOTS]: DEFAULT_SETTINGS.categories[CATEGORIES_NIGHTLIFE_SPOTS],
-        [CATEGORIES_OUTDOORS_AND_RECREATION]: DEFAULT_SETTINGS.categories[CATEGORIES_OUTDOORS_AND_RECREATION],
-        [CATEGORIES_TRAVEL_AND_TRANSPORT]: DEFAULT_SETTINGS.categories[CATEGORIES_TRAVEL_AND_TRANSPORT],
-        [CATEGORIES_AIRPORTS]: DEFAULT_SETTINGS.categories[CATEGORIES_AIRPORTS],
-        [CATEGORIES_BUS_STATIONS]: DEFAULT_SETTINGS.categories[CATEGORIES_BUS_STATIONS],
-        [CATEGORIES_TOURIST_INFORMATION_CENTERS]: DEFAULT_SETTINGS.categories[CATEGORIES_TOURIST_INFORMATION_CENTERS],
-        [CATEGORIES_TRAIN_STATIONS]: DEFAULT_SETTINGS.categories[CATEGORIES_TRAIN_STATIONS],
-      },
 
-      themeColor:DEFAULT_SETTINGS.themeColor,
-    }, () => this.props.changeSettings(DEFAULT_SETTINGS))
+
+      this.setState({
+        detectionLimit: DEFAULT_SETTINGS.detectionLimit,
+        nearbyLimit: DEFAULT_SETTINGS.nearbyLimit,
+        nearbyRadius: DEFAULT_SETTINGS.nearbyLimit,
+        categories: {
+          [CATEGORIES_TOURISTIC_SITES]: DEFAULT_SETTINGS.categories[CATEGORIES_TOURISTIC_SITES],
+          [CATEGORIES_AMPHITHEATERS]: DEFAULT_SETTINGS.categories[CATEGORIES_AMPHITHEATERS],
+          [CATEGORIES_AQUARIUMS]: DEFAULT_SETTINGS.categories[CATEGORIES_AQUARIUMS],
+          [CATEGORIES_ART_GALLERIES]: DEFAULT_SETTINGS.categories[CATEGORIES_ART_GALLERIES],
+          [CATEGORIES_CONCERT_HALLS]: DEFAULT_SETTINGS.categories[CATEGORIES_CONCERT_HALLS],
+          [CATEGORIES_EXHIBITS]: DEFAULT_SETTINGS.categories[CATEGORIES_EXHIBITS],
+          [CATEGORIES_HISTORIC_SITES]: DEFAULT_SETTINGS.categories[CATEGORIES_HISTORIC_SITES],
+          [CATEGORIES_MUSEUMS]: DEFAULT_SETTINGS.categories[CATEGORIES_MUSEUMS],
+          [CATEGORIES_PUBLIC_ART]: DEFAULT_SETTINGS.categories[CATEGORIES_PUBLIC_ART],
+          [CATEGORIES_STADIUMS]: DEFAULT_SETTINGS.categories[CATEGORIES_STADIUMS],
+          [CATEGORIES_ZOOS]: DEFAULT_SETTINGS.categories[CATEGORIES_ZOOS],
+          [CATEGORIES_RESTAURANTS]: DEFAULT_SETTINGS.categories[CATEGORIES_RESTAURANTS],
+          [CATEGORIES_NIGHTLIFE_SPOTS]: DEFAULT_SETTINGS.categories[CATEGORIES_NIGHTLIFE_SPOTS],
+          [CATEGORIES_OUTDOORS_AND_RECREATION]: DEFAULT_SETTINGS.categories[CATEGORIES_OUTDOORS_AND_RECREATION],
+          [CATEGORIES_TRAVEL_AND_TRANSPORT]: DEFAULT_SETTINGS.categories[CATEGORIES_TRAVEL_AND_TRANSPORT],
+          [CATEGORIES_AIRPORTS]: DEFAULT_SETTINGS.categories[CATEGORIES_AIRPORTS],
+          [CATEGORIES_BUS_STATIONS]: DEFAULT_SETTINGS.categories[CATEGORIES_BUS_STATIONS],
+          [CATEGORIES_TOURIST_INFORMATION_CENTERS]: DEFAULT_SETTINGS.categories[CATEGORIES_TOURIST_INFORMATION_CENTERS],
+          [CATEGORIES_TRAIN_STATIONS]: DEFAULT_SETTINGS.categories[CATEGORIES_TRAIN_STATIONS],
+        },
+        themeColor: DEFAULT_SETTINGS.themeColor,
+      }, () => {
+        this.props.changeSettings(DEFAULT_SETTINGS)
+      })
+
 
   }
 
 
   render () {
 
-    const { dectionLimit, nearbyRadius, category, nearbyLimit, categories } = this.state;
+    const { detectionLimit, nearbyRadius, category, nearbyLimit, categories } = this.state;
     const { settings, themeColor } = this.props;
     const { containerHeight, containerWidth, opacity, opacity2, zIndex, borderRadius, borderTopLeftRadius, paddingHorizontal, backdropZ, backdropOpacity } = this.state.animation
     // console.log('settings', settings);
@@ -274,7 +278,7 @@ class Settings extends React.Component {
         <Animated.View style={{position: 'absolute', height: '100%', width: '100%', zIndex: backdropZ}}>
           <Animated.View style={[styles.backdrop, {opacity: backdropOpacity}]}></Animated.View>
 
-        <Animated.View style={[styles.container, {height: containerHeight, width: containerWidth, zIndex , borderRadius: borderTopLeftRadius}]}>
+        <Animated.View style={[styles.container, {height: containerHeight, width: containerWidth, zIndex, borderRadius: borderTopLeftRadius}]}>
 
           <Animated.View style={[styles.heading, { borderRadius, borderTopLeftRadius, borderBottomColor: themeColor, backgroundColor: themeColor, paddingHorizontal}]}>
             <Animated.Text style={[styles.headingText, {opacity}]}> Settings</Animated.Text>
@@ -293,18 +297,18 @@ class Settings extends React.Component {
             <View style={[styles.itemLast, { borderBottomWidth: 0.5, borderBottomColor: themeColor }]}>
               <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
                 <Text style={{fontSize: FONT_SIZE_MEDIUM}}>Maximum Detected Landmarks: </Text>
-                { (dectionLimit === null || dectionLimit === 0 || dectionLimit === undefined)
-                    ? <Text style={{fontSize: FONT_SIZE_LARGE, color: themeColor}}>{settings.dectionLimit}</Text>
-                    : <Text style={{fontSize: FONT_SIZE_LARGE, color: themeColor}}>{dectionLimit}</Text>
+                { (detectionLimit === null || detectionLimit === 0 || detectionLimit === undefined)
+                    ? <Text style={{fontSize: FONT_SIZE_LARGE, color: themeColor}}>{settings.detectionLimit}</Text>
+                    : <Text style={{fontSize: FONT_SIZE_LARGE, color: themeColor}}>{detectionLimit}</Text>
                 }
               </View>
               <Slider
                 step={1}
-                value={dectionLimit === null ? settings.dectionLimit : dectionLimit }
+                value={detectionLimit === null ? settings.detectionLimit : detectionLimit }
                 minimumValue={1}
-                maximumValue={5}
+                maximumValue={3}
                 minimumTrackTintColor={themeColor}
-                onValueChange={(dectionLimit) => this.setState({dectionLimit})}
+                onValueChange={(detectionLimit) => this.setState({detectionLimit})}
               />
               <Animated.Text style={{fontSize: FONT_SIZE_SMALLER,  opacity: opacity2 }}>
                 Maximum number of landmark that can be detected in Detection Mode.
@@ -352,7 +356,7 @@ class Settings extends React.Component {
                 step={1}
                 value={nearbyLimit === null ? settings.nearbyLimit : nearbyLimit}
                 minimumValue={1}
-                maximumValue={10}
+                maximumValue={20}
                 minimumTrackTintColor={themeColor}
                 onValueChange={(nearbyLimit) => this.setState({nearbyLimit})}
               />
@@ -1167,10 +1171,10 @@ class Settings extends React.Component {
             </View>
 
             <TouchableOpacity
-              style={[styles.resetButton, {borderTopColor: red}]}
+              style={[styles.resetButton, {borderTopColor: themeColor}]}
               onPress={this.defaultSettings}
             >
-              <Text style={styles.resetButtonText}>
+              <Text style={[styles.resetButtonText, {color: themeColor}]}>
                 Reset to Default
               </Text>
             </TouchableOpacity>
@@ -1201,15 +1205,12 @@ const styles = StyleSheet.create({
   },
   container: {
     position: 'absolute',
-    top: 15,
+    top: (ScreenHeight * 0.05) + 10,
     right: 15,
     zIndex: 10,
-    // height: ScreenHeight * 60 / 100,
-    // width: ScreenWidth * 80 / 100,
     backgroundColor: '#eee',
-    // borderRadius: 10,
 
-    // borderTopLeftRadius: 10,
+
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
 
@@ -1263,7 +1264,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5,
   },
   resetButtonText: {
-    color: red,
     fontSize: FONT_SIZE_LARGE,
     textAlign: 'center'
   },
