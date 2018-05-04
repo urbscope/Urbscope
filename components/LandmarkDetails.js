@@ -13,13 +13,28 @@ import { View,
 import { cardBackground, cardButtonText } from '../utils/colors'
 import { fixLandmarkDetail } from '../utils/helpers'
 
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+
+import { connect } from 'react-redux'
+
 
 import { GOOGLE_API } from '../utils/keysAPI'
 
 import * as KnowledgeGraphAPI from '../utils/kgsAPI'
 
 
-const { width, height } = Dimensions.get('window');
+// const { width, height } = Dimensions.get('window');
+var ScreenWidth = Dimensions.get('window').width
+var ScreenHeight = Dimensions.get('window').height
+
+const FONT_SIZE_SMALLER = ScreenHeight * 0.015
+const FONT_SIZE_SMALL   = ScreenHeight * 0.017
+const FONT_SIZE_MEDIUM  = ScreenHeight * 0.02
+const FONT_SIZE_LARGE   = ScreenHeight * 0.028
+const FONT_SIZE_LARGER  = ScreenHeight * 0.035
+const FONT_SIZE_LARGEST = ScreenHeight * 0.034
+
+
 
 class LandmarkDetails extends Component {
   state = {
@@ -55,7 +70,7 @@ class LandmarkDetails extends Component {
 
   render(){
 
-    const { location, multiple } = this.props
+    const { location, multiple, themeColor } = this.props
     const { loading } = this.state
     const { name, image, detailedDescription, url } = this.state.details
 
@@ -69,39 +84,49 @@ class LandmarkDetails extends Component {
             source={image
                     ? {uri: image.contentUrl}
                     : {uri: ''}}
-            style={height > 700
-                    ? styles.landmarkImage
-                    : styles.landmarkImageltX }
+            style={styles.landmarkImage}
           />
 
-          <View style={height > 700
-                  ? styles.header
-                  : styles.headerltX }>
-            <Text style={name.length > 23
-                          ? { fontSize: 20 }
-                          : styles.landmarkName }>{name}</Text>
+          <View style={styles.header}>
+            <Text style={name.length > 22
+                          ? { fontSize: FONT_SIZE_LARGE, color: themeColor }
+                          : { fontSize: FONT_SIZE_LARGER, color: themeColor } }>{name}</Text>
           </View>
 
 
           <ScrollView
             contentContainerStyle={{
               flexGrow: 1,
-              padding: 17,
+              padding: ScreenHeight * 0.01,
               justifyContent: 'center',
               alignItems: 'center',
             }}
           >
-            <Text style={height > 700
-                ? {fontSize: 15, textAlign: 'center'}
-                : {fontSize: 14, textAlign: 'center'}}>
+            <Text style={{fontSize: FONT_SIZE_SMALL}} >
                 {detailedDescription.articleBody}
             </Text>
           </ScrollView>
 
+          <View style={styles.linksContainer}>
+            <TouchableOpacity style={styles.linkButton}
+              onPress={ () => Linking.openURL(detailedDescription.url) }
+            >
+              <FontAwesome name='wikipedia-w' size={ScreenHeight * 0.026} color={themeColor}/>
+            </TouchableOpacity>
 
-          {detailedDescription.url &&
+            {url &&
+              <TouchableOpacity
+                  style={styles.linkButton}
+                  onPress={ () => Linking.openURL(url) }
+              >
+                <MaterialIcons name='open-in-browser' size={ScreenHeight * 0.035} color={themeColor}/>
+              </TouchableOpacity>
+            }
+          </View>
+
+          {/*detailedDescription.url &&
             <TouchableOpacity
-                style={height > 700
+                style={ScreenHeight > 700
                         ? styles.wikipediaLink
                         : styles.wikipediaLinkltX}
                 onPress={ () => {
@@ -109,23 +134,23 @@ class LandmarkDetails extends Component {
                 }}
 
             >
-              <Text style={styles.wikipediaLinkText}>Read more on Wikipedia</Text>
+              <Text style={[styles.wikipediaLinkText, {color: themeColor}]}>Read more on Wikipedia</Text>
             </TouchableOpacity>
           }
 
 
           {url &&
              <TouchableOpacity
-                style={height > 700
+                style={ScreenHeight > 700
                         ? styles.footer
                         : styles.footerltX}
                 onPress={ () => {
                   Linking.openURL(url)
                 }}
               >
-                <Text style={styles.website}>Go to website</Text>
+                <Text style={[styles.website, {color: themeColor}]}>Go to website</Text>
               </TouchableOpacity>
-          }
+          */}
 
 
         </View>
@@ -148,23 +173,23 @@ class LandmarkDetails extends Component {
   }
 }
 
-export default LandmarkDetails
+
 
 const styles = StyleSheet.create({
 
   childView: {
     marginTop: 40,
     backgroundColor: '#eee',
-    width: width - 100,
+    width: ScreenWidth - 100,
     // margin: 10,
     marginRight: 20,
     borderColor: '#ddd',
-    shadowColor: '#444',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 5,
     },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.2,
     shadowRadius: 5,
     // padding: 15,
     justifyContent: 'space-around',
@@ -173,16 +198,16 @@ const styles = StyleSheet.create({
   childViewSingle: {
     marginTop: 40,
     backgroundColor: '#eee',
-    width: width - 80,
+    width: ScreenWidth - 80,
     // margin: 10,
     // marginRight: 1,
     borderColor: '#ddd',
-    shadowColor: '#444',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 5,
     },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.2,
     shadowRadius: 5,
     // padding: 15,
     justifyContent: 'space-around',
@@ -192,7 +217,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     // flex: 0.3,
-    height: 54,
+    height: ScreenHeight*0.06,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -209,7 +234,7 @@ const styles = StyleSheet.create({
   },
   landmarkImage: {
     // flex: 1,
-    height: 190
+    height: ScreenHeight * 0.25
   },
   landmarkImageltX: {
     // flex: 1,
@@ -243,7 +268,6 @@ const styles = StyleSheet.create({
   },
   wikipediaLinkText: {
     fontSize: 16,
-    color: cardButtonText
   },
   footer: {
     // flex: 0.2,
@@ -263,8 +287,41 @@ const styles = StyleSheet.create({
   },
   website: {
     fontSize: 16,
-    color: cardButtonText
+
+  },
+  linksContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+
+    // height: 40,
+    paddingTop: 5,
+    paddingBottom: 10,
+    paddingHorizontal: 40,
+  },
+  linkButton: {
+    height: ScreenHeight * 0.05,
+
+    width: ScreenHeight * 0.05,
+    borderRadius: ScreenHeight * 0.05 / 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    backgroundColor: '#eee',
+    justifyContent: 'center',
+    alignItems: 'center',
   }
 
-
 })
+
+mapStateToProps = (state) => {
+  return {
+    themeColor: state.themeColor
+  }
+}
+
+export default connect(mapStateToProps)(LandmarkDetails)

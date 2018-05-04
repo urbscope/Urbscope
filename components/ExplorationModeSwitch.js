@@ -3,33 +3,39 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { NavigationActions } from 'react-navigation'
 import { buttonActive, buttonActiveOutline, activeTint, inactiveTint } from '../utils/colors'
 
+import { connect } from 'react-redux';
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+
 class ExplorationModeSwitch extends Component {
 
   goToRecommendations = () => {
 
-    this.props.dispatch(NavigationActions.reset({
-      index: 0,
-      actions: [ NavigationActions.navigate({ routeName: 'Recommendations'}) ]
-    }))
+    this.props.changeScreen('Recommendations')
+    // this.props.dispatch(NavigationActions.reset({
+    //   index: 0,
+    //   actions: [ NavigationActions.navigate({ routeName: 'Recommendations'}) ]
+    // }))
 
-    console.log("go to Recommendations");
+    // console.log("go to Recommendations");
   }
 
   goToNearbyLocations = () => {
 
-    this.props.dispatch(NavigationActions.reset({
-      index: 0,
-      actions: [ NavigationActions.navigate({ routeName: 'NearbyLocations'}) ]
-    }))
+    this.props.changeScreen('NearbyLocations')
 
-    console.log("go to NearbyLocations");
+    // this.props.dispatch(NavigationActions.reset({
+    //   index: 0,
+    //   actions: [ NavigationActions.navigate({ routeName: 'NearbyLocations'}) ]
+    // }))
+
+    // console.log("go to NearbyLocations");
   }
 
   doNothing = () => {}
 
   render(){
 
-    const { currentScreen } = this.props
+    const { currentScreen, themeColor } = this.props
 
     let isSelectedNearbyLocations
     let isSelectedRecommendations
@@ -46,23 +52,44 @@ class ExplorationModeSwitch extends Component {
       isSelectedRecommendationsText = styles.selectedText
     }
 
+    console.log(currentScreen);
+    // style={[styles.squareButton1, isSelectedNearbyLocations]}
     return (
       <View style={styles.container}>
         <TouchableOpacity
-          style={[styles.squareButton1, isSelectedNearbyLocations]}
+          style={{width: '50%', justifyContent: 'center', alignItems: 'center'}}
           onPress={currentScreen === 'NearbyLocations' ? this.doNothing : this.goToNearbyLocations }
         >
-          <View>
-            <Text style={isSelectedNearbyLocationsText}>Nearby Locations</Text>
-          </View>
+          <FontAwesome
+            name={currentScreen === 'NearbyLocations' ? 'circle' : 'circle-thin'}
+            size={10}
+            color={currentScreen === 'NearbyLocations' ? themeColor : '#888'}
+          />
+
+          <Text style={currentScreen === 'NearbyLocations'
+            ? {color: themeColor, fontSize: 11, fontWeight: '200', padding: 5}
+            : {color: '#888', fontSize: 11, fontWeight: '200', padding: 5}
+          }>
+            Map
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.squareButton2, isSelectedRecommendations]}
+          style={{width: '50%', justifyContent: 'center', alignItems: 'center'}}
           onPress={currentScreen === 'NearbyLocations' ? this.goToRecommendations : this.doNothing }
         >
+          <FontAwesome
+            name={currentScreen === 'NearbyLocations' ? 'circle-thin' : 'circle'}
+            size={10}
+            color={currentScreen === 'NearbyLocations' ? '#888' : themeColor}
+          />
           <View >
-            <Text style={isSelectedRecommendationsText}>Recommendations</Text>
+            <Text style={currentScreen === 'NearbyLocations'
+              ? {color: '#777', fontSize: 11, fontWeight: '200', padding: 5}
+              : {color: themeColor, fontSize: 11, fontWeight: '200', padding: 5}
+            }>
+              Recommendations
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -70,17 +97,19 @@ class ExplorationModeSwitch extends Component {
   }
 }
 
-export default ExplorationModeSwitch
+
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     position: 'absolute',
     width: '80%',
-    top: '5%',
+    bottom: 0,
     left: '10%',
     right: 0,
+    zIndex: 1,
   },
+
   squareButton1: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -112,3 +141,13 @@ const styles = StyleSheet.create({
     color: inactiveTint,
   }
 })
+
+
+mapStateToProps = (state) => {
+  return {
+    settings: state.settings,
+    themeColor: state.themeColor,
+  }
+}
+
+export default connect(mapStateToProps)(ExplorationModeSwitch)
