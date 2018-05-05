@@ -31,27 +31,9 @@ const Tabs = TabNavigator({
     Recommendations: { screen: Recommendations },
   },
   {
-    // navigationOptions: ({ navigation }) => ({
-    //
-    //   tabBarIcon: ({ focused, tintColor }) => {
-    //     // console.log(TabBarBottom);
-    //     const { routeName } = navigation.state;
-    //     let iconName;
-    //     if (routeName === 'NearbyLocations') {
-    //       iconName = `circle${focused ? '' : '-thin'}`;
-    //     } else if (routeName === 'Recommendations') {
-    //       iconName = `circle${focused ? '' : '-thin'}`;
-    //     }
-    //     return <FontAwesome
-    //       name={iconName} size={7} color={tintColor}
-    //       style={{padding: 0}}
-    //
-    //       />
-    //   },
-    // }),
     tabBarOptions: {
       showLabel: true,
-      lazyLoad: true,
+      lazyLoad: false,
       upperCaseLabel: false,
       allowFontScaling: true,
     },
@@ -60,7 +42,6 @@ const Tabs = TabNavigator({
     tabBarComponent: TabBarExploration,
     tabBarPosition: 'bottom',
     animationEnabled: true,
-    // swipeEnabled: true,
   }
 )
 const MainNavigtor = StackNavigator({
@@ -94,19 +75,7 @@ class AppWithStore extends React.Component {
   }
 
   componentDidMount () {
-    // AsyncStorage.removeItem("settingsstorage");
     // AsyncStorage.clear()
-
-
-
-    // this.props.loadUserID((id) =>console.log(this.props.userID));
-    // this.props.loadUserID();
-
-    //   getUserID().then(id=>{
-    //   if (!id)
-    //     this.createUserID();
-    //     }
-    // );
 
     getUserID().then(id=>{
         // console.log("user id: ", id);

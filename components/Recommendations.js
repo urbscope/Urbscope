@@ -381,8 +381,9 @@ class Recommendations extends Component {
                             stagger={50}
                             maxScale={1.4}
                             starStyle={{
-                              width: ScreenHeight * 0.03,
-                              height: ScreenHeight * 0.03,
+                              width: ScreenHeight * 0.026,
+                              height: ScreenHeight * 0.026,
+                              marginRight: ScreenHeight * 0.003,
                               opacity: 0.7
                             }}
                             />

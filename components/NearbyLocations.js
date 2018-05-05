@@ -49,6 +49,7 @@ class NearbyLocations extends Component {
     this.state = {
       hasCameraPermission: null,
       location: null,
+      listLoading: true,
       markers: {},
       sponsoredLocation: null,
       selectedMarker: null,
@@ -102,6 +103,8 @@ class NearbyLocations extends Component {
 
   async fetchMarkers(settings ){
     // console.log(settings);
+    this.setState({listLoading: true});
+
 
     let location = await this._getLocationAsync();
     //console.log(location);
@@ -122,7 +125,7 @@ class NearbyLocations extends Component {
 
     console.log(url);
     fetchLandmarksFromServer(url).then(res=>{
-      this.setState({markers: res[0], sponsoredLocation: res[1]});
+      this.setState({markers: res[0], sponsoredLocation: res[1], listLoading: false});
     });
 
   }
@@ -378,29 +381,31 @@ async componentDidMount() {
               />
 
 
-                <NearbyLocationsList locations={Object.values(this.state.markers)}
-                                     sponsoredLocation = {this.state.sponsoredLocation}
-                                     handlePress={(key) => {
-                                          let loc;
-                                          if (this.state.markers[key]){
-                                            loc = this.state.markers[key].location;
-                                            setTimeout(() => {
-                                              Animated.spring(this.state.mapViewPosition, { toValue: {x: ScreenWidth-20, y: 0}, friction: 7, tension: 20}).start();
-                                            }, 1000)
-                                          } else if (this.state.sponsoredLocation['key'] === key){
-                                            loc = this.state.sponsoredLocation.location;
-                                            setTimeout(() => {
-                                              Animated.spring(this.state.mapViewPosition, { toValue: {x: ScreenWidth-20, y: 0}, friction: 7, tension: 20}).start();
-                                            }, 1000)
-                                          } else {
-                                            return;
-                                          }
-                                          this.setState({
-                                              destination: loc,
-                                              showArrow: true,
-                                              selectedMarker: key
-                                          }, this.getTargetBearingAndDistance);
-                                     }}
+                <NearbyLocationsList
+                  locations={Object.values(this.state.markers)}
+                  loading={this.state.listLoading}
+                  sponsoredLocation = {this.state.sponsoredLocation}
+                  handlePress={(key) => {
+                    let loc;
+                    if (this.state.markers[key]){
+                      loc = this.state.markers[key].location;
+                      setTimeout(() => {
+                        Animated.spring(this.state.mapViewPosition, { toValue: {x: ScreenWidth-20, y: 0}, friction: 7, tension: 20}).start();
+                      }, 1000)
+                    } else if (this.state.sponsoredLocation['key'] === key){
+                      loc = this.state.sponsoredLocation.location;
+                      setTimeout(() => {
+                        Animated.spring(this.state.mapViewPosition, { toValue: {x: ScreenWidth-20, y: 0}, friction: 7, tension: 20}).start();
+                      }, 1000)
+                    } else {
+                      return;
+                    }
+                    this.setState({
+                        destination: loc,
+                        showArrow: true,
+                        selectedMarker: key
+                    }, this.getTargetBearingAndDistance);
+                   }}
                 />
 
 
