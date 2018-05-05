@@ -28,7 +28,7 @@ import { pinRed, pinBlue, pinGold } from '../utils/colors'
 import {getUserID, updateVisitedLocations} from "../utils/localStorageAPI";
 import NearbyLocationsList from "./NearbyLocationsList";
 import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
-import PopupDialog, { DialogTitle } from 'react-native-popup-dialog';
+import PopupDialog, {DialogTitle, ScaleAnimation} from 'react-native-popup-dialog';
 
 
 var foursquare = require('react-foursquare')({
@@ -41,7 +41,9 @@ let GOOGLE_MAPS_APIKEY = "AIzaSyCOFvXSiK0tMiDIXbWpUaj5s89lMh55Ov4";
 // Get Screen Dimensions
 const ScreenHeight = Dimensions.get('window').height
 const ScreenWidth  = Dimensions.get('window').width
+const FONT_SIZE_LARGEST = ScreenHeight * 0.034
 
+const scaleAnimation = new ScaleAnimation();
 
 class NearbyLocations extends Component {
 
@@ -256,17 +258,20 @@ async componentDidMount() {
 
       this.targetBearing = geolib.getRhumbLineBearing(formatLocation(this.state.location), pointCoords);
 
-      console.log("distance to destination is ", distanceToDestination);
+      console.log("distance to destination is ", distanceToDestination.value);
       if (distanceToDestination.value <= 100){
+        console.log("reached");
         this.addVisitedLocation();
-        this.popupDialog.show(()=>this.setState({
-                                        showArrow: false,
-                                        destination: null,
-                                        selectedMarker: null,
-                                        distanceToDestinationMeters: null,
-                                        distanceToDestinationText: null,
-                                        arrowRotation:null }
-                                      ));
+          this.setState({
+              showArrow: false,
+              destination: null,
+              selectedMarker: null,
+              distanceToDestinationMeters: null,
+              distanceToDestinationText: null,
+              arrowRotation:null }
+          )
+        this.popupDialog.show();
+
       }
 
 
@@ -381,10 +386,21 @@ async componentDidMount() {
             />
           */}
 
-          <PopupDialog
-            dialogTitle={<DialogTitle title="Destination Reached!" />}
-            ref={(popupDialog) => { this.popupDialog = popupDialog; }}
-            />
+              <PopupDialog
+                overlayOpacity = {0.7}
+                width = {ScreenWidth*0.75}
+                height= {ScreenHeight*0.12}
+                dialogStyle= {{borderRadius: 10, zIndex:20 }}
+                ref={(popupDialog) => { this.popupDialog = popupDialog; }}
+                dialogAnimation={scaleAnimation}
+
+              >
+                    <View style = {[styles.popupView, {backgroundColor: themeColor}]} >
+                        <Text style = {styles.popupText}>
+                            Destination reached!
+                        </Text>
+                    </View>
+              </PopupDialog>
 
             <ChangeModeSwitch
                 replaceScreen={navigation.replace}
@@ -655,6 +671,17 @@ async componentDidMount() {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
+    },
+     popupView: {
+         borderRadius: 10,
+         flex: 1,
+         justifyContent: 'center',
+         alignItems: 'center',
+     },
+     popupText: {
+         color: '#fff',
+         fontSize: FONT_SIZE_LARGEST,
+         fontWeight: '200',
     }
   })
 

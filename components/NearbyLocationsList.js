@@ -72,7 +72,7 @@ import { StyleSheet,
 
 
     render() {
-      console.log(this.props.loading)
+      // console.log(this.props.loading)
 
       const { listViewPosition } = this.state
 
