@@ -28,6 +28,8 @@ import { pinRed, pinBlue, pinGold } from '../utils/colors'
 import {getUserID, updateVisitedLocations} from "../utils/localStorageAPI";
 import NearbyLocationsList from "./NearbyLocationsList";
 import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
+import PopupDialog, { DialogTitle } from 'react-native-popup-dialog';
+
 
 var foursquare = require('react-foursquare')({
   clientID: 'EECH5IF2TSK01WV2DQUKIRNT5CUVRTH0AVVDFM521E32ZVPH',
@@ -254,8 +256,19 @@ async componentDidMount() {
 
       this.targetBearing = geolib.getRhumbLineBearing(formatLocation(this.state.location), pointCoords);
 
-      if (distanceToDestination.value <= 100)
+      console.log("distance to destination is ", distanceToDestination);
+      if (distanceToDestination.value <= 100){
         this.addVisitedLocation();
+        this.popupDialog.show(()=>this.setState({
+                                        showArrow: false,
+                                        destination: null,
+                                        selectedMarker: null,
+                                        distanceToDestinationMeters: null,
+                                        distanceToDestinationText: null,
+                                        arrowRotation:null }
+                                      ));
+      }
+
 
     } catch (error) {
       console.error(error);
@@ -264,6 +277,7 @@ async componentDidMount() {
 
 
   addVisitedLocation = ()=>{
+      console.log("adding to visited");
       let id = this.state.selectedMarker ;
       if (id){
           let obj = Object.assign({}, this.state.markers[id], {rating: null, description: null});
@@ -366,6 +380,11 @@ async componentDidMount() {
             }
             />
           */}
+
+          <PopupDialog
+            dialogTitle={<DialogTitle title="Destination Reached!" />}
+            ref={(popupDialog) => { this.popupDialog = popupDialog; }}
+            />
 
             <ChangeModeSwitch
                 replaceScreen={navigation.replace}
