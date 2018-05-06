@@ -692,4 +692,3 @@ import { Dimensions,
 
 
           export default connect(mapStateToProps, mapDispatchToProps)(NearbyLocations)
-          // export default connect(mapStateToProps)(NearbyLocations)

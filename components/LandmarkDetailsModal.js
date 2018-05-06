@@ -112,10 +112,10 @@ class LandmarkDetailsModal extends Component {
     if (this.props.visible !== nextProps.visible) {
       if (nextProps.visible === true){
         this.modalAppear()
-        console.log("modal appesr");
+        //console.log("modal appesr");
       } else {
         this.modalDisappear()
-        console.log("disappear");
+        //console.log("disappear");
       }
     }
   }
