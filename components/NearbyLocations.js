@@ -28,7 +28,7 @@ import { Dimensions,
   import {getUserID, updateVisitedLocations} from "../utils/localStorageAPI";
   import NearbyLocationsList from "./NearbyLocationsList";
   import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
-  import PopupDialog, { DialogTitle } from 'react-native-popup-dialog';
+  import PopupDialog, {DialogTitle, ScaleAnimation} from 'react-native-popup-dialog';
 
 
   var foursquare = require('react-foursquare')({
@@ -48,6 +48,8 @@ import { Dimensions,
   const FONT_SIZE_LARGE   = ScreenHeight * 0.028
   const FONT_SIZE_LARGER  = ScreenHeight * 0.035
   const FONT_SIZE_LARGEST = ScreenHeight * 0.034
+
+  const scaleAnimation = new ScaleAnimation();
 
   class NearbyLocations extends Component {
 
@@ -263,7 +265,7 @@ import { Dimensions,
         this.targetBearing = geolib.getRhumbLineBearing(formatLocation(this.state.location), pointCoords);
 
         console.log("distance to destination is ", distanceToDestination);
-        if (distanceToDestination.value <= 100){
+        if (distanceToDestination.value <= 30){
           this.addVisitedLocation();
           this.popupDialog.show(()=>this.setState({
             showArrow: false,
@@ -273,6 +275,7 @@ import { Dimensions,
             distanceToDestinationText: null,
             arrowRotation:null }
           ));
+          this.popupDialog.show();
         }
 
 
@@ -384,9 +387,20 @@ import { Dimensions,
 
 
                 <PopupDialog
-                  dialogTitle={<DialogTitle title="Destination Reached!" />}
+                  overlayOpacity = {0.7}
+                  width = {ScreenWidth*0.75}
+                  height= {ScreenHeight*0.12}
+                  dialogStyle= {{borderRadius: 10, zIndex:20 }}
                   ref={(popupDialog) => { this.popupDialog = popupDialog; }}
-                  />
+                  dialogAnimation={scaleAnimation}
+
+                  >
+                  <View style = {[styles.popupView, {backgroundColor: themeColor}]} >
+                    <Text style = {styles.popupText}>
+                      Destination reached!
+                    </Text>
+                  </View>
+                </PopupDialog>
 
                 <ChangeModeSwitch
                   replaceScreen={navigation.replace}
@@ -586,25 +600,25 @@ import { Dimensions,
             },
             mapWindow: Platform.OS === 'IOS'
             ? {
-                position: 'absolute',
-                borderTopRightRadius: 20,
-                borderBottomRightRadius: 20,
-                // borderWidth: 1,
-                left: - ScreenWidth + 20,
-                borderColor: '#eee',
-                // bottom: 25,
-                width: '100%',
-                height: 0.425 * ScreenHeight ,
-                zIndex: 14,
-                top: 0.5 * ScreenHeight ,
-                shadowColor: '#000',
-                shadowOffset: {
-                  width: 1,
-                  height: 1
-                },
-                shadowRadius: 3,
-                shadowOpacity: 0.2,
-              }
+              position: 'absolute',
+              borderTopRightRadius: 20,
+              borderBottomRightRadius: 20,
+              // borderWidth: 1,
+              left: - ScreenWidth + 20,
+              borderColor: '#eee',
+              // bottom: 25,
+              width: '100%',
+              height: 0.425 * ScreenHeight ,
+              zIndex: 14,
+              top: 0.5 * ScreenHeight ,
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 1,
+                height: 1
+              },
+              shadowRadius: 3,
+              shadowOpacity: 0.2,
+            }
             : {
               position: 'absolute',
               borderTopRightRadius: 20,
@@ -672,23 +686,34 @@ import { Dimensions,
               flex: 1,
               justifyContent: 'center',
               alignItems: 'center',
-            }
-          })
+            },
+            popupView: {
+              borderRadius: 10,
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            },
+            popupText: {
+              color: '#fff',
+              fontSize: FONT_SIZE_LARGEST,
+              fontWeight: '200',
+            },
+        })
 
 
-          mapStateToProps = (state) => {
-            return {
-              settings: state.settings,
-              themeColor: state.themeColor,
-            }
+        mapStateToProps = (state) => {
+          return {
+            settings: state.settings,
+            themeColor: state.themeColor,
           }
+        }
 
-          mapDispatchToProps = (dispatch, { navigation }) => {
-            return {
-              setHasVisitedTrue: () => dispatch(setHasVisitedTrue()),
-              setHasVisitedFalse: ()=>dispatch(setHasVisitedFalse())
-            }
+        mapDispatchToProps = (dispatch, { navigation }) => {
+          return {
+            setHasVisitedTrue: () => dispatch(setHasVisitedTrue()),
+            setHasVisitedFalse: ()=>dispatch(setHasVisitedFalse())
           }
+        }
 
 
-          export default connect(mapStateToProps, mapDispatchToProps)(NearbyLocations)
+        export default connect(mapStateToProps, mapDispatchToProps)(NearbyLocations)
