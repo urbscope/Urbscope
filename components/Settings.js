@@ -273,8 +273,6 @@ class Settings extends React.Component {
 
     if (this.state.shouldRender) {
       return (
-//
-
         <Animated.View style={{position: 'absolute', height: '100%', width: '100%', zIndex: backdropZ}}>
           <Animated.View style={[styles.backdrop, {opacity: backdropOpacity}]}></Animated.View>
 
@@ -320,7 +318,6 @@ class Settings extends React.Component {
               <Text style={{fontSize: FONT_SIZE_LARGER, color: themeColor}}>Exploration Settings</Text>
             </View>
 
-            {/*Nearby Location Radius */}
             <View style={styles.item}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Text style={{fontSize: FONT_SIZE_MEDIUM}}>Radius of Nearby Landmarks: </Text>
@@ -343,7 +340,6 @@ class Settings extends React.Component {
 
             </View>
 
-            {/*Nearby Location Limit */}
             <View style={styles.item}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Text style={{fontSize: FONT_SIZE_MEDIUM}}>Maximum Nearby Landmarks: </Text>
@@ -368,7 +364,7 @@ class Settings extends React.Component {
             </View>
 
 
-            {/* Category */}
+
             <View style={[styles.item, {borderColor: themeColor}]}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Text style={{fontSize: FONT_SIZE_MEDIUM}}>Select categories: </Text>
@@ -1188,7 +1184,8 @@ class Settings extends React.Component {
       )
     } else {
       return (
-        <View />
+        <View >
+        </View>
       )
     }
   }

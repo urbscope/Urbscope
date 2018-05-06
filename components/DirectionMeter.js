@@ -73,9 +73,7 @@ class DirectionMeter extends Component {
 
   _onGLContextCreate = async (gl) => {
 
-
     const scene = new THREE.Scene();
-    // scene.background = new THREE.Color( 0x222222 );
 
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -87,15 +85,12 @@ class DirectionMeter extends Component {
     const renderer = ExpoTHREE.createRenderer({ gl });
     renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-
     scene.add( new THREE.AmbientLight( 0xeeeeee ) );
-
 
 		var light = new THREE.PointLight( 0xeeeeee );
     light.position.z = 80;
 		light.position.y = 30;
 		scene.add( light );
-
 
     var length = 2, width = 1;
 
@@ -192,13 +187,14 @@ class DirectionMeter extends Component {
       )
     } else {
       return(
-        <Animated.View/>
+        <View>
+        </View>
       )
     }
   }
 }
 
-// export default DirectionMeter
+
 
 const styles = StyleSheet.create({
     container: {

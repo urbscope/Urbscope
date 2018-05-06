@@ -293,8 +293,7 @@ class DetectionMode extends Component {
             ref={(ref) => { this.camera = ref }}
             type={Camera.Constants.Type.back}
           >
-            {/*<TouchableWithoutFeedback onPress={this.closeModal}>
-            */}
+            
 
 
               <View style={{flex: 1, alignItems: 'center'}}
@@ -303,8 +302,7 @@ class DetectionMode extends Component {
                   { (this.state.shouldRenderModalButton)
                       ? (<Animated.View
 
-                          style={/*this.state.detected
-                              ?*/ [styles.modalButton, {
+                          style={[styles.modalButton, {
                           width: diameter,
                           height: diameter,
                           zIndex,
@@ -312,8 +310,7 @@ class DetectionMode extends Component {
                           top,
                           opacity,
                           backgroundColor: themeColor
-                      }]
-                          /*: {}*/}
+                      }]}
                           >
                           <TouchableOpacity
                           style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}

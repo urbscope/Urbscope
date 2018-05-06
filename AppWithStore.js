@@ -42,6 +42,7 @@ const Tabs = TabNavigator({
     tabBarComponent: TabBarExploration,
     tabBarPosition: 'bottom',
     animationEnabled: true,
+    swipeEnabled: false,
   }
 )
 const MainNavigtor = StackNavigator({
@@ -113,7 +114,7 @@ class AppWithStore extends React.Component {
   }
 
   render() {
-    // console.log(this.props.userID);
+
     if (this.state.loading) {
       return (
         <SplashLoading />

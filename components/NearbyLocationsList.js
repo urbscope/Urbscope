@@ -4,6 +4,7 @@ import { StyleSheet,
   Dimensions,
   View,
   Text,
+  Platform,
   Image,
   ActivityIndicator,
   Animated,
@@ -190,8 +191,8 @@ import { StyleSheet,
                                 })
                               }
                             </ScrollView>
-            )
-          }
+                          )
+                        }
                       </Animated.View>
                     )
                   }
@@ -235,7 +236,8 @@ import { StyleSheet,
                     justifyContent: 'space-around',
                     alignItems: 'flex-start'
                   },
-                  listWindow: {
+                  listWindow: Platform.OS === 'IOS'
+                  ? {
                     backgroundColor: '#eee',
                     position: 'absolute',
                     borderTopRightRadius: 20,
@@ -254,8 +256,21 @@ import { StyleSheet,
                     },
                     shadowRadius: 3,
                     shadowOpacity: 0.2,
-
-                  },
+                  }
+                  : {
+                    backgroundColor: '#eee',
+                    position: 'absolute',
+                    borderTopRightRadius: 20,
+                    borderBottomRightRadius: 20,
+                    width: '100%',
+                    height: 0.425 * ScreenHeight ,
+                    left: - ScreenWidth + 20,
+                    top: 0.05 * ScreenHeight,
+                    borderColor: '#eee',
+                    bottom: 25,
+                    zIndex: 5,
+                  }
+                  ,
                   listWindowDrag: {
                     position: 'absolute',
                     right: 0,
@@ -264,13 +279,13 @@ import { StyleSheet,
                     borderTopRightRadius: 20,
                     borderBottomRightRadius: 20,
                     zIndex: 1,
-                    shadowColor: '#000',
-                    shadowRadius: 3,
-                    shadowOpacity: 0.4,
-                    shadowOffset: {
-                      width: -1,
-                      height: 0,
-                    },
+                    // shadowColor: '#000',
+                    // shadowRadius: 3,
+                    // shadowOpacity: 0.4,
+                    // shadowOffset: {
+                    //   width: -1,
+                    //   height: 0,
+                    // },
                   },
                   listWindowDragLine: {
                     height: '40%',
@@ -286,13 +301,13 @@ import { StyleSheet,
                     justifyContent: 'center',
                     alignItems: 'center',
                     opacity: 0.8,
-                    shadowColor: '#000',
-                    shadowRadius: 3,
-                    shadowOpacity: 0.3,
-                    shadowOffset: {
-                      width: 0,
-                      height: 2,
-                    },
+                    // shadowColor: '#000',
+                    // shadowRadius: 3,
+                    // shadowOpacity: 0.3,
+                    // shadowOffset: {
+                    //   width: 0,
+                    //   height: 2,
+                    // },
                   },
                 });
 

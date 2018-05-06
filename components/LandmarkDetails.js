@@ -124,34 +124,6 @@ class LandmarkDetails extends Component {
             }
           </View>
 
-          {/*detailedDescription.url &&
-            <TouchableOpacity
-                style={ScreenHeight > 700
-                        ? styles.wikipediaLink
-                        : styles.wikipediaLinkltX}
-                onPress={ () => {
-                  Linking.openURL(detailedDescription.url)
-                }}
-
-            >
-              <Text style={[styles.wikipediaLinkText, {color: themeColor}]}>Read more on Wikipedia</Text>
-            </TouchableOpacity>
-          }
-
-
-          {url &&
-             <TouchableOpacity
-                style={ScreenHeight > 700
-                        ? styles.footer
-                        : styles.footerltX}
-                onPress={ () => {
-                  Linking.openURL(url)
-                }}
-              >
-                <Text style={[styles.website, {color: themeColor}]}>Go to website</Text>
-              </TouchableOpacity>
-          */}
-
 
         </View>
       )

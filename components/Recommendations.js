@@ -9,6 +9,7 @@ import { View,
   StatusBar,
   FlatList,
   Dimensions,
+  Platform,
   SafeAreaView,
   LayoutAnimation } from 'react-native'
 
@@ -17,8 +18,8 @@ import Rating from 'react-native-rating'
 import { NavigationActions } from 'react-navigation';
 
 
-import ChangeModeSwitch from './ChangeModeSwitch'
-import ExplorationModeSwitch from './ExplorationModeSwitch'
+// import ChangeModeSwitch from './ChangeModeSwitch'
+
 import Settings from './Settings'
 import Loading from './Loading'
 
@@ -135,6 +136,15 @@ class Recommendations extends Component {
       console.log('rating', rating);
       console.log('index', index);
 
+      var temp = this.state.visitedPlaces
+      delete temp[index];
+
+      setTimeout(() => {
+        LayoutAnimation.linear();
+        this.setState({
+          visitedPlaces: temp,
+        })
+      }, 1000)
     }
 
     // UNSAFE_componentWillReceiveProps(nextProps){
@@ -167,7 +177,6 @@ class Recommendations extends Component {
       let visitedPlaces = await getVisitedLocations()
       console.log('visited', visitedPlaces);
 
-
       this._getLocationAsync().then((location) => {
         let url = "https://urbserver.herokuapp.com/recommend/"
         + userID
@@ -179,7 +188,7 @@ class Recommendations extends Component {
             recommendedPlaces: res[0],
             sponsoredLocation: res[1],
             loading: false,
-            visitedPlaces, // COMMENTED THIS FOR THE MOMENT.
+            visitedPlaces,
             userID,
           });
         })
@@ -212,6 +221,7 @@ class Recommendations extends Component {
 
     render(){
       const { navigation, themeColor } = this.props;
+
 
       const { settingVisible, loading, visitedPlaces, recommendedPlaces } = this.state;
       const recommendedPlacesValues = recommendedPlaces?Object.values(recommendedPlaces):[];
@@ -254,20 +264,22 @@ class Recommendations extends Component {
 
       if (loading) {
         return(
-          <View style={ {flex: 1, backgroundColor: '#444'} }>
+          <View style={ {flex: 1, backgroundColor: {themeColor}} }>
             <Loading loading={this.state.loading} />
           </View>
         )
       } else {
 
         return (
-          <SafeAreaView style={[styles.container, {backgroundColor: themeColor}]}>
+
+            <SafeAreaView style={[styles.container, {backgroundColor: themeColor}]}>
+
 
             <StatusBar barStyle="light-content" translucent={true}/>
 
             <View style={{backgroundColor: '#eee', flex: 1}}>
 
-              {(!visitedPlaces || visitedPlaces.length === 0)
+              {(!visitedPlaces || Object.keys(visitedPlaces).length === 0)
                 ? <View></View>
                 : (
                   <View >
@@ -307,11 +319,11 @@ class Recommendations extends Component {
                               <View style={styles.visitedPlacesListItemRating}>
                                 <Rating
                                   onChange={rating => {
-                                    this.ratingEntered(rating, index)
+                                    this.ratingEntered(rating, item.key)
                                   }}
-                                  selectedStar={starFilled}
+                                  selectedStar={RatingImages.starFilledred}
                                   unselectedStar={starEmpty}
-                                  initial={item.rating}
+                                  initial={0}
                                   editable={true}
                                   config={{
                                     easing: Easing.inOut(Easing.ease),
@@ -320,9 +332,10 @@ class Recommendations extends Component {
                                   stagger={50}
                                   maxScale={1.4}
                                   starStyle={{
-                                    width: ScreenHeight * 0.03,
-                                    height: ScreenHeight * 0.03,
-                                    opacity: 0.7,
+                                    width: ScreenHeight * 0.026,
+                                    height: ScreenHeight * 0.026,
+                                    marginRight: ScreenHeight * 0.003,
+                                    opacity: 0.7
                                   }}
                                   />
                               </View>
@@ -367,12 +380,9 @@ class Recommendations extends Component {
 
                         <View style={styles.recommendedPlacesListItemRating}>
                           <Rating
-                            onChange={rating => {
-                              this.ratingEntered(rating, index)
-                            }}
                             selectedStar={starFilled}
                             unselectedStar={starEmpty}
-                            initial={0}
+                            initial={item.rating}
                             editable={false}
                             config={{
                               easing: Easing.inOut(Easing.ease),
@@ -418,6 +428,7 @@ class Recommendations extends Component {
 
             <View style={{paddingTop: 6.75, backgroundColor: themeColor}}>
             </View>
+
 
           </SafeAreaView>
         )

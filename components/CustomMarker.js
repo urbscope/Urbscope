@@ -11,7 +11,9 @@ export default class CustomMarker extends Component {
     }
 
     render(){
-        return <MapView.Marker {...this.props} onPress={this.onPress} />
+        return (
+            <MapView.Marker {...this.props} onPress={this.onPress} />
+        )
     }
 
 }
