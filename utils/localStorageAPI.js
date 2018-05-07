@@ -32,6 +32,10 @@ export function updateVisitedLocations(entry) {
   return AsyncStorage.mergeItem(VISITED_STORAGE_KEY, JSON.stringify(entry), (error)=>console.log(error));
 }
 
+export function setVisitedLocation(entry) {
+    return AsyncStorage.setItem(VISITED_STORAGE_KEY, JSON.stringify(entry), (error)=>console.log(error));
+}
+
 
 export function getUserID(){
     return AsyncStorage.getItem(UID_STORAGE_KEY).then( entry => {

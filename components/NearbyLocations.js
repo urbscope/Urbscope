@@ -264,7 +264,6 @@ import { Dimensions,
 
         this.targetBearing = geolib.getRhumbLineBearing(formatLocation(this.state.location), pointCoords);
 
-        console.log("distance to destination is ", distanceToDestination);
         if (distanceToDestination.value <= 30){
           this.addVisitedLocation();
           this.popupDialog.show(()=>this.setState({

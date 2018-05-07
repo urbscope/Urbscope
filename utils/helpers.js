@@ -1,5 +1,18 @@
 import { red, green, black, blue, orange } from './colors'
 
+export const sendRatingToServer = async (uid, landmark, rating)=> {
+    let inLL = landmark.location.latitude  + "," + landmark.location.longitude;
+    console.log(landmark)
+    let categoryID = landmark.categoryID;
+    let landmarkID = landmark.key;
+
+    fetch(`https://urbserver.herokuapp.com/rate/${uid}?inLL=${inLL}&categoryID=${categoryID}&landmarkID=${landmarkID}&rating=${rating}`)
+        .then(res=>{
+            if (res.status != 200)
+                console.log("Bad Response from sendRatingToServer ", res);
+        });
+
+}
 
 export const fixDetectedLandmarks = (res) => {
 
@@ -107,6 +120,7 @@ export const fetchLandmarksFromServer= (url)=>{
                     key: obj.destinationID.toString(),
                     address: obj.address,
                     description: obj.description,
+                    categoryID:obj.categoryID,
                 }
             }
             return [markers, sponsored];
