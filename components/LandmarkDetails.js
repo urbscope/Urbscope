@@ -89,8 +89,8 @@ class LandmarkDetails extends Component {
 
           <View style={styles.header}>
             <Text style={name.length > 22
-                          ? { fontSize: FONT_SIZE_LARGE, color: themeColor }
-                          : { fontSize: FONT_SIZE_LARGER, color: themeColor } }>{name}</Text>
+                          ? { fontSize: FONT_SIZE_LARGE, fontWeight: '200', color: themeColor }
+                          : { fontSize: FONT_SIZE_LARGER, fontWeight: '200', color: themeColor } }>{name}</Text>
           </View>
 
 
@@ -102,7 +102,7 @@ class LandmarkDetails extends Component {
               alignItems: 'center',
             }}
           >
-            <Text style={{fontSize: FONT_SIZE_SMALL}} >
+            <Text style={{fontSize: FONT_SIZE_SMALL, fontWeight: '200',}} >
                 {detailedDescription.articleBody}
             </Text>
           </ScrollView>
