@@ -24,11 +24,11 @@ import Settings from './Settings'
 import Loading from './Loading'
 
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
-import {getUserID, getVisitedLocations} from "../utils/localStorageAPI";
+import {getUserID, getVisitedLocations, setVisitedLocation} from "../utils/localStorageAPI";
 
 import {red, blue, green, yellow, black} from '../utils/colors';
 import { connect } from 'react-redux';
-import {fetchLandmarksFromServer, formatLocation} from "../utils/helpers";
+import {fetchLandmarksFromServer, formatLocation, sendRatingToServer} from "../utils/helpers";
 import {Location, Permissions} from "expo";
 import {setHasVisitedFalse } from "../actions";
 
@@ -133,11 +133,10 @@ class Recommendations extends Component {
     }
 
     ratingEntered = (rating, index) => {
-      console.log('rating', rating);
-      console.log('index', index);
-
-      var temp = this.state.visitedPlaces
+      var temp = this.state.visitedPlaces;
+      sendRatingToServer(this.state.userID, this.state.visitedPlaces[index], rating);
       delete temp[index];
+      setVisitedLocation(temp);
 
       setTimeout(() => {
         LayoutAnimation.linear();
@@ -160,7 +159,6 @@ class Recommendations extends Component {
 
 
     componentDidUpdate(nextProps, prevState) {
-      console.log("Recommendation:componentDidUpdate");
       if (nextProps.hasVisitedIsChanged) {
         this.loadVisitedLocations();
       }
@@ -170,12 +168,10 @@ class Recommendations extends Component {
 
     async componentDidMount () {
       LayoutAnimation.linear();
-      console.log("Recommendations:componentDidMount");
       let userID = await getUserID();
 
       // THIS WAITS FOR THE VISITED PLACES
-      let visitedPlaces = await getVisitedLocations()
-      console.log('visited', visitedPlaces);
+      let visitedPlaces = await getVisitedLocations();
 
       this._getLocationAsync().then((location) => {
         let url = "https://urbserver.herokuapp.com/recommend/"
